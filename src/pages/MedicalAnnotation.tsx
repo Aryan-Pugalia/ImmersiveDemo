@@ -213,29 +213,6 @@ export default function MedicalAnnotation() {
             <SampleGallery onSampleSelected={handleSampleSelected} />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="grid grid-cols-3 gap-6 mt-16"
-          >
-            {[
-              { icon: Brain, title: "AI Analysis", desc: "Gemini-powered region detection" },
-              { icon: Scan, title: "Interactive Overlay", desc: "Toggle, adjust, and explore" },
-              { icon: Activity, title: "Clinical Detail", desc: "Per-region confidence scores" },
-            ].map(({ icon: Icon, title, desc }) => (
-              <div
-                key={title}
-                className="bg-muted border border-border p-6 flex flex-col items-start text-left hover:bg-muted/80 transition-all duration-400"
-              >
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                  <Icon className="w-4 h-4 text-primary" />
-                </div>
-                <p className="text-sm font-bold font-headline text-foreground uppercase tracking-wide">{title}</p>
-                <p className="text-xs text-muted-foreground font-body mt-1 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </motion.div>
         </div>
       </div>
     );
