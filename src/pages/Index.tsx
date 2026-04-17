@@ -1,82 +1,133 @@
 import { useNavigate } from "react-router-dom";
 
+const CAPABILITIES = [
+  {
+    bullet: "magenta",
+    category: "Text & NLP",
+    title: "Text & NLP",
+    description: "High-throughput annotation pipelines for language models and conversational AI at enterprise scale.",
+    subs: ["Named Entity Recognition", "Intent Classification", "Summarisation QA", "Coreference Resolution"],
+  },
+  {
+    bullet: "violet",
+    category: "Computer Vision",
+    title: "Computer Vision",
+    description: "Pixel-perfect labelling for detection, segmentation, and visual understanding tasks.",
+    subs: ["Object Detection", "Instance Segmentation", "Keypoint Annotation", "Image Classification"],
+  },
+  {
+    bullet: "magenta",
+    category: "Video Annotation",
+    title: "Video Annotation",
+    description: "Frame-accurate temporal labelling for action recognition and scene understanding.",
+    subs: ["Object Tracking", "Action Recognition", "Scene Segmentation", "Event Detection"],
+  },
+  {
+    bullet: "violet",
+    category: "3D Sensor Fusion",
+    title: "3D Sensor Fusion",
+    description: "Multi-modal 3D annotation fusing LiDAR, radar, and camera for autonomous systems.",
+    subs: ["LiDAR Point Clouds", "Radar Fusion", "HD Map Labelling", "Obstacle Classification"],
+  },
+  {
+    bullet: "magenta",
+    category: "Audio & Speech",
+    title: "Audio & Speech",
+    description: "Spoken language annotation with speaker attribution and phoneme-level precision.",
+    subs: ["Speech Transcription", "Speaker Diarisation", "Sound Event Detection", "Emotion Labelling"],
+  },
+  {
+    bullet: "violet",
+    category: "RLHF & Red Teaming",
+    title: "RLHF & Red Teaming",
+    description: "Expert human feedback and adversarial probing to align and harden frontier models.",
+    subs: ["Preference Ranking", "Constitutional AI Review", "Adversarial Prompting", "Safety Evaluation"],
+  },
+];
+
+const CheckIcon = () => (
+  <svg className="capability-check" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const Index = () => {
   const navigate = useNavigate();
 
   return (
     <>
-      <main className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20 hero-gradient">
-        <div className="max-w-4xl w-full text-center flex flex-col items-center">
-          {/* Branding */}
-          <div className="space-y-4 mb-12">
-            <span className="block font-headline text-lg md:text-xl font-bold tracking-[0.15em] text-primary">
+      {/* Single viewport — no scroll on desktop; natural scroll on mobile */}
+      <div className="landing-root flex flex-col hero-gradient relative">
+
+        {/* ── Hero ── */}
+        <div className="flex-shrink-0 flex flex-col items-center justify-center px-6 pt-10 pb-5 text-center">
+          <div className="space-y-3 mb-7">
+            <span className="block font-headline text-base md:text-lg font-bold tracking-[0.15em] text-primary">
               TP.ai Data Services
             </span>
-            <div className="space-y-2">
-              <span className="block font-headline text-sm md:text-base font-bold tracking-[0.3em] text-muted-foreground/60 uppercase">
+            <div className="space-y-1">
+              <span className="block font-headline text-xs font-bold tracking-[0.3em] text-muted-foreground/60 uppercase">
                 INTRODUCING
               </span>
-              <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight text-foreground">
+              <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-foreground">
                 TP.ai FABStudio
               </h1>
             </div>
-            <p className="max-w-xl mx-auto text-muted-foreground text-lg md:text-xl font-light leading-relaxed mt-6 font-body">
+            <p className="max-w-lg mx-auto text-muted-foreground text-sm md:text-base font-light leading-relaxed font-body pt-1">
               The next generation of industrial-grade data pipelines.
             </p>
           </div>
-
-          {/* CTA */}
-          <div className="mb-20">
-            <button
-              onClick={() => navigate("/use-cases")}
-              className="group px-16 py-5 bg-primary text-primary-foreground font-bold uppercase tracking-[0.3em] text-xs rounded-sm transition-all duration-300 active:scale-95 hover:bg-primary/90"
-            >
-              LET'S GO
-            </button>
-          </div>
-
-          {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
-            <div className="bg-muted border border-border p-8 flex flex-col items-start text-left hover:bg-muted/80 transition-all duration-400 group">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
-                <span className="font-headline text-[10px] tracking-[0.2em] uppercase text-accent/80 font-bold">
-                  Infrastructure
-                </span>
-              </div>
-              <h3 className="font-headline text-2xl font-bold text-foreground mb-3 uppercase tracking-wide">
-                Multi-modal Fortress
-              </h3>
-              <p className="text-sm text-muted-foreground font-body leading-relaxed max-w-xs">
-                Secure annotation for Text, Image, Video, Audio, and 3D pipelines at enterprise scale.
-              </p>
-            </div>
-
-            <div className="bg-muted border border-border p-8 flex flex-col items-start text-left hover:bg-muted/80 transition-all duration-400">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-accent"></div>
-                <span className="font-headline text-[10px] tracking-[0.2em] uppercase text-accent/80 font-bold">
-                  Analytics
-                </span>
-              </div>
-              <h3 className="font-headline text-2xl font-bold text-foreground mb-3 uppercase tracking-wide">
-                Operational Intelligence
-              </h3>
-              <p className="text-sm text-muted-foreground font-body leading-relaxed max-w-xs">
-                Integrated Workflow, QC protocols, and real-time performance analytics.
-              </p>
-            </div>
-          </div>
+          <button
+            onClick={() => navigate("/use-cases")}
+            className="px-14 py-4 bg-primary text-primary-foreground font-bold uppercase tracking-[0.3em] text-xs rounded-sm transition-all duration-300 active:scale-95 hover:bg-primary/90"
+          >
+            LET'S GO
+          </button>
         </div>
 
-        {/* Bottom accent line */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-16 h-[1px] bg-primary/30"></div>
-      </main>
+        {/* Thin accent divider */}
+        <div className="w-16 h-px bg-primary/30 mx-auto flex-shrink-0 mb-1" />
+
+        {/* ── Capabilities — fills remaining height ── */}
+        <div className="flex-1 min-h-0 flex flex-col justify-center">
+          <section className="capabilities-section">
+            <div className="text-center mb-5 px-6">
+              <span className="capabilities-label">CAPABILITIES</span>
+              <h2 className="capabilities-heading">Everything You Need To Train Frontier Models</h2>
+            </div>
+
+            <div className="marquee-outer">
+              <div className="marquee-fade-left" aria-hidden="true" />
+              <div className="marquee-fade-right" aria-hidden="true" />
+              <div className="marquee-track" aria-label="Capabilities showcase">
+                {[...CAPABILITIES, ...CAPABILITIES].map((cap, i) => (
+                  <article key={i} className="capability-card">
+                    <div className="capability-card-header">
+                      <div className={`capability-bullet ${cap.bullet === "magenta" ? "bullet-magenta" : "bullet-violet"}`} />
+                      <span className="capability-category">{cap.category}</span>
+                    </div>
+                    <h3 className="capability-title">{cap.title}</h3>
+                    <p className="capability-desc">{cap.description}</p>
+                    <ul className="capability-subs">
+                      {cap.subs.map((sub) => (
+                        <li key={sub} className="capability-sub-item">
+                          <CheckIcon />
+                          {sub}
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
 
       {/* Background blur decorations */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[-1] opacity-20">
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent rounded-full blur-[180px]"></div>
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] bg-primary rounded-full blur-[180px]"></div>
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent rounded-full blur-[180px]" />
+        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] bg-primary rounded-full blur-[180px]" />
       </div>
     </>
   );

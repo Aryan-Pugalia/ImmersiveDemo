@@ -21,6 +21,16 @@ export const useCases: UseCase[] = [
     secondaryTag: "Autonomous",
   },
   {
+    id: "6",
+    slug: "medical-annotation",
+    title: "Medical Image Annotation",
+    description: "Annotate tumors, lesions, and regions of interest on medical scans — X-Ray, MRI, CT — with AI-assisted verification.",
+    icon: "radiology",
+    idTag: "MED-001",
+    categoryTag: "Medical Imaging",
+    secondaryTag: "AI-Assisted",
+  },
+  {
     id: "2",
     slug: "ner",
     title: "Named Entity Recognition",

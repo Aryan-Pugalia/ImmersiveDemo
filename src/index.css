@@ -122,3 +122,233 @@
 .card-icon-hover {
   transition: color 400ms;
 }
+
+/* ─── Capabilities Marquee Section ──────────────────────────────────────── */
+
+/* Full viewport container — no scroll on desktop */
+.landing-root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .landing-root {
+    height: auto;
+    overflow: visible;
+    min-height: 100vh;
+  }
+}
+
+/* Section sits inside the flex column — no background of its own */
+.capabilities-section {
+  position: relative;
+}
+
+.capabilities-label {
+  display: block;
+  font-family: 'TP Sans', 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: #FF2D87;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.capabilities-heading {
+  font-family: 'TP Sans', 'DM Sans', sans-serif;
+  font-size: clamp(1.25rem, 2.8vw, 1.875rem);
+  font-weight: 700;
+  color: hsl(30, 5%, 89%);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ── Scroller ── */
+
+.marquee-outer {
+  position: relative;
+  overflow: hidden;
+  padding: 0.75rem 0;
+}
+
+/* Edge fade masks — match the page background colour */
+.marquee-fade-left,
+.marquee-fade-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.marquee-fade-left {
+  left: 0;
+  background: linear-gradient(to right, hsl(0, 0%, 7.5%), transparent);
+}
+
+.marquee-fade-right {
+  right: 0;
+  background: linear-gradient(to left, hsl(0, 0%, 7.5%), transparent);
+}
+
+/* Animated track */
+.marquee-track {
+  display: flex;
+  gap: 1.1rem;
+  width: max-content;
+  padding: 0.25rem 0;
+  animation: marquee-scroll 55s linear infinite;
+}
+
+.marquee-outer:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+/* ── Individual cards ── */
+
+.capability-card {
+  flex-shrink: 0;
+  width: 272px;
+  background: rgba(28, 22, 37, 0.82);
+  border: 1px solid rgba(139, 127, 216, 0.14);
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+}
+
+.capability-card:hover {
+  border-color: rgba(255, 45, 135, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(255, 45, 135, 0.1),
+    0 0 22px rgba(255, 45, 135, 0.1);
+}
+
+.capability-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.capability-bullet {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bullet-magenta {
+  background: #FF2D87;
+  box-shadow: 0 0 7px rgba(255, 45, 135, 0.65);
+}
+
+.bullet-violet {
+  background: #8B7FD8;
+  box-shadow: 0 0 7px rgba(139, 127, 216, 0.65);
+}
+
+.capability-category {
+  font-family: 'TP Sans', 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(168, 159, 184, 0.65);
+}
+
+.capability-title {
+  font-family: 'TP Sans', 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: hsl(30, 5%, 89%);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.3;
+}
+
+.capability-desc {
+  font-family: 'TP Sans', 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  color: #A89FB8;
+  line-height: 1.55;
+  margin: 0 0 0.75rem 0;
+}
+
+.capability-subs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.capability-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'TP Sans', 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  color: #A89FB8;
+  line-height: 1.4;
+}
+
+.capability-check {
+  width: 10px;
+  height: 10px;
+  color: #FF2D87;
+  flex-shrink: 0;
+}
+
+/* ── Mobile: horizontal swipe, no animation ── */
+
+@media (max-width: 767px) {
+  /* Allow the page to scroll naturally on mobile */
+  .h-screen-mobile-off {
+    height: auto;
+    overflow: visible;
+  }
+
+  .marquee-outer {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .marquee-fade-left,
+  .marquee-fade-right {
+    display: none;
+  }
+
+  .marquee-track {
+    animation: none;
+    width: max-content;
+    padding: 0.25rem 1.25rem;
+  }
+
+  /* Hide the duplicate second set */
+  .marquee-track > article:nth-child(n + 7) {
+    display: none;
+  }
+
+  .capability-card {
+    width: 240px;
+  }
+}
