@@ -8,6 +8,11 @@ export function useSegmentation() {
   const [error, setError] = useState<string | null>(null);
 
   const analyze = async (file: File) => {
+    if (!supabase) {
+      setError("AI analysis is not configured in this environment.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -17,8 +22,7 @@ export function useSegmentation() {
       const base64 = await new Promise<string>((resolve, reject) => {
         reader.onload = () => {
           const dataUrl = reader.result as string;
-          const base64Part = dataUrl.split(",")[1];
-          resolve(base64Part);
+          resolve(dataUrl.split(",")[1]);
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);
