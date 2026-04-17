@@ -31,6 +31,16 @@ export const useCases: UseCase[] = [
     secondaryTag: "AI-Assisted",
   },
   {
+    id: "7",
+    slug: "invoice-labeler",
+    title: "Invoice Labeler",
+    description: "Label and extract structured fields from invoices and receipts — vendor, totals, line items — with bounding-box annotation and JSON export.",
+    icon: "receipt_long",
+    idTag: "DOC-101",
+    categoryTag: "Document AI",
+    secondaryTag: "IDP",
+  },
+  {
     id: "2",
     slug: "ner",
     title: "Named Entity Recognition",
