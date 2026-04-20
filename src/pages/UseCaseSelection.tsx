@@ -70,7 +70,7 @@ const UseCaseSelection = () => {
         <div className="flex flex-col items-center mb-16 md:mb-24">
           <div className="inline-block">
             <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground tracking-tight text-center">
-              Choose a capability
+              Select Your Pipeline
             </h1>
             <div className="gradient-underline mx-auto w-24"></div>
           </div>
