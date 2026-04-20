@@ -224,8 +224,8 @@
 
 .label-service {
   display: block;
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 800;
   letter-spacing: 0.16em;
   color: #aa00b6;
   margin-bottom: 0.3rem;
@@ -233,8 +233,8 @@
 
 .label-introducing {
   display: block;
-  font-size: 0.6rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: rgba(210,195,225,0.5);
