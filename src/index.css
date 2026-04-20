@@ -254,10 +254,10 @@
 .title-fab { color: #aa00b6; }
 
 .banner-subtitle {
-  font-size: clamp(0.72rem, 1.4vw, 0.88rem);
-  font-weight: 400;
-  color: rgba(215,205,230,0.5);
-  line-height: 1.6;
+  font-size: clamp(0.95rem, 1.7vw, 1.15rem);
+  font-weight: 500;
+  color: rgba(225,215,240,0.82);
+  line-height: 1.55;
 }
 
 /* ── Visual band ── */
@@ -314,7 +314,7 @@
   background: #aa00b6;
   color: #ffffff;
   font-family: inherit;
-  font-size: 0.73rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -362,7 +362,7 @@
 .capabilities-label {
   display: block;
   font-family: 'TP Sans', 'DM Sans', sans-serif;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.3em;
   color: #aa00b6;
@@ -372,7 +372,7 @@
 
 .capabilities-heading {
   font-family: 'TP Sans', 'DM Sans', sans-serif;
-  font-size: clamp(1rem, 2.4vw, 1.55rem);
+  font-size: clamp(1.25rem, 2.8vw, 1.85rem);
   font-weight: 700;
   color: hsl(30, 5%, 89%);
   letter-spacing: -0.02em;
@@ -478,28 +478,28 @@
 
 .capability-category {
   font-family: 'TP Sans', 'DM Sans', sans-serif;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(168, 159, 184, 0.65);
+  color: rgba(190, 180, 205, 0.85);
 }
 
 .capability-title {
   font-family: 'TP Sans', 'DM Sans', sans-serif;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: hsl(30, 5%, 89%);
+  color: hsl(30, 5%, 92%);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 0.5rem 0;
   line-height: 1.3;
 }
 
 .capability-desc {
   font-family: 'TP Sans', 'DM Sans', sans-serif;
-  font-size: 0.68rem;
-  color: #A89FB8;
+  font-size: 0.85rem;
+  color: #c4bcd2;
   line-height: 1.55;
   margin: 0 0 0.75rem 0;
 }
@@ -516,16 +516,16 @@
 .capability-sub-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-family: 'TP Sans', 'DM Sans', sans-serif;
-  font-size: 0.65rem;
-  color: #A89FB8;
-  line-height: 1.4;
+  font-size: 0.88rem;
+  color: #c4bcd2;
+  line-height: 1.45;
 }
 
 .capability-check {
-  width: 9px;
-  height: 9px;
+  width: 13px;
+  height: 13px;
   color: #aa00b6;
   flex-shrink: 0;
 }
