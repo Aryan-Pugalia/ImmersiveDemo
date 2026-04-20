@@ -1,13 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import { useInvoiceAnnotation } from "@/context/InvoiceAnnotationContext";
 import { LABELS, getLabelConfig } from "@/types/invoice-annotation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, AlertTriangle, CheckCircle } from "lucide-react";
+import { Download, AlertTriangle, CheckCircle, BarChart2 } from "lucide-react";
 
 export default function InvoiceReviewExport() {
   const { documents } = useInvoiceAnnotation();
+  const navigate = useNavigate();
 
   const requiredLabels = LABELS.filter((l) => l.required);
 
@@ -40,9 +42,14 @@ export default function InvoiceReviewExport() {
           <h1 className="text-2xl font-bold">Review & Export</h1>
           <p className="text-sm text-muted-foreground">Validate annotations and export structured data</p>
         </div>
-        <Button onClick={handleExport} className="gap-2">
-          <Download className="h-4 w-4" /> Export JSON
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate("/qa-report/invoice-labeler")} className="gap-2">
+            <BarChart2 className="h-4 w-4" /> QA Report
+          </Button>
+          <Button onClick={handleExport} className="gap-2">
+            <Download className="h-4 w-4" /> Export JSON
+          </Button>
+        </div>
       </div>
 
       {documents.map((doc) => {

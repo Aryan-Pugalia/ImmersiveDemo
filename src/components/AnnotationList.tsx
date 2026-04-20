@@ -210,6 +210,10 @@ export function AnnotationList({
                         <span className="text-xs text-foreground flex-1 truncate">
                           {ann.label || "Unlabeled"}
                         </span>
+                        <span className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                          ann.confidence >= 80 ? "bg-green-500" :
+                          ann.confidence >= 50 ? "bg-amber-500" : "bg-red-500"
+                        }`} />
                         <Badge variant="outline" className={`text-[9px] px-1 py-0 ${confidenceBadge(ann.confidence)}`}>
                           {ann.confidence}%
                         </Badge>

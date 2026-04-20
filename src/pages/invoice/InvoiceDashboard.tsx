@@ -3,7 +3,8 @@ import { useInvoiceAnnotation } from "@/context/InvoiceAnnotationContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, CheckCircle, Clock, AlertCircle, ArrowRight } from "lucide-react";
+import { StatusPill } from "@/components/StatusPill";
+import { FileText, CheckCircle, Clock, AlertCircle, ArrowRight, BarChart2 } from "lucide-react";
 
 const statusConfig = {
   not_started: { label: "Not Started", variant: "outline" as const, icon: AlertCircle },
@@ -52,14 +53,19 @@ export default function InvoiceDashboard() {
 
       {/* Total annotations */}
       <Card>
-        <CardContent className="p-5 flex items-center justify-between">
+        <CardContent className="p-5 flex items-center justify-between flex-wrap gap-3">
           <div>
             <p className="text-sm text-muted-foreground">Total Annotations Created</p>
             <p className="text-3xl font-bold">{totalAnnotations}</p>
           </div>
-          <Button variant="outline" onClick={() => navigate("review")}>
-            Review All <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate("/qa-report/invoice-labeler")} className="gap-1.5">
+              <BarChart2 className="h-4 w-4" /> QA Report
+            </Button>
+            <Button variant="outline" onClick={() => navigate("review")}>
+              Review All <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -86,6 +92,9 @@ export default function InvoiceDashboard() {
                       <p className="text-xs text-muted-foreground capitalize">
                         {doc.type} · {doc.annotations.length} annotation{doc.annotations.length !== 1 ? "s" : ""}
                       </p>
+                      <div className="mt-1.5">
+                        <StatusPill documentStatus={doc.status} />
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

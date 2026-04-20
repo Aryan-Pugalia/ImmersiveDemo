@@ -248,7 +248,15 @@ export default function InvoiceAnnotateWorkspace() {
                               onClick={(e) => e.stopPropagation()}
                             />
                           </TableCell>
-                          <TableCell className="text-xs capitalize">{ann.confidence}</TableCell>
+                          <TableCell>
+                            <span className="flex items-center gap-1.5">
+                              <span className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                                ann.confidence === "high"   ? "bg-green-500" :
+                                ann.confidence === "medium" ? "bg-amber-500"  : "bg-red-500"
+                              }`} />
+                              <span className="text-xs capitalize text-muted-foreground">{ann.confidence}</span>
+                            </span>
+                          </TableCell>
                           <TableCell className="text-[10px] text-muted-foreground">
                             {Math.round(ann.box.x)},{Math.round(ann.box.y)}
                           </TableCell>
