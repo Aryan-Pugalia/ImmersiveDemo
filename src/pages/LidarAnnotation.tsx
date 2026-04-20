@@ -2,7 +2,7 @@ import React, { useState, useRef, useMemo, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import { Slider } from "@/components/ui/slider";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Grid, Html, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, Html, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { Badge } from "@/components/ui/badge";
 import GuidedTutorial, { TUTORIAL_STEPS } from "@/components/GuidedTutorial";
@@ -30,6 +30,26 @@ import { RealisticScene } from "@/components/lidar/RealisticScene";
 import { LidarPointCloud, getScenePointCloud } from "@/components/lidar/LidarPointCloud";
 import { AI_BOXES } from "@/components/lidar/aiVerification";
 import { AIWorkflowPanel, WorkflowStage } from "@/components/lidar/AIWorkflowPanel";
+import { buildEgoVehicle } from "@/components/lidar/sceneBuilder";
+
+// Ego vehicle (at origin) — built once and shared across view modes
+function EgoVehicle({ wireframe = false }: { wireframe?: boolean }) {
+  const group = useMemo(() => buildEgoVehicle(), []);
+  // In LiDAR view, render the ego car with muted appearance so it still reads
+  // as a vehicle but doesn't compete with point cloud brightness.
+  useEffect(() => {
+    group.traverse((c) => {
+      const m = c as THREE.Mesh;
+      if (m.isMesh) {
+        const mat = m.material as THREE.MeshStandardMaterial;
+        if (wireframe) {
+          mat.emissiveIntensity = 0.15;
+        }
+      }
+    });
+  }, [group, wireframe]);
+  return <primitive object={group} />;
+}
 
 // --- Types ---
 interface BBox3D {
@@ -47,10 +67,10 @@ type ToolMode = "select" | "bbox" | "move";
 type ViewMode = "lidar" | "camera" | "overlay";
 
 const LABELS = [
-  { name: "Car", color: "#22d3ee", icon: Car },
-  { name: "Pedestrian", color: "#f472b6", icon: PersonStanding },
-  { name: "Cyclist", color: "#a78bfa", icon: Bike },
-  { name: "Vegetation", color: "#4ade80", icon: TreePine },
+  { name: "Car", color: "#5ac8fa", icon: Car },           // sky blue
+  { name: "Pedestrian", color: "#ff3aa5", icon: PersonStanding }, // hot pink
+  { name: "Cyclist", color: "#a78bfa", icon: Bike },      // violet
+  { name: "Vegetation", color: "#00e0b8", icon: TreePine },// teal
 ];
 
 const LABEL_COLOR: Record<string, string> = Object.fromEntries(
@@ -151,13 +171,13 @@ function GroundPlane({
 
 // Seeded initial human annotations — intentionally slightly imperfect vs AI
 const INITIAL_BBOXES: BBox3D[] = [
-  { id: "car-1", position: [6, 0.8, 3],     size: [4.4, 1.6, 1.95], rotation: 0,              label: "Car",        color: "#22d3ee", visible: true, source: "human" },
-  { id: "car-2", position: [-8.8, 0.95, -4], size: [4.6, 1.85, 2.0], rotation: 0.22,           label: "Car",        color: "#22d3ee", visible: true, source: "human" },
-  { id: "car-3", position: [14, 0.82, 11],  size: [4.5, 1.65, 1.95], rotation: Math.PI / 2,   label: "Car",        color: "#22d3ee", visible: true, source: "human" },
-  { id: "ped-1", position: [-2, 0.9, 8],    size: [0.6, 1.8, 0.5],   rotation: 0,              label: "Pedestrian", color: "#f472b6", visible: true, source: "human" },
+  { id: "car-1", position: [6, 0.8, 3],     size: [4.4, 1.6, 1.95], rotation: 0,              label: "Car",        color: "#5ac8fa", visible: true, source: "human" },
+  { id: "car-2", position: [-8.8, 0.95, -4], size: [4.6, 1.85, 2.0], rotation: 0.22,           label: "Car",        color: "#5ac8fa", visible: true, source: "human" },
+  { id: "car-3", position: [14, 0.82, 11],  size: [4.5, 1.65, 1.95], rotation: Math.PI / 2,   label: "Car",        color: "#5ac8fa", visible: true, source: "human" },
+  { id: "ped-1", position: [-2, 0.9, 8],    size: [0.6, 1.8, 0.5],   rotation: 0,              label: "Pedestrian", color: "#ff3aa5", visible: true, source: "human" },
   // ped-2 intentionally missing — will be flagged by AI Verify
-  { id: "tree-1", position: [-15, 2.1, 10], size: [3.0, 4.2, 3.0],   rotation: 0,              label: "Vegetation", color: "#4ade80", visible: true, source: "human" },
-  { id: "tree-2", position: [16, 2.1, -12], size: [2.6, 4.0, 2.6],   rotation: 0,              label: "Vegetation", color: "#4ade80", visible: true, source: "human" },
+  { id: "tree-1", position: [-15, 2.1, 10], size: [3.0, 4.2, 3.0],   rotation: 0,              label: "Vegetation", color: "#00e0b8", visible: true, source: "human" },
+  { id: "tree-2", position: [16, 2.1, -12], size: [2.6, 4.0, 2.6],   rotation: 0,              label: "Vegetation", color: "#00e0b8", visible: true, source: "human" },
 ];
 
 export default function LidarAnnotation() {
@@ -465,8 +485,8 @@ export default function LidarAnnotation() {
               viewMode === "camera"
                 ? "#aac6e0"
                 : viewMode === "overlay"
-                ? "#101118"
-                : "hsl(0, 0%, 7.5%)",
+                ? "#0a0a14"
+                : "#000000",
           }}
           gl={{ antialias: true }}
           shadows={viewMode !== "lidar"}
@@ -481,20 +501,9 @@ export default function LidarAnnotation() {
           {/* Lighting & scene per view */}
           {viewMode === "lidar" && (
             <>
-              <ambientLight intensity={0.3} />
-              <directionalLight position={[10, 20, 10]} intensity={0.5} />
-              <Grid
-                args={[80, 80]}
-                cellSize={2}
-                cellThickness={0.5}
-                cellColor="#1a1a22"
-                sectionSize={10}
-                sectionThickness={1}
-                sectionColor="#2a1a30"
-                fadeDistance={60}
-                fadeStrength={1}
-                position={[0, -0.02, 0]}
-              />
+              <ambientLight intensity={0.55} />
+              <directionalLight position={[8, 14, 6]} intensity={0.75} />
+              <EgoVehicle wireframe />
               {showPoints && <LidarPointCloud />}
             </>
           )}
@@ -550,13 +559,8 @@ export default function LidarAnnotation() {
 
           <GroundPlane onPlace={addBBox} active={tool === "bbox"} />
 
-          {/* Vehicle/sensor origin marker — hide in camera view */}
-          {viewMode !== "camera" && (
-            <mesh position={[0, 0.1, 0]}>
-              <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-              <meshBasicMaterial color="#f59e0b" transparent opacity={0.6} />
-            </mesh>
-          )}
+          {/* Ego vehicle in overlay too (camera view already has it via RealisticScene) */}
+          {viewMode === "overlay" && <EgoVehicle />}
         </Canvas>
       </div>
 

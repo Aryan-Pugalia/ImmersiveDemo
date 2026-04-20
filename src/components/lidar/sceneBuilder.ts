@@ -333,6 +333,37 @@ export function buildRoad(size: [number, number, number]): THREE.Group {
   return g;
 }
 
+/**
+ * Ego vehicle — the car carrying the LiDAR sensor. Rendered at world origin.
+ * NOT included in SCENE_OBJECTS so it is NOT sampled as points (points represent
+ * the environment returned by the sensor, not the sensor platform itself).
+ */
+export function buildEgoVehicle(): THREE.Group {
+  const g = buildCar("#2461c9", "sedan");
+
+  // LiDAR sensor housing (cylindrical puck + white dome, classic Velodyne look)
+  const sensor = new THREE.Group();
+  const puckMat = new THREE.MeshStandardMaterial({ color: "#222", roughness: 0.4, metalness: 0.6 });
+  const puck = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.22, 20), puckMat);
+  puck.position.y = 0.11;
+  sensor.add(puck);
+
+  const domeMat = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.35 });
+  const dome = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.14, 20), domeMat);
+  dome.position.y = 0.29;
+  sensor.add(dome);
+
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.09, 14, 10), domeMat);
+  tip.position.y = 0.4;
+  sensor.add(tip);
+
+  // Sit sensor on the cabin roof (~1.75m above ground for a sedan)
+  sensor.position.y = 1.65;
+  g.add(sensor);
+
+  return g;
+}
+
 export function buildSign(): THREE.Group {
   const g = new THREE.Group();
   const poleMat  = new THREE.MeshStandardMaterial({ color: "#888", metalness: 0.8, roughness: 0.35 });

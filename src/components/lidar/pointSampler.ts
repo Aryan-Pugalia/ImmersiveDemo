@@ -3,29 +3,32 @@ import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.j
 import { SCENE_OBJECTS, SceneObject, SceneObjectType, buildSceneObject } from "./sceneBuilder";
 
 // ─── Density per type (points per object) ──────────────────────────────────
+// Road is handled separately via a concentric-ring generator — not sampled.
 const DENSITY: Record<SceneObjectType, number> = {
-  road:       14000,
-  building:    5200,
+  road:           0,     // handled by generateGroundRings()
+  building:    5800,
   car:         3600,
-  tree:        1800,
-  pedestrian:   520,
-  sign:         240,
+  tree:        1600,
+  pedestrian:   500,
+  sign:         220,
+};
+
+// Sensor model — Velodyne-ish 32-beam puck at ~1.75 m above ground
+const SENSOR = {
+  height:       1.75,
+  minBeamDeg:   1.2,     // degrees below horizontal — near edge of laser skirt
+  maxBeamDeg:  26.0,     // steep, hits ground close to sensor
+  beams:         42,
+  maxRadius:     55,     // points further than this fade away (atmospheric / range limit)
 };
 
 export interface ScenePointCloud {
-  positions: Float32Array;   // xyz triplets
-  colors:    Float32Array;   // rgb triplets
-  labels:    Uint8Array;     // per-point object index (into SCENE_OBJECTS)
+  positions: Float32Array;
+  colors:    Float32Array;
+  labels:    Uint8Array;   // per-point object index (255 = ground/ring)
 }
 
-// Simple Gaussian noise (Box-Muller)
-function gauss(rand: () => number): number {
-  const u = 1 - rand();
-  const v = rand();
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-}
-
-// Seeded PRNG (deterministic so the cloud doesn't jitter between remounts)
+// ─── RNG + noise ───────────────────────────────────────────────────────────
 function mulberry32(seed: number) {
   let a = seed;
   return function () {
@@ -35,82 +38,153 @@ function mulberry32(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+function gauss(rand: () => number): number {
+  const u = 1 - rand();
+  const v = rand();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
 
-/**
- * LiDAR-style height-based color ramp.
- * Low (ground)  → warm orange
- * Mid (cars)    → yellow/green
- * High (trees / buildings top) → cyan / blue
- */
-function lidarColor(y: number, out: [number, number, number]) {
-  const t = Math.max(0, Math.min(1, y / 14));
-  // piecewise ramp
-  if (t < 0.25) {
-    // orange → yellow
-    const k = t / 0.25;
-    out[0] = 1.0;
-    out[1] = 0.35 + k * 0.55;
-    out[2] = 0.05;
-  } else if (t < 0.55) {
-    // yellow → green
-    const k = (t - 0.25) / 0.30;
-    out[0] = 1.0 - k * 0.75;
-    out[1] = 0.9 + k * 0.1;
-    out[2] = 0.05 + k * 0.25;
-  } else if (t < 0.80) {
-    // green → cyan
-    const k = (t - 0.55) / 0.25;
-    out[0] = 0.25 - k * 0.25;
-    out[1] = 1.0 - k * 0.1;
-    out[2] = 0.30 + k * 0.65;
-  } else {
-    // cyan → blue
-    const k = (t - 0.80) / 0.20;
-    out[0] = 0.0;
-    out[1] = 0.9 - k * 0.6;
-    out[2] = 0.95 + k * 0.05;
+// ─── LiDAR warm color ramp (orange → red by distance) ──────────────────────
+function warmColor(distance: number, out: [number, number, number]) {
+  const t = Math.min(1, distance / 45);
+  // Close: bright yellow-orange.  Mid: orange.  Far: deep red.
+  const r = 1.0;
+  const g = 0.70 - t * 0.55;    // 0.70 → 0.15
+  const b = 0.08 - t * 0.06;    // 0.08 → 0.02
+  out[0] = r; out[1] = Math.max(0.05, g); out[2] = Math.max(0.01, b);
+}
+
+// Ground-truth AABB footprints used for ring occlusion
+interface Footprint {
+  minX: number; maxX: number; minZ: number; maxZ: number;
+}
+function objectFootprints(): Footprint[] {
+  // Approximate ground footprints so ring points stop inside objects (casts shadow)
+  const pads: Partial<Record<SceneObjectType, [number, number]>> = {
+    car: [2.3, 1.1],
+    pedestrian: [0.35, 0.35],
+    tree: [1.6, 1.6],
+    building: [0, 0],   // taken from size
+    sign: [0.25, 0.25],
+  };
+
+  const fps: Footprint[] = [];
+  for (const obj of SCENE_OBJECTS) {
+    if (obj.type === "road") continue;
+    const [px, , pz] = obj.position;
+
+    let hx: number, hz: number;
+    if (obj.type === "building" && obj.size) {
+      hx = obj.size[0] / 2 + 0.2;
+      hz = obj.size[2] / 2 + 0.2;
+    } else {
+      const p = pads[obj.type] ?? [1, 1];
+      hx = p[0]; hz = p[1];
+    }
+    fps.push({ minX: px - hx, maxX: px + hx, minZ: pz - hz, maxZ: pz + hz });
+  }
+  // Ego vehicle footprint (at origin)
+  fps.push({ minX: -1.2, maxX: 1.2, minZ: -2.4, maxZ: 2.4 });
+  return fps;
+}
+
+function insideAnyFootprint(x: number, z: number, fps: Footprint[]): boolean {
+  for (const f of fps) {
+    if (x >= f.minX && x <= f.maxX && z >= f.minZ && z <= f.maxZ) return true;
+  }
+  return false;
+}
+
+// ─── Concentric ground rings (the classic LiDAR look) ──────────────────────
+function pushGroundRings(
+  positions: number[],
+  colors:    number[],
+  labels:    number[],
+  rand:      () => number,
+  footprints: Footprint[],
+) {
+  const rgb: [number, number, number] = [0, 0, 0];
+
+  for (let b = 0; b < SENSOR.beams; b++) {
+    // Each beam has a fixed angle below horizontal → hits ground at a fixed radius
+    const t = b / (SENSOR.beams - 1);
+    // Non-linear distribution so rings cluster near the sensor (like real beams)
+    const k = Math.pow(1 - t, 1.6);
+    const deg = SENSOR.minBeamDeg + (1 - k) * (SENSOR.maxBeamDeg - SENSOR.minBeamDeg);
+    const r = SENSOR.height / Math.tan((deg * Math.PI) / 180);
+    if (r > SENSOR.maxRadius) continue;
+
+    // Angular resolution: more points for big rings (longer circumference)
+    const circ = 2 * Math.PI * r;
+    const stepDeg = 0.35;                       // horizontal angular resolution
+    const n = Math.max(120, Math.floor((360 / stepDeg)));
+    const jitterR = 0.06 + r * 0.006;           // range noise grows with distance
+    const jitterY = 0.012;
+
+    for (let i = 0; i < n; i++) {
+      const theta = (i / n) * Math.PI * 2 + b * 0.018;
+      const rr = r + gauss(rand) * jitterR;
+      const x = Math.cos(theta) * rr;
+      const z = Math.sin(theta) * rr;
+
+      // Occlude inside object footprints (creates shadows behind objects)
+      if (insideAnyFootprint(x, z, footprints)) continue;
+
+      // Small inner dead-zone beneath the sensor
+      if (Math.hypot(x, z) < 1.6) continue;
+
+      const y = 0.02 + gauss(rand) * jitterY;
+      warmColor(Math.hypot(x, z), rgb);
+
+      // Slight per-point brightness variation
+      const bv = 0.85 + rand() * 0.3;
+      positions.push(x, y, z);
+      colors.push(
+        Math.min(1, rgb[0] * bv),
+        Math.min(1, rgb[1] * bv),
+        Math.min(1, rgb[2] * bv),
+      );
+      labels.push(255);
+    }
   }
 }
 
 /**
- * Build each scene object into a THREE.Group, then sample points from every
- * mesh on its surface using MeshSurfaceSampler. Points are transformed into
- * world space, jittered with mild Gaussian noise to mimic sensor imprecision,
- * and colored with a height-based LiDAR ramp.
+ * Build each scene object into a THREE.Group, sample points from every mesh,
+ * then overlay the concentric ground ring pattern. Final result: warm-orange
+ * LiDAR-style point cloud with visible scan rings and object shadows.
  */
 export function generateScenePointCloud(): ScenePointCloud {
   const rand = mulberry32(20260421);
+  const footprints = objectFootprints();
 
-  // Estimate total points first so we can allocate a single typed array
-  let total = 0;
-  for (const obj of SCENE_OBJECTS) total += DENSITY[obj.type] ?? 1000;
+  const positions: number[] = [];
+  const colors:    number[] = [];
+  const labels:    number[] = [];
 
-  const positions = new Float32Array(total * 3);
-  const colors    = new Float32Array(total * 3);
-  const labels    = new Uint8Array(total);
+  // 1) Concentric ground rings first (so objects render on top)
+  pushGroundRings(positions, colors, labels, rand, footprints);
 
-  let cursor = 0;
+  // 2) Sample each non-road scene object
   const tmpPos    = new THREE.Vector3();
   const tmpNormal = new THREE.Vector3();
   const worldPos  = new THREE.Vector3();
   const rgb: [number, number, number] = [0, 0, 0];
 
   SCENE_OBJECTS.forEach((obj: SceneObject, objIdx: number) => {
+    if (obj.type === "road") return;
+
     const group = buildSceneObject(obj);
     group.updateMatrixWorld(true);
 
-    // Collect all meshes in this group with their world matrix
     const meshes: THREE.Mesh[] = [];
     group.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) meshes.push(child as THREE.Mesh);
     });
-
     if (meshes.length === 0) return;
 
     const totalForObj = DENSITY[obj.type] ?? 1000;
-
-    // Distribute samples across meshes proportional to their surface area
-    const areas = meshes.map((m) => estimateMeshArea(m));
+    const areas = meshes.map(estimateMeshArea);
     const areaSum = areas.reduce((a, b) => a + b, 0) || 1;
 
     meshes.forEach((mesh, mi) => {
@@ -118,36 +192,35 @@ export function generateScenePointCloud(): ScenePointCloud {
       const sampler = new MeshSurfaceSampler(mesh).build();
 
       for (let i = 0; i < share; i++) {
-        if (cursor >= total) return;
-
         sampler.sample(tmpPos, tmpNormal);
         worldPos.copy(tmpPos).applyMatrix4(mesh.matrixWorld);
 
-        // LiDAR sensor jitter (small Gaussian noise, scaled with distance)
-        const dist = worldPos.length();
-        const sigma = 0.012 + dist * 0.0015;
+        const dist = Math.hypot(worldPos.x, worldPos.z);
+        if (dist > SENSOR.maxRadius) continue;
+
+        const sigma = 0.015 + dist * 0.0018;
         worldPos.x += gauss(rand) * sigma;
         worldPos.y += gauss(rand) * sigma * 0.7;
         worldPos.z += gauss(rand) * sigma;
 
-        const p3 = cursor * 3;
-        positions[p3]     = worldPos.x;
-        positions[p3 + 1] = worldPos.y;
-        positions[p3 + 2] = worldPos.z;
+        warmColor(dist + worldPos.y * 0.15, rgb);
+        // Pedestrians/trees get a touch of yellow boost for visibility
+        if (obj.type === "pedestrian" || obj.type === "sign") {
+          rgb[1] = Math.min(1, rgb[1] + 0.25);
+        }
+        const bv = 0.9 + rand() * 0.25;
 
-        lidarColor(worldPos.y, rgb);
-        // slight per-point brightness variation
-        const bv = 0.85 + rand() * 0.25;
-        colors[p3]     = Math.min(1, rgb[0] * bv);
-        colors[p3 + 1] = Math.min(1, rgb[1] * bv);
-        colors[p3 + 2] = Math.min(1, rgb[2] * bv);
-
-        labels[cursor] = objIdx;
-        cursor++;
+        positions.push(worldPos.x, worldPos.y, worldPos.z);
+        colors.push(
+          Math.min(1, rgb[0] * bv),
+          Math.min(1, rgb[1] * bv),
+          Math.min(1, rgb[2] * bv),
+        );
+        labels.push(objIdx);
       }
     });
 
-    // Dispose geometries / materials we no longer need (sampling is done)
+    // Dispose — sampling is one-shot
     group.traverse((child) => {
       const m = child as THREE.Mesh;
       if (m.isMesh) {
@@ -159,26 +232,16 @@ export function generateScenePointCloud(): ScenePointCloud {
     });
   });
 
-  // If we over-allocated (cursor < total), slice the arrays
-  if (cursor < total) {
-    return {
-      positions: positions.slice(0, cursor * 3),
-      colors:    colors.slice(0, cursor * 3),
-      labels:    labels.slice(0, cursor),
-    };
-  }
-
-  return { positions, colors, labels };
+  return {
+    positions: new Float32Array(positions),
+    colors:    new Float32Array(colors),
+    labels:    new Uint8Array(labels),
+  };
 }
 
-// Rough surface-area estimate from BufferGeometry position attribute
 function estimateMeshArea(mesh: THREE.Mesh): number {
   const geom = mesh.geometry;
   if (!geom) return 1;
-  const pos = geom.attributes.position;
-  if (!pos) return 1;
-
-  // Cheap proxy: bounding-box surface area × mesh world scale
   if (!geom.boundingBox) geom.computeBoundingBox();
   const bb = geom.boundingBox!;
   const size = new THREE.Vector3();

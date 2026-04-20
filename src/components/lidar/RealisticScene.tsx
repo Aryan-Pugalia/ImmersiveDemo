@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import * as THREE from "three";
 import { Environment } from "@react-three/drei";
-import { SCENE_OBJECTS, buildSceneObject } from "./sceneBuilder";
+import { SCENE_OBJECTS, buildSceneObject, buildEgoVehicle } from "./sceneBuilder";
 
 /**
  * Photorealistic rendering of the same scene used for LiDAR sampling.
@@ -14,6 +14,7 @@ export function RealisticScene() {
     () => SCENE_OBJECTS.map((obj) => ({ id: obj.id, group: buildSceneObject(obj) })),
     []
   );
+  const ego = useMemo(() => buildEgoVehicle(), []);
 
   return (
     <>
@@ -46,6 +47,9 @@ export function RealisticScene() {
       {groups.map(({ id, group }) => (
         <primitive key={id} object={group} />
       ))}
+
+      {/* Ego vehicle with LiDAR sensor */}
+      <primitive object={ego} />
     </>
   );
 }
