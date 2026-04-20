@@ -1,10 +1,9 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Slider } from "@/components/ui/slider";
-import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid, Html, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import GuidedTutorial, { TUTORIAL_STEPS } from "@/components/GuidedTutorial";
 import {
@@ -21,11 +20,16 @@ import {
   ChevronRight,
   Layers,
   Tag,
-  Move,
-  ZoomIn,
-  ZoomOut,
   HelpCircle,
+  Camera,
+  Boxes,
+  SquareStack,
 } from "lucide-react";
+
+import { RealisticScene } from "@/components/lidar/RealisticScene";
+import { LidarPointCloud, getScenePointCloud } from "@/components/lidar/LidarPointCloud";
+import { AI_BOXES } from "@/components/lidar/aiVerification";
+import { AIWorkflowPanel, WorkflowStage } from "@/components/lidar/AIWorkflowPanel";
 
 // --- Types ---
 interface BBox3D {
@@ -36,9 +40,11 @@ interface BBox3D {
   label: string;
   color: string;
   visible: boolean;
+  source?: "human" | "ai";
 }
 
 type ToolMode = "select" | "bbox" | "move";
+type ViewMode = "lidar" | "camera" | "overlay";
 
 const LABELS = [
   { name: "Car", color: "#22d3ee", icon: Car },
@@ -47,110 +53,23 @@ const LABELS = [
   { name: "Vegetation", color: "#4ade80", icon: TreePine },
 ];
 
-// --- Generate synthetic LiDAR point cloud ---
-function generatePointCloud(count: number): Float32Array {
-  const positions = new Float32Array(count * 3);
-  const rng = (seed: number) => {
-    let s = seed;
-    return () => {
-      s = (s * 16807 + 0) % 2147483647;
-      return s / 2147483647;
-    };
-  };
-  const rand = rng(42);
+const LABEL_COLOR: Record<string, string> = Object.fromEntries(
+  LABELS.map((l) => [l.name, l.color])
+);
 
-  for (let i = 0; i < count * 0.4; i++) {
-    const idx = i * 3;
-    positions[idx] = (rand() - 0.5) * 60;
-    positions[idx + 1] = (rand() - 0.5) * 0.15;
-    positions[idx + 2] = (rand() - 0.5) * 60;
-  }
-
-  const carStart = Math.floor(count * 0.4);
-  for (let i = 0; i < count * 0.08; i++) {
-    const idx = (carStart + i) * 3;
-    positions[idx] = 5 + (rand() - 0.5) * 4.5;
-    positions[idx + 1] = rand() * 1.6;
-    positions[idx + 2] = 3 + (rand() - 0.5) * 2;
-  }
-
-  const car2Start = Math.floor(count * 0.48);
-  for (let i = 0; i < count * 0.07; i++) {
-    const idx = (car2Start + i) * 3;
-    positions[idx] = -8 + (rand() - 0.5) * 4;
-    positions[idx + 1] = rand() * 1.5;
-    positions[idx + 2] = -5 + (rand() - 0.5) * 2;
-  }
-
-  const pedStart = Math.floor(count * 0.55);
-  for (let i = 0; i < count * 0.03; i++) {
-    const idx = (pedStart + i) * 3;
-    positions[idx] = -2 + (rand() - 0.5) * 0.6;
-    positions[idx + 1] = rand() * 1.8;
-    positions[idx + 2] = 8 + (rand() - 0.5) * 0.5;
-  }
-
-  const cycStart = Math.floor(count * 0.58);
-  for (let i = 0; i < count * 0.03; i++) {
-    const idx = (cycStart + i) * 3;
-    positions[idx] = 12 + (rand() - 0.5) * 1.5;
-    positions[idx + 1] = rand() * 1.7;
-    positions[idx + 2] = -2 + (rand() - 0.5) * 0.8;
-  }
-
-  const treePositions = [
-    [-15, 10],
-    [15, -12],
-    [-10, -15],
-    [20, 8],
-  ];
-  let treeStart = Math.floor(count * 0.61);
-  for (const [tx, tz] of treePositions) {
-    for (let i = 0; i < count * 0.04; i++) {
-      if (treeStart + i >= count) break;
-      const idx = (treeStart + i) * 3;
-      const r = rand() * 1.5;
-      const a = rand() * Math.PI * 2;
-      positions[idx] = tx + Math.cos(a) * r;
-      positions[idx + 1] = rand() * 4;
-      positions[idx + 2] = tz + Math.sin(a) * r;
-    }
-    treeStart += Math.floor(count * 0.04);
-  }
-
-  for (let i = treeStart; i < count; i++) {
-    const idx = i * 3;
-    positions[idx] = (rand() - 0.5) * 50;
-    positions[idx + 1] = rand() * 0.5;
-    positions[idx + 2] = (rand() - 0.5) * 50;
-  }
-
-  return positions;
-}
-
-function generateColors(positions: Float32Array): Float32Array {
-  const count = positions.length / 3;
-  const colors = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const y = positions[i * 3 + 1];
-    const t = Math.min(y / 4, 1);
-    colors[i * 3] = t * 0.8 + 0.1;
-    colors[i * 3 + 1] = 0.6 + t * 0.4;
-    colors[i * 3 + 2] = 1 - t * 0.7;
-  }
-  return colors;
-}
-
+// ─── Bounding box 3D (shared between view modes) ─────────────────────────────
 function BoundingBox3D({
   bbox,
   selected,
   displayName,
   onClick,
+  dashed = false,
 }: {
   bbox: BBox3D;
   selected: boolean;
   displayName: string;
   onClick: () => void;
+  dashed?: boolean;
 }) {
   if (!bbox.visible) return null;
   const color = selected ? "#ffffff" : bbox.color;
@@ -169,15 +88,19 @@ function BoundingBox3D({
         <meshBasicMaterial
           color={bbox.color}
           transparent
-          opacity={selected ? 0.15 : 0.08}
+          opacity={selected ? 0.14 : 0.06}
           side={THREE.DoubleSide}
+          depthWrite={false}
         />
       </mesh>
       <lineSegments>
-        <edgesGeometry
-          args={[new THREE.BoxGeometry(...bbox.size)]}
+        <edgesGeometry args={[new THREE.BoxGeometry(...bbox.size)]} />
+        <lineBasicMaterial
+          color={color}
+          linewidth={2}
+          transparent={dashed}
+          opacity={dashed ? 0.65 : 1}
         />
-        <lineBasicMaterial color={color} linewidth={2} />
       </lineSegments>
       <Html
         position={[0, bbox.size[1] / 2 + 0.3, 0]}
@@ -191,33 +114,13 @@ function BoundingBox3D({
           style={{
             background: bbox.color,
             color: "#000",
-            opacity: 0.9,
+            opacity: 0.92,
           }}
         >
           {displayName}
         </div>
       </Html>
     </group>
-  );
-}
-
-function PointCloud({ positions, colors }: { positions: Float32Array; colors: Float32Array }) {
-  const ref = useRef<THREE.Points>(null);
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          args={[colors, 3]}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.08} vertexColors sizeAttenuation />
-    </points>
   );
 }
 
@@ -228,11 +131,8 @@ function GroundPlane({
   onPlace: (pos: [number, number, number]) => void;
   active: boolean;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-
   return (
     <mesh
-      ref={meshRef}
       rotation={[-Math.PI / 2, 0, 0]}
       position={[0, -0.01, 0]}
       visible={false}
@@ -249,34 +149,15 @@ function GroundPlane({
   );
 }
 
+// Seeded initial human annotations — intentionally slightly imperfect vs AI
 const INITIAL_BBOXES: BBox3D[] = [
-  {
-    id: "car-1",
-    position: [5, 0.8, 3],
-    size: [4.5, 1.6, 2],
-    rotation: 0,
-    label: "Car",
-    color: "#22d3ee",
-    visible: true,
-  },
-  {
-    id: "car-2",
-    position: [-8, 0.75, -5],
-    size: [4, 1.5, 2],
-    rotation: 0.3,
-    label: "Car",
-    color: "#22d3ee",
-    visible: true,
-  },
-  {
-    id: "ped-1",
-    position: [-2, 0.9, 8],
-    size: [0.6, 1.8, 0.5],
-    rotation: 0,
-    label: "Pedestrian",
-    color: "#f472b6",
-    visible: true,
-  },
+  { id: "car-1", position: [6, 0.8, 3],     size: [4.4, 1.6, 1.95], rotation: 0,              label: "Car",        color: "#22d3ee", visible: true, source: "human" },
+  { id: "car-2", position: [-8.8, 0.95, -4], size: [4.6, 1.85, 2.0], rotation: 0.22,           label: "Car",        color: "#22d3ee", visible: true, source: "human" },
+  { id: "car-3", position: [14, 0.82, 11],  size: [4.5, 1.65, 1.95], rotation: Math.PI / 2,   label: "Car",        color: "#22d3ee", visible: true, source: "human" },
+  { id: "ped-1", position: [-2, 0.9, 8],    size: [0.6, 1.8, 0.5],   rotation: 0,              label: "Pedestrian", color: "#f472b6", visible: true, source: "human" },
+  // ped-2 intentionally missing — will be flagged by AI Verify
+  { id: "tree-1", position: [-15, 2.1, 10], size: [3.0, 4.2, 3.0],   rotation: 0,              label: "Vegetation", color: "#4ade80", visible: true, source: "human" },
+  { id: "tree-2", position: [16, 2.1, -12], size: [2.6, 4.0, 2.6],   rotation: 0,              label: "Vegetation", color: "#4ade80", visible: true, source: "human" },
 ];
 
 export default function LidarAnnotation() {
@@ -286,25 +167,29 @@ export default function LidarAnnotation() {
   const [tool, setTool] = useState<ToolMode>("select");
   const [activeLabel, setActiveLabel] = useState(LABELS[0]);
   const [showPoints, setShowPoints] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>("lidar");
 
-  // Tutorial always starts on page load
+  // Workflow state
+  const [stage, setStage] = useState<WorkflowStage>("annotating");
+  const [aiRan, setAiRan] = useState(false);
+  const [showAIBoxes, setShowAIBoxes] = useState(true);
+
+  // Tutorial
   const [tutorialStep, setTutorialStep] = useState<number | null>(0);
 
-  const pointData = useMemo(() => {
-    const positions = generatePointCloud(12000);
-    const colors = generateColors(positions);
-    return { positions, colors };
+  // Point cloud count for header
+  const pointCount = useMemo(() => {
+    try {
+      return getScenePointCloud().positions.length / 3;
+    } catch {
+      return 0;
+    }
   }, []);
 
   useEffect(() => {
     if (tutorialStep === null) return;
-
     const stepId = TUTORIAL_STEPS[tutorialStep]?.id;
-
-    if (stepId === "place-box" && tool !== "bbox") {
-      setTool("bbox");
-    }
-
+    if (stepId === "place-box" && tool !== "bbox") setTool("bbox");
     if (stepId === "edit-properties" && !selectedId && bboxes.length > 0) {
       setSelectedId(bboxes[0].id);
     }
@@ -313,42 +198,34 @@ export default function LidarAnnotation() {
   const advanceTutorial = useCallback(() => {
     setTutorialStep((prev) => {
       if (prev === null) return null;
-      if (prev >= TUTORIAL_STEPS.length - 1) {
-        // Last step done — just dismiss
-        return null;
-      }
+      if (prev >= TUTORIAL_STEPS.length - 1) return null;
       return prev + 1;
     });
   }, []);
 
-  const skipTutorial = useCallback(() => {
-    setTutorialStep(null);
-  }, []);
+  const skipTutorial = useCallback(() => setTutorialStep(null), []);
 
   const restartTutorial = useCallback(() => {
     setBboxes(INITIAL_BBOXES);
     setSelectedId(null);
     setTool("select");
+    setStage("annotating");
+    setAiRan(false);
     setTutorialStep(0);
   }, []);
 
-  // Tutorial step: "select-tool" — advance when user clicks select
   const handleSetTool = useCallback(
     (newTool: ToolMode) => {
       setTool(newTool);
       if (tutorialStep !== null) {
         const stepId = TUTORIAL_STEPS[tutorialStep]?.id;
-        if (stepId === "select-tool" && newTool === "select") {
-          advanceTutorial();
-        } else if (stepId === "bbox-tool" && newTool === "bbox") {
-          advanceTutorial();
-        }
+        if (stepId === "select-tool" && newTool === "select") advanceTutorial();
+        else if (stepId === "bbox-tool" && newTool === "bbox") advanceTutorial();
       }
     },
     [tutorialStep, advanceTutorial]
   );
 
-  // Tutorial step: "label-class" — advance when user clicks a label
   const handleSetLabel = useCallback(
     (label: typeof LABELS[0]) => {
       setActiveLabel(label);
@@ -375,12 +252,11 @@ export default function LidarAnnotation() {
         label: activeLabel.name,
         color: activeLabel.color,
         visible: true,
+        source: "human",
       };
       setBboxes((prev) => [...prev, newBox]);
       setSelectedId(newBox.id);
       setTool("select");
-
-      // Advance tutorial on box placement
       if (tutorialStep !== null && TUTORIAL_STEPS[tutorialStep]?.id === "place-box") {
         advanceTutorial();
       }
@@ -388,7 +264,6 @@ export default function LidarAnnotation() {
     [activeLabel, tutorialStep, advanceTutorial]
   );
 
-  // Tutorial step: "select-box" — advance when user selects an annotation
   const handleSelectBBox = useCallback(
     (id: string) => {
       setSelectedId(id);
@@ -399,10 +274,13 @@ export default function LidarAnnotation() {
     [tutorialStep, advanceTutorial]
   );
 
-  // Track slider interaction for tutorial
   const sliderInteracted = useRef(false);
   const handleSliderChange = useCallback(() => {
-    if (!sliderInteracted.current && tutorialStep !== null && TUTORIAL_STEPS[tutorialStep]?.id === "edit-properties") {
+    if (
+      !sliderInteracted.current &&
+      tutorialStep !== null &&
+      TUTORIAL_STEPS[tutorialStep]?.id === "edit-properties"
+    ) {
       sliderInteracted.current = true;
       advanceTutorial();
     }
@@ -424,26 +302,45 @@ export default function LidarAnnotation() {
 
   const selectedBBox = bboxes.find((b) => b.id === selectedId);
 
-  // Compute display names with numbering for duplicate labels
   const bboxDisplayNames = useMemo(() => {
     const labelCounts: Record<string, number> = {};
-    bboxes.forEach((b) => {
-      labelCounts[b.label] = (labelCounts[b.label] || 0) + 1;
-    });
+    bboxes.forEach((b) => (labelCounts[b.label] = (labelCounts[b.label] || 0) + 1));
     const labelIndexes: Record<string, number> = {};
     const names: Record<string, string> = {};
     bboxes.forEach((b) => {
       labelIndexes[b.label] = (labelIndexes[b.label] || 0) + 1;
-      names[b.id] = labelCounts[b.label] > 1
-        ? `${b.label} ${labelIndexes[b.label]}`
-        : b.label;
+      names[b.id] =
+        labelCounts[b.label] > 1
+          ? `${b.label} ${labelIndexes[b.label]}`
+          : b.label;
     });
     return names;
   }, [bboxes]);
 
+  const humanBoxesForAI = useMemo(
+    () =>
+      bboxes
+        .filter((b) => b.source !== "ai")
+        .map((b) => ({
+          id: b.id,
+          label: b.label,
+          position: b.position,
+          size: b.size,
+        })),
+    [bboxes]
+  );
+
+  const onRunAI = useCallback(() => {
+    setAiRan(true);
+    setShowAIBoxes(true);
+  }, []);
+
+  const onOpenQAReport = useCallback(() => {
+    navigate("/qa-report/lidar-annotation");
+  }, [navigate]);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background">
-      {/* Tutorial overlay */}
       {tutorialStep !== null && (
         <GuidedTutorial
           currentStep={tutorialStep}
@@ -482,6 +379,8 @@ export default function LidarAnnotation() {
             setBboxes(INITIAL_BBOXES);
             setSelectedId(null);
             setTool("select");
+            setStage("annotating");
+            setAiRan(false);
           }}
           tooltip="Reset"
         />
@@ -499,15 +398,33 @@ export default function LidarAnnotation() {
               TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
             </span>
             <ChevronRight size={14} className="text-muted-foreground" />
-            <span className="text-foreground/80 text-sm">
-              LiDAR 3D Annotation
-            </span>
+            <span className="text-foreground/80 text-sm">LiDAR 3D Annotation</span>
             <ChevronRight size={14} className="text-muted-foreground" />
-            <span className="text-muted-foreground text-xs">
-              scene_0042.pcd
-            </span>
+            <span className="text-muted-foreground text-xs">scene_0042.pcd</span>
           </div>
           <div className="flex items-center gap-2">
+            {/* View mode toggle */}
+            <div className="flex items-center gap-0.5 rounded-md border border-border p-0.5 bg-background/60">
+              <ViewToggleButton
+                icon={<Boxes size={13} />}
+                label="LiDAR"
+                active={viewMode === "lidar"}
+                onClick={() => setViewMode("lidar")}
+              />
+              <ViewToggleButton
+                icon={<Camera size={13} />}
+                label="Camera"
+                active={viewMode === "camera"}
+                onClick={() => setViewMode("camera")}
+              />
+              <ViewToggleButton
+                icon={<SquareStack size={13} />}
+                label="Overlay"
+                active={viewMode === "overlay"}
+                onClick={() => setViewMode("overlay")}
+              />
+            </div>
+
             <button
               onClick={restartTutorial}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
@@ -526,7 +443,7 @@ export default function LidarAnnotation() {
               variant="outline"
               className="text-xs border-border text-muted-foreground"
             >
-              12,194 pts
+              {pointCount.toLocaleString()} pts
             </Badge>
           </div>
         </div>
@@ -535,18 +452,24 @@ export default function LidarAnnotation() {
         {tool === "bbox" && (
           <div
             className="absolute top-14 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-lg text-sm font-semibold"
-            style={{
-              background: activeLabel.color,
-              color: "#000",
-            }}
+            style={{ background: activeLabel.color, color: "#000" }}
           >
             Click on ground to place {activeLabel.name} bounding box
           </div>
         )}
 
         <Canvas
-          style={{ background: "hsl(0, 0%, 7.5%)" }}
+          key={viewMode}
+          style={{
+            background:
+              viewMode === "camera"
+                ? "#aac6e0"
+                : viewMode === "overlay"
+                ? "#101118"
+                : "hsl(0, 0%, 7.5%)",
+          }}
           gl={{ antialias: true }}
+          shadows={viewMode !== "lidar"}
         >
           <PerspectiveCamera makeDefault position={[15, 12, 20]} fov={50} />
           <OrbitControls
@@ -554,29 +477,38 @@ export default function LidarAnnotation() {
             dampingFactor={0.1}
             maxPolarAngle={Math.PI / 2.1}
           />
-          <ambientLight intensity={0.3} />
-          <directionalLight position={[10, 20, 10]} intensity={0.5} />
 
-          <Grid
-            args={[80, 80]}
-            cellSize={2}
-            cellThickness={0.5}
-            cellColor="#1a1a22"
-            sectionSize={10}
-            sectionThickness={1}
-            sectionColor="#2a1a30"
-            fadeDistance={60}
-            fadeStrength={1}
-            position={[0, -0.02, 0]}
-          />
-
-          {showPoints && (
-            <PointCloud
-              positions={pointData.positions}
-              colors={pointData.colors}
-            />
+          {/* Lighting & scene per view */}
+          {viewMode === "lidar" && (
+            <>
+              <ambientLight intensity={0.3} />
+              <directionalLight position={[10, 20, 10]} intensity={0.5} />
+              <Grid
+                args={[80, 80]}
+                cellSize={2}
+                cellThickness={0.5}
+                cellColor="#1a1a22"
+                sectionSize={10}
+                sectionThickness={1}
+                sectionColor="#2a1a30"
+                fadeDistance={60}
+                fadeStrength={1}
+                position={[0, -0.02, 0]}
+              />
+              {showPoints && <LidarPointCloud />}
+            </>
           )}
 
+          {viewMode === "camera" && <RealisticScene />}
+
+          {viewMode === "overlay" && (
+            <>
+              <RealisticScene />
+              {showPoints && <LidarPointCloud pointSize={0.04} />}
+            </>
+          )}
+
+          {/* Human annotations */}
           {bboxes.map((bbox) => (
             <BoundingBox3D
               key={bbox.id}
@@ -589,17 +521,66 @@ export default function LidarAnnotation() {
             />
           ))}
 
+          {/* AI verification overlay boxes */}
+          {aiRan &&
+            showAIBoxes &&
+            AI_BOXES.map((ai) => {
+              const color = LABEL_COLOR[ai.label] || "#eab308";
+              const dashedBox: BBox3D = {
+                id: ai.id,
+                position: ai.position,
+                size: ai.size,
+                rotation: ai.rotation,
+                label: ai.label,
+                color,
+                visible: true,
+                source: "ai",
+              };
+              return (
+                <BoundingBox3D
+                  key={ai.id}
+                  bbox={dashedBox}
+                  selected={false}
+                  displayName={`AI · ${ai.label}`}
+                  onClick={() => {}}
+                  dashed
+                />
+              );
+            })}
+
           <GroundPlane onPlace={addBBox} active={tool === "bbox"} />
 
-          <mesh position={[0, 0.1, 0]}>
-            <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-            <meshBasicMaterial color="#f59e0b" transparent opacity={0.6} />
-          </mesh>
+          {/* Vehicle/sensor origin marker — hide in camera view */}
+          {viewMode !== "camera" && (
+            <mesh position={[0, 0.1, 0]}>
+              <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+              <meshBasicMaterial color="#f59e0b" transparent opacity={0.6} />
+            </mesh>
+          )}
         </Canvas>
       </div>
 
       {/* Right Panel */}
-      <div className="w-72 flex flex-col border-l border-border overflow-y-auto bg-card">
+      <div className="w-80 flex flex-col border-l border-border overflow-y-auto bg-card">
+        {/* Workflow */}
+        <div className="border-b border-border">
+          <div className="px-4 pt-3 pb-1 flex items-center gap-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Workflow
+            </span>
+          </div>
+          <AIWorkflowPanel
+            humanBoxes={humanBoxesForAI}
+            stage={stage}
+            onStageChange={setStage}
+            aiRan={aiRan}
+            onRunAI={onRunAI}
+            showAIBoxes={showAIBoxes}
+            onToggleAIBoxes={setShowAIBoxes}
+            onOpenQAReport={onOpenQAReport}
+          />
+        </div>
+
         {/* Label selector */}
         <div className="p-4 border-b border-border" data-tutorial="label-grid">
           <div className="flex items-center gap-2 mb-3">
@@ -632,7 +613,7 @@ export default function LidarAnnotation() {
         </div>
 
         {/* Annotations list */}
-        <div className="p-4 flex-1" data-tutorial="annotations-list">
+        <div className="p-4 border-b border-border" data-tutorial="annotations-list">
           <div className="flex items-center gap-2 mb-3">
             <Layers size={14} className="text-muted-foreground" />
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -649,7 +630,9 @@ export default function LidarAnnotation() {
                   background:
                     selectedId === bbox.id ? "hsl(0, 0%, 12%)" : "transparent",
                   borderColor:
-                    selectedId === bbox.id ? bbox.color + "66" : "hsl(0, 0%, 13%)",
+                    selectedId === bbox.id
+                      ? bbox.color + "66"
+                      : "hsl(0, 0%, 13%)",
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -657,7 +640,9 @@ export default function LidarAnnotation() {
                     className="w-2.5 h-2.5 rounded-full"
                     style={{ background: bbox.color }}
                   />
-                  <span className="text-sm text-foreground/90">{bboxDisplayNames[bbox.id] || bbox.label}</span>
+                  <span className="text-sm text-foreground/90">
+                    {bboxDisplayNames[bbox.id] || bbox.label}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
@@ -680,7 +665,10 @@ export default function LidarAnnotation() {
                     }}
                     className="p-1 rounded hover:bg-destructive/20 transition-colors"
                   >
-                    <Trash2 size={12} className="text-muted-foreground hover:text-destructive" />
+                    <Trash2
+                      size={12}
+                      className="text-muted-foreground hover:text-destructive"
+                    />
                   </button>
                 </div>
               </div>
@@ -695,14 +683,17 @@ export default function LidarAnnotation() {
 
         {/* Selected bbox properties */}
         {selectedBBox && (
-          <div className="p-4 border-t border-border" data-tutorial="properties-panel">
+          <div className="p-4" data-tutorial="properties-panel">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Properties
             </span>
             <div className="mt-3 space-y-3 text-xs text-muted-foreground">
               <div className="flex justify-between">
                 <span>Label</span>
-                <span style={{ color: selectedBBox.color }} className="font-semibold">
+                <span
+                  style={{ color: selectedBBox.color }}
+                  className="font-semibold"
+                >
                   {selectedBBox.label}
                 </span>
               </div>
@@ -819,6 +810,32 @@ function ToolButton({
       }`}
     >
       {icon}
+    </button>
+  );
+}
+
+function ViewToggleButton({
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-colors ${
+        active
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+      }`}
+    >
+      {icon}
+      {label}
     </button>
   );
 }
