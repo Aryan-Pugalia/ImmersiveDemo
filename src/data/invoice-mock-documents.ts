@@ -10,8 +10,8 @@ export const mockDocuments: InvoiceDocument[] = [
       { id: "a1", label: "vendor_name", box: { x: 40, y: 30, width: 200, height: 32 }, value: "Acme Corporation", confidence: "high" },
       { id: "a2", label: "invoice_number", box: { x: 380, y: 30, width: 120, height: 24 }, value: "INV-1042", confidence: "high" },
       { id: "a3", label: "date", box: { x: 380, y: 60, width: 120, height: 24 }, value: "2026-03-15", confidence: "high" },
-      { id: "a4", label: "total_amount", box: { x: 380, y: 340, width: 120, height: 28 }, value: "$2,450.00", confidence: "medium" },
-      { id: "a5", label: "tax", box: { x: 380, y: 310, width: 120, height: 24 }, value: "$196.00", confidence: "medium" },
+      { id: "a4", label: "total_amount", box: { x: 390, y: 274, width: 115, height: 24 }, value: "$2,450.00", confidence: "medium" },
+      { id: "a5", label: "tax", box: { x: 390, y: 248, width: 115, height: 22 }, value: "$196.00", confidence: "medium" },
     ],
   },
   {
