@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import type { SegmentedRegion } from "@/types/segmentation";
 import type { Annotation, DrawingTool, AnnotationCategory, TumorType, TumorStage } from "@/types/annotation";
-import { ArrowLeft, Brain, Scan, Activity, PenTool, ChevronRight } from "lucide-react";
+import { ArrowLeft, Brain, Scan, Activity, PenTool, ChevronRight, BarChart2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type ViewMode = "ai" | "annotate";
@@ -176,10 +176,10 @@ export default function MedicalAnnotation() {
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <span
-              className="text-sm font-bold tracking-wide text-primary cursor-pointer hover:text-primary/80 transition-colors font-headline"
+              className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai FABStudio
+              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm text-foreground/80 font-body">Medical Image Annotation</span>
@@ -233,10 +233,10 @@ export default function MedicalAnnotation() {
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <span
-              className="text-sm font-bold tracking-wide text-primary cursor-pointer hover:text-primary/80 transition-colors font-headline"
+              className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai FABStudio
+              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm text-foreground/80 font-body">Medical Image Annotation</span>
@@ -245,6 +245,16 @@ export default function MedicalAnnotation() {
             <Badge variant="outline" className="text-xs border-primary/50 text-primary">
               {annotations.length} annotation{annotations.length !== 1 ? "s" : ""}
             </Badge>
+            {annotations.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => navigate("/qa-report/medical-annotation")}
+              >
+                <BarChart2 className="h-3.5 w-3.5" /> QA Report
+              </Button>
+            )}
             <Button variant="ghost" size="sm" onClick={reset} className="text-xs text-muted-foreground hover:text-foreground">
               New Image
             </Button>

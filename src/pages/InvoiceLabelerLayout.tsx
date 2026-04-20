@@ -19,10 +19,10 @@ export default function InvoiceLabelerLayout() {
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <span
-              className="text-sm font-bold tracking-wide text-primary cursor-pointer"
+              className="text-sm font-bold tracking-wide text-white cursor-pointer"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai FABStudio
+              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm text-foreground/80">Invoice Labeler</span>

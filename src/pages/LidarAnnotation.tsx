@@ -493,10 +493,10 @@ export default function LidarAnnotation() {
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 border-b border-border bg-card/90 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <span
-              className="text-foreground font-bold text-sm tracking-wide cursor-pointer hover:text-primary transition-colors"
+              className="text-white font-bold text-sm tracking-wide cursor-pointer hover:text-white/80 transition-colors"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai FABStudio
+              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
             </span>
             <ChevronRight size={14} className="text-muted-foreground" />
             <span className="text-foreground/80 text-sm">
