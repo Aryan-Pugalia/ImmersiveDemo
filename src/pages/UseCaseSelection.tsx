@@ -33,14 +33,15 @@ const UseCaseSelection = () => {
               TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
           </div>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 hover:border-primary/70 hover:bg-primary/10 transition-colors text-xs font-bold text-primary font-body uppercase tracking-wider"
-          >
-            <span className="material-symbols-outlined text-sm" style={{ fontSize:"14px" }}>monitoring</span>
-            Dashboard
-          </button>
-          <div className="relative" ref={profileRef}>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 hover:border-primary/70 hover:bg-primary/10 transition-colors text-xs font-bold text-primary font-body uppercase tracking-wider"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize:"14px" }}>monitoring</span>
+              Dashboard
+            </button>
+            <div className="relative" ref={profileRef}>
             <button
               onClick={() => setProfileOpen(!profileOpen)}
               className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary/30 hover:border-primary transition-colors bg-muted flex items-center justify-center"
@@ -64,6 +65,7 @@ const UseCaseSelection = () => {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
 
