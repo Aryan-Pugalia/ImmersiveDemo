@@ -234,7 +234,7 @@ export default function ImageABTesting() {
 
         {/* ── Right: workflow panel ── */}
         <aside
-          className="w-[420px] shrink-0 border-l border-border/20 overflow-y-auto flex flex-col"
+          className="w-[420px] shrink-0 border-l border-border/20 overflow-hidden flex flex-col"
           style={{ background: "hsl(0,0%,5.5%)" }}
         >
           <ABWorkflowPanel

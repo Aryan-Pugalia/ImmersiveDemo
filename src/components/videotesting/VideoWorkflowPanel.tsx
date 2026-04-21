@@ -109,9 +109,9 @@ export function VideoWorkflowPanel({
   ).length;
 
   return (
-    <div className="flex flex-col gap-0">
+    <div className="flex flex-col gap-0 h-full overflow-hidden">
       {/* Stepper */}
-      <div className="px-4 pt-5 pb-4">
+      <div className="px-4 pt-5 pb-4 shrink-0">
         <div className="flex items-center justify-between">
           {STAGES.map((s, i) => {
             const Icon = s.Icon;
@@ -169,11 +169,11 @@ export function VideoWorkflowPanel({
         </div>
       </div>
 
-      <div className="h-px bg-border" />
+      <div className="h-px bg-border shrink-0" />
 
       {/* EVALUATE */}
       {stage === "evaluate" && (
-        <div className="px-4 pb-5 pt-4 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-5 pt-4 flex flex-col gap-4">
           <p className="text-sm text-muted-foreground leading-relaxed">
             Rate each video pair across 5 dimensions. Watch frame-by-frame for
             temporal artifacts and A/V sync issues.{" "}
@@ -249,9 +249,9 @@ export function VideoWorkflowPanel({
 
       {/* AI REVIEW */}
       {stage === "ai_review" && (
-        <div className="px-4 pb-5 pt-4 flex flex-col gap-4">
+        <div className="flex-1 overflow-hidden flex flex-col">
           {!aiRan ? (
-            <>
+            <div className="flex-1 overflow-y-auto px-4 pb-5 pt-4 flex flex-col gap-4">
               <p className="text-sm text-muted-foreground leading-relaxed">
                 The AI reviewer will analyse each video pair against the prompt
                 and your ratings, producing a reference verdict, confidence
@@ -260,39 +260,45 @@ export function VideoWorkflowPanel({
               <Button className="w-full h-10 gap-2 text-sm" onClick={onRunAI}>
                 <Play size={16} /> Run AI Analysis
               </Button>
-            </>
+            </div>
           ) : stats ? (
             <>
-              <div className="grid grid-cols-2 gap-2.5">
-                <MetricTile label="Agreement" value={(stats.avgAgreement * 100).toFixed(0) + "%"} tone="primary" />
-                <MetricTile label="AI Avg Conf." value={(stats.avgAIConf * 100).toFixed(0) + "%"} tone="primary" />
-                <MetricTile label="Matches" value={`${stats.matches}/${stats.total}`} tone="good" />
-                <MetricTile label="Needs QA" value={String(stats.needsQA)} tone={stats.needsQA > 0 ? "warn" : "good"} />
+              {/* Scrollable metrics + verdict cards */}
+              <div className="overflow-y-auto flex-1 min-h-0 px-4 pt-4 flex flex-col gap-4 pb-2">
+                <div className="grid grid-cols-2 gap-2.5">
+                  <MetricTile label="Agreement" value={(stats.avgAgreement * 100).toFixed(0) + "%"} tone="primary" />
+                  <MetricTile label="AI Avg Conf." value={(stats.avgAIConf * 100).toFixed(0) + "%"} tone="primary" />
+                  <MetricTile label="Matches" value={`${stats.matches}/${stats.total}`} tone="good" />
+                  <MetricTile label="Needs QA" value={String(stats.needsQA)} tone={stats.needsQA > 0 ? "warn" : "good"} />
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  {qaResults.map((r) => (
+                    <AIVerdictCard key={r.task.id} result={r} />
+                  ))}
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-0.5">
-                {qaResults.map((r) => (
-                  <AIVerdictCard key={r.task.id} result={r} />
-                ))}
+              {/* Pinned action button */}
+              <div className="px-4 pb-5 pt-3 shrink-0 border-t border-border/20">
+                {stats.needsQA > 0 ? (
+                  <Button
+                    className="w-full h-10 text-sm"
+                    variant="secondary"
+                    onClick={() => onStageChange("qa_review")}
+                  >
+                    Route to QA ({stats.needsQA}{" "}
+                    {stats.needsQA === 1 ? "task" : "tasks"})
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full h-10 text-sm"
+                    onClick={() => onStageChange("delivered")}
+                  >
+                    All Clear — Mark Delivered
+                  </Button>
+                )}
               </div>
-
-              {stats.needsQA > 0 ? (
-                <Button
-                  className="w-full h-10 text-sm"
-                  variant="secondary"
-                  onClick={() => onStageChange("qa_review")}
-                >
-                  Route to QA ({stats.needsQA}{" "}
-                  {stats.needsQA === 1 ? "task" : "tasks"})
-                </Button>
-              ) : (
-                <Button
-                  className="w-full h-10 text-sm"
-                  onClick={() => onStageChange("delivered")}
-                >
-                  All Clear — Mark Delivered
-                </Button>
-              )}
             </>
           ) : null}
         </div>
@@ -310,7 +316,7 @@ export function VideoWorkflowPanel({
 
       {/* DELIVERED */}
       {stage === "delivered" && (
-        <div className="px-4 pb-5 pt-4 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-5 pt-4 flex flex-col gap-4">
           <div className="flex items-center gap-3 p-4 rounded-lg border border-green-500/30 bg-green-500/5">
             <CheckCircle2 className="text-green-500 shrink-0" size={22} />
             <div>
@@ -647,60 +653,64 @@ function QAReviewPanel({
   const allResolved = flagged.every((r) => resolutions[r.task.id] != null);
 
   return (
-    <div className="px-4 pb-5 pt-4 flex flex-col gap-4">
-      {/* Summary banner */}
-      <div className="flex items-start gap-3 p-3.5 rounded-lg border border-amber-500/30 bg-amber-500/5">
-        <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
-        <div className="text-sm leading-snug space-y-0.5">
-          <span className="font-semibold text-amber-300">
-            {stats.needsQA}{" "}
-            {stats.needsQA === 1 ? "task" : "tasks"} flagged for QA.
-          </span>
-          {stats.conflicts > 0 && (
-            <span className="text-muted-foreground">
-              {" "}
-              {stats.conflicts} human–AI conflict
-              {stats.conflicts > 1 ? "s" : ""} detected.
+    <div className="flex-1 overflow-hidden flex flex-col">
+      {/* Scrollable content area */}
+      <div className="overflow-y-auto flex-1 min-h-0 px-4 pt-4 flex flex-col gap-4">
+        {/* Summary banner */}
+        <div className="flex items-start gap-3 p-3.5 rounded-lg border border-amber-500/30 bg-amber-500/5">
+          <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
+          <div className="text-sm leading-snug space-y-0.5">
+            <span className="font-semibold text-amber-300">
+              {stats.needsQA}{" "}
+              {stats.needsQA === 1 ? "task" : "tasks"} flagged for QA.
             </span>
-          )}
-          <p className="text-muted-foreground">
-            Resolve each item and log detected imperfections before approving.
-          </p>
+            {stats.conflicts > 0 && (
+              <span className="text-muted-foreground">
+                {" "}
+                {stats.conflicts} human–AI conflict
+                {stats.conflicts > 1 ? "s" : ""} detected.
+              </span>
+            )}
+            <p className="text-muted-foreground">
+              Resolve each item and log detected imperfections before approving.
+            </p>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2">
+          <SmallStat label="Flagged"   value={String(stats.needsQA)}                          color="#f59e0b" />
+          <SmallStat label="Conflicts" value={String(stats.conflicts)}                         color="#ef4444" />
+          <SmallStat label="Agreement" value={(stats.avgAgreement * 100).toFixed(0) + "%"}     color="hsl(var(--primary))" />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {flagged.map((result) => (
+            <QAResolutionCard
+              key={result.task.id}
+              result={result}
+              resolution={resolutions[result.task.id] ?? null}
+              onResolve={(v) =>
+                setResolutions((prev) => ({ ...prev, [result.task.id]: v }))
+              }
+              note={arbitrationNotes[result.task.id] ?? ""}
+              onNoteChange={(n) =>
+                setArbitrationNotes((prev) => ({ ...prev, [result.task.id]: n }))
+              }
+              imperfections={detectedImperfections[result.task.id] ?? []}
+              onImperfectionsChange={(list) =>
+                setDetectedImperfections((prev) => ({
+                  ...prev,
+                  [result.task.id]: list,
+                }))
+              }
+            />
+          ))}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-2">
-        <SmallStat label="Flagged"   value={String(stats.needsQA)}                          color="#f59e0b" />
-        <SmallStat label="Conflicts" value={String(stats.conflicts)}                         color="#ef4444" />
-        <SmallStat label="Agreement" value={(stats.avgAgreement * 100).toFixed(0) + "%"}     color="hsl(var(--primary))" />
-      </div>
-
-      <div className="flex flex-col gap-3 max-h-[28rem] overflow-y-auto pr-0.5">
-        {flagged.map((result) => (
-          <QAResolutionCard
-            key={result.task.id}
-            result={result}
-            resolution={resolutions[result.task.id] ?? null}
-            onResolve={(v) =>
-              setResolutions((prev) => ({ ...prev, [result.task.id]: v }))
-            }
-            note={arbitrationNotes[result.task.id] ?? ""}
-            onNoteChange={(n) =>
-              setArbitrationNotes((prev) => ({ ...prev, [result.task.id]: n }))
-            }
-            imperfections={detectedImperfections[result.task.id] ?? []}
-            onImperfectionsChange={(list) =>
-              setDetectedImperfections((prev) => ({
-                ...prev,
-                [result.task.id]: list,
-              }))
-            }
-          />
-        ))}
-      </div>
-
-      <div className="flex gap-2">
+      {/* Pinned action buttons — always visible at bottom */}
+      <div className="px-4 pb-5 pt-3 shrink-0 border-t border-border/20 flex gap-2">
         <Button variant="outline" className="flex-1 gap-2 text-sm" onClick={onOpenQAReport}>
           <BarChart2 size={16} /> QA Report
         </Button>

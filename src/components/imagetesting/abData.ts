@@ -179,7 +179,7 @@ export function computeQAResults(
 
     const humanOverall = ratings.overall;
 
-    // Agreement score across all 5 dimensions (where AI has a non-TIE opinion)
+    // Agreement score across all rated dimensions
     const DIMS: RatingDimKey[] = [
       "realism",
       "composition",
@@ -191,36 +191,51 @@ export function computeQAResults(
     let scored = 0;
     for (const dim of DIMS) {
       const humanVal = ratings[dim];
-      if (humanVal !== null && ai.winner !== "TIE") {
+      if (humanVal !== null) {
         scored++;
-        if (humanVal === ai.winner || humanVal === "TIE") matching++;
+        if (ai.winner === "TIE") {
+          if (humanVal === "TIE") matching++;
+        } else {
+          if (humanVal === ai.winner || humanVal === "TIE") matching++;
+        }
       }
     }
-    const agreementScore = scored > 0 ? matching / scored : 0.5;
+    const agreementScore = scored > 0 ? matching / scored : 0;
 
-    // Status flags
-    let status: QAStatus = "match";
-
-    if (ai.confidence < 0.75) {
-      flagReasons.push(`AI confidence low (${(ai.confidence * 100).toFixed(0)}%)`);
-      status = "low_ai_conf";
-    }
-
-    if (ratings.confidence === "LOW") {
-      flagReasons.push("Annotator reported low confidence");
-      if (status === "match") status = "low_annotator_conf";
-    }
-
-    if (
+    const hasConflict =
       humanOverall !== null &&
       humanOverall !== "TIE" &&
       ai.winner !== "TIE" &&
-      humanOverall !== ai.winner
-    ) {
+      humanOverall !== ai.winner;
+    const hasLowAIConf = ai.confidence < 0.75;
+    const hasLowAnnotatorConf = ratings.confidence === "LOW";
+
+    // Collect flag reasons (always shown as informational warnings in QA cards)
+    if (hasLowAIConf) {
+      flagReasons.push(`AI confidence low (${(ai.confidence * 100).toFixed(0)}%)`);
+    }
+    if (hasLowAnnotatorConf) {
+      flagReasons.push("Annotator reported low confidence");
+    }
+    if (hasConflict) {
       flagReasons.push(
         `Human chose Image ${humanOverall}, AI recommends Image ${ai.winner}`
       );
+    }
+
+    // Status priority:
+    // 1. Conflict (human disagrees with AI) → always requires QA
+    // 2. Low annotator confidence → needs review
+    // 3. Low AI confidence alone when human agreed → counts as match with a warning
+    // 4. Otherwise → match
+    let status: QAStatus = "match";
+    if (hasConflict) {
       status = "conflict";
+    } else if (hasLowAnnotatorConf) {
+      status = "low_annotator_conf";
+    } else if (hasLowAIConf && humanOverall === null) {
+      // AI uncertain AND human hasn't given an overall verdict yet
+      status = "low_ai_conf";
     }
 
     return {
