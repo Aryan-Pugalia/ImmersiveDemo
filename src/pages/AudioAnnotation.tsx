@@ -3,6 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Play, Pause, Download, Save, Send, SkipBack, SkipForward, Repeat, Volume2, CheckCircle, XCircle, Copy, Check } from "lucide-react";
 
+// ─── Web Speech API language map ─────────────────────────────────────────────
+const LANG_BCP47: Record<string, string> = {
+  zh: "zh-CN", ar: "ar-SA", hi: "hi-IN", ko: "ko-KR", fr: "fr-FR", ja: "ja-JP",
+};
+
+// Speak a segment using the browser's built-in TTS
+function speakSegment(text: string, lang: string, speaker: string) {
+  if (!("speechSynthesis" in window) || !text.trim()) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang  = LANG_BCP47[lang] ?? "en-US";
+  utter.rate  = speaker === "S2" ? 0.85 : 0.9;
+  utter.pitch = speaker === "S2" ? 1.25 : speaker === "OVERLAP" ? 1.1 : 0.95;
+  utter.volume = 1;
+  // Pick best available voice for the language
+  const voices = window.speechSynthesis.getVoices();
+  const match  = voices.find(v => v.lang.startsWith(LANG_BCP47[lang]?.slice(0,2) ?? ""));
+  if (match) utter.voice = match;
+  window.speechSynthesis.speak(utter);
+}
+
 // ─── Seed data ────────────────────────────────────────────────────────────────
 
 const LANG_META: Record<string, { flag: string; label: string; rtl?: boolean }> = {
@@ -500,8 +521,9 @@ function Workspace({ task, onBack }: { task: Task; onBack: () => void }) {
   const [showExport, setShowExport] = useState(false);
   const [reviewNote, setReviewNote] = useState("");
   const [saved,      setSaved]      = useState(false);
-  const rafRef = useRef<number | null>(null);
-  const startRef = useRef<{ ts: number; base: number } | null>(null);
+  const rafRef         = useRef<number | null>(null);
+  const startRef       = useRef<{ ts: number; base: number } | null>(null);
+  const lastSpokenRef  = useRef<string | null>(null); // segmentId last spoken
   const totalMs = task.durationSec * 1000;
   const rtl = !!LANG_META[task.language]?.rtl;
 
@@ -520,15 +542,41 @@ function Workspace({ task, onBack }: { task: Task; onBack: () => void }) {
       rafRef.current = requestAnimationFrame(tick);
     } else {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      // Stop any ongoing speech when paused
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      lastSpokenRef.current = null;
     }
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [isPlaying]);
 
+  // Preload voices and cancel speech on unmount
+  useEffect(() => {
+    if ("speechSynthesis" in window) {
+      // Trigger voice list load (required in some browsers)
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.addEventListener("voiceschanged", () => window.speechSynthesis.getVoices());
+    }
+    return () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); };
+  }, []);
+
   const currentMs = Math.round(playhead * totalMs);
+
+  // ── Speech synthesis: speak each segment as playhead enters it ──────────────
+  useEffect(() => {
+    if (!isPlaying) return;
+    const activeSeg = segs.find(s => currentMs >= s.startMs && currentMs < s.endMs);
+    if (!activeSeg) return;
+    if (activeSeg.id === lastSpokenRef.current) return; // already speaking this one
+    lastSpokenRef.current = activeSeg.id;
+    const textToSpeak = activeSeg.sourceText.trim() || activeSeg.englishText.trim();
+    speakSegment(textToSpeak, task.language, activeSeg.speaker);
+  }, [currentMs, isPlaying, segs, task.language]);
 
   const seekToMs = useCallback((ms: number) => {
     setPlayhead(ms / totalMs);
     startRef.current = null;
+    lastSpokenRef.current = null;
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   }, [totalMs]);
 
   const addSegment = (startMs: number, endMs: number) => {
