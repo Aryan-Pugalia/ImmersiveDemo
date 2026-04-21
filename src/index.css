@@ -489,14 +489,14 @@
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(190, 180, 205, 0.85);
+  color: rgba(235, 230, 245, 0.95);
 }
 
 .capability-title {
   font-family: 'TP Sans', 'DM Sans', sans-serif;
   font-size: 1.05rem;
   font-weight: 700;
-  color: hsl(30, 5%, 92%);
+  color: hsl(0, 0%, 96%);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0;
@@ -506,7 +506,7 @@
 .capability-desc {
   font-family: 'TP Sans', 'DM Sans', sans-serif;
   font-size: 0.85rem;
-  color: #c4bcd2;
+  color: #e0d8ed;
   line-height: 1.55;
   margin: 0 0 0.75rem 0;
 }
@@ -527,7 +527,7 @@
   gap: 0.45rem;
   font-family: 'TP Sans', 'DM Sans', sans-serif;
   font-size: 0.88rem;
-  color: #c4bcd2;
+  color: #e0d8ed;
   line-height: 1.45;
 }
 
