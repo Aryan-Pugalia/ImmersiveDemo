@@ -110,10 +110,13 @@ export const en = {
     tasksToday: "tasks today",
     footerNote: "All data is simulated for demonstration purposes · TP.ai FABStudio Platform Dashboard",
     status: {
-      onTrack: "On Track",
-      atRisk: "At Risk",
+      on_track: "On Track",
+      at_risk: "At Risk",
       delayed: "Delayed",
       completed: "Completed",
+      // legacy aliases kept for legend dots
+      onTrack: "On Track",
+      atRisk: "At Risk",
     },
     col: {
       project: "Project / Client",
@@ -124,6 +127,21 @@ export const en = {
       team: "Team",
     },
     thisWeek: "↑ 2 this week",
+    prio: { high: "HIGH", med: "MED", low: "LOW" },
+    eventPool: [
+      { title: "Dataset ready for client download",    detail: "Multilingual Speech Batch 7 — ZH subset (847 segments, 2.3 GB)" },
+      { title: "Deadline at risk — immediate attention", detail: "Video Temporal Annotation is 16% complete; due Apr 20" },
+      { title: "Dataset ready for client download",    detail: "Invoice APAC — KO subset export available (198 documents)" },
+      { title: "QA flag: re-annotation required",      detail: "AutoVision LiDAR frame 0412 — missed occlusion, 3 boxes deleted" },
+      { title: "Batch completed — review open",        detail: "Korean CX Transcription — 40 tasks submitted, IAA 88%" },
+      { title: "Awaiting senior QA sign-off",          detail: "Medical Scan Annotation — 12 scans queued for final approval" },
+      { title: "Dataset ready for client download",    detail: "French Legal IDP — first 67 invoices exported (JSON + SRT)" },
+      { title: "Low-confidence segments flagged",      detail: "Hindi Batch hi_02 — 3 segments marked needs-pass-2" },
+      { title: "Annotators onboarded",                 detail: "3 new annotators added to RLHF Image Preference (GenAI Studio)" },
+      { title: "Quality milestone reached",            detail: "RLHF Image Preference exceeded 85% IAA threshold — ahead of schedule" },
+      { title: "Client SLA at risk",                   detail: "AutoVision delivery window closes Apr 23 — 38 tasks remain in queue" },
+      { title: "Dataset ready for client download",    detail: "Medical Scan Annotation — all 95 scans annotated, QC passed" },
+    ],
   },
 } as const;
 

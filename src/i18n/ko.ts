@@ -1,30 +1,23 @@
 import type { Translations } from "./en";
 
 export const ko: Translations = {
-  // ── Nav / common ──────────────────────────────────────────────────────────
   nav: {
     dashboard: "대시보드",
     back: "뒤로",
     newImage: "새 이미지",
     qaReport: "QA 보고서",
   },
-
-  // ── Landing (Index) ───────────────────────────────────────────────────────
   landing: {
     introducing: "소개합니다",
     cta: "시작하기",
     capabilitiesLabel: "핵심 역량",
     capabilitiesHeading: "프론티어 모델 학습에 필요한 모든 것",
   },
-
-  // ── Use-cases page ────────────────────────────────────────────────────────
   useCasesPage: {
     heading: "파이프라인 선택",
     role: "역할",
     roleValue: "데이터 어노테이터",
   },
-
-  // ── Use-case cards ────────────────────────────────────────────────────────
   useCases: {
     "lidar-annotation": {
       title: "라이다 3D 어노테이션",
@@ -51,8 +44,6 @@ export const ko: Translations = {
       description: "화자 분리, 구간 타이밍, 오디오 품질 플래그, QC 검토 워크플로우를 통해 다국어 음성을 전사하고 영어로 번역합니다.",
     },
   },
-
-  // ── Capabilities marquee ──────────────────────────────────────────────────
   capabilities: {
     "Text & NLP":        { title: "텍스트 & NLP",        subs: ["개체명 인식", "의도 분류", "요약 QA", "상호참조 해결"] },
     "Computer Vision":   { title: "컴퓨터 비전",          subs: ["객체 감지", "인스턴스 분할", "키포인트 어노테이션", "이미지 분류"] },
@@ -61,8 +52,6 @@ export const ko: Translations = {
     "Audio & Speech":    { title: "오디오 & 음성",         subs: ["음성 전사", "화자 분리", "음향 이벤트 감지", "감정 레이블링"] },
     "RLHF & Red Teaming":{ title: "RLHF & 레드팀",        subs: ["선호도 순위", "Constitutional AI 검토", "적대적 프롬프팅", "안전성 평가"] },
   },
-
-  // ── Annotation tool common strings ────────────────────────────────────────
   tools: {
     annotate: "어노테이션",
     aiVerify: "AI 검증",
@@ -80,8 +69,6 @@ export const ko: Translations = {
     uploadPrompt: "의료 스캔을 업로드하여 종양 및 관심 영역을 어노테이션하고 AI로 검증하세요.",
     aiPowered: "AI 보조 의료 영상",
   },
-
-  // ── Dashboard ─────────────────────────────────────────────────────────────
   dashboard: {
     title: "운영 현황",
     subtitle: "모든 활성 어노테이션 프로젝트의 실시간 현황",
@@ -112,10 +99,12 @@ export const ko: Translations = {
     tasksToday: "오늘 작업",
     footerNote: "모든 데이터는 데모 목적으로 시뮬레이션된 것입니다 · TP.ai FABStudio 플랫폼 대시보드",
     status: {
-      onTrack: "정상",
-      atRisk: "위험",
+      on_track: "정상",
+      at_risk: "위험",
       delayed: "지연",
       completed: "완료",
+      onTrack: "정상",
+      atRisk: "위험",
     },
     col: {
       project: "프로젝트 / 클라이언트",
@@ -126,5 +115,20 @@ export const ko: Translations = {
       team: "팀",
     },
     thisWeek: "↑ 이번 주 2개",
+    prio: { high: "높음", med: "중간", low: "낮음" },
+    eventPool: [
+      { title: "데이터셋 다운로드 준비 완료",       detail: "다국어 음성 배치 7 — ZH 서브셋 (847세그먼트, 2.3GB)" },
+      { title: "기한 위험 — 즉각적인 조치 필요",    detail: "비디오 시간적 어노테이션 16% 완료, 마감 4월 20일" },
+      { title: "데이터셋 다운로드 준비 완료",       detail: "인보이스 APAC — KO 서브셋 내보내기 가능 (198건)" },
+      { title: "QA 표시: 재어노테이션 필요",        detail: "AutoVision LiDAR 프레임 0412 — 폐색 누락, 박스 3개 삭제" },
+      { title: "배치 완료 — 검토 진행 중",          detail: "한국어 CX 전사 — 40개 작업 제출, IAA 88%" },
+      { title: "시니어 QA 최종 승인 대기",          detail: "의료 스캔 어노테이션 — 스캔 12건 최종 승인 대기 중" },
+      { title: "데이터셋 다운로드 준비 완료",       detail: "프랑스 법률 IDP — 인보이스 67건 내보내기 완료 (JSON + SRT)" },
+      { title: "낮은 신뢰도 구간 표시됨",           detail: "힌디어 배치 hi_02 — 3개 구간 2차 검토 표시" },
+      { title: "어노테이터 온보딩 완료",            detail: "RLHF 이미지 선호도에 새 어노테이터 3명 배정 (GenAI Studio)" },
+      { title: "품질 마일스톤 달성",               detail: "RLHF 이미지 선호도 IAA 85% 기준 초과 — 일정 앞당겨짐" },
+      { title: "클라이언트 SLA 위험",              detail: "AutoVision 납품 기간 4월 23일 마감 — 대기열 38개 작업 남음" },
+      { title: "데이터셋 다운로드 준비 완료",       detail: "의료 스캔 어노테이션 — 95개 스캔 모두 완료, QC 통과" },
+    ],
   },
 };

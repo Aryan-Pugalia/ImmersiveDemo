@@ -26,7 +26,8 @@ type EventKind = "ready" | "flagged" | "completed" | "assigned" | "review";
 type EventPrio = "high" | "medium" | "low";
 interface LiveEvent {
   id: string; kind: EventKind; prio: EventPrio;
-  title: string; detail: string; ts: string; project: string;
+  /** index into t.dashboard.eventPool for localised title+detail */
+  idx: number; ts: string; project: string;
 }
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
@@ -58,19 +59,20 @@ const CITIES: CityNode[] = [
   { name:"Bogotá",     country:"CO", lat:4.7,   lon:-74.1,  base:6  },
 ];
 
-const EVENT_POOL: Omit<LiveEvent, "id" | "ts">[] = [
-  { kind:"ready",     prio:"high",   title:"Dataset ready for client download", detail:"Multilingual Speech Batch 7 — ZH subset (847 segments, 2.3 GB)", project:"p1" },
-  { kind:"flagged",   prio:"high",   title:"Deadline at risk — immediate attention", detail:"Video Temporal Annotation is 16% complete; due Apr 20", project:"p6" },
-  { kind:"ready",     prio:"high",   title:"Dataset ready for client download", detail:"Invoice APAC — KO subset export available (198 documents)", project:"p4" },
-  { kind:"flagged",   prio:"high",   title:"QA flag: re-annotation required",   detail:"AutoVision LiDAR frame 0412 — missed occlusion, 3 boxes deleted", project:"p2" },
-  { kind:"completed", prio:"medium", title:"Batch completed — review open",     detail:"Korean CX Transcription — 40 tasks submitted, IAA 88%", project:"p7" },
-  { kind:"review",    prio:"medium", title:"Awaiting senior QA sign-off",       detail:"Medical Scan Annotation — 12 scans queued for final approval", project:"p3" },
-  { kind:"ready",     prio:"high",   title:"Dataset ready for client download", detail:"French Legal IDP — first 67 invoices exported (JSON + SRT)", project:"p8" },
-  { kind:"flagged",   prio:"medium", title:"Low-confidence segments flagged",   detail:"Hindi Batch hi_02 — 3 segments marked needs-pass-2", project:"p1" },
-  { kind:"assigned",  prio:"low",    title:"Annotators onboarded",             detail:"3 new annotators added to RLHF Image Preference (GenAI Studio)", project:"p5" },
-  { kind:"completed", prio:"medium", title:"Quality milestone reached",         detail:"RLHF Image Preference exceeded 85% IAA threshold — ahead of schedule", project:"p5" },
-  { kind:"flagged",   prio:"high",   title:"Client SLA at risk",               detail:"AutoVision delivery window closes Apr 23 — 38 tasks remain in queue", project:"p2" },
-  { kind:"ready",     prio:"high",   title:"Dataset ready for client download", detail:"Medical Scan Annotation — all 95 scans annotated, QC passed", project:"p3" },
+// Metadata only — title & detail come from t.dashboard.eventPool[idx] at render time
+const EVENT_POOL_META: Omit<LiveEvent, "id" | "ts">[] = [
+  { kind:"ready",     prio:"high",   idx:0,  project:"p1" },
+  { kind:"flagged",   prio:"high",   idx:1,  project:"p6" },
+  { kind:"ready",     prio:"high",   idx:2,  project:"p4" },
+  { kind:"flagged",   prio:"high",   idx:3,  project:"p2" },
+  { kind:"completed", prio:"medium", idx:4,  project:"p7" },
+  { kind:"review",    prio:"medium", idx:5,  project:"p3" },
+  { kind:"ready",     prio:"high",   idx:6,  project:"p8" },
+  { kind:"flagged",   prio:"medium", idx:7,  project:"p1" },
+  { kind:"assigned",  prio:"low",    idx:8,  project:"p5" },
+  { kind:"completed", prio:"medium", idx:9,  project:"p5" },
+  { kind:"flagged",   prio:"high",   idx:10, project:"p2" },
+  { kind:"ready",     prio:"high",   idx:11, project:"p3" },
 ];
 
 // Daily throughput for sparkline (last 7 days)
@@ -98,8 +100,8 @@ function eventIcon(k: EventKind) {
        : k === "review"    ? <FileCheck size={13}/>
        :                     <Users size={13}/>;
 }
-function prioLabel(p: EventPrio) {
-  return p === "high" ? "HIGH" : p === "medium" ? "MED" : "LOW";
+function prioLabel(p: EventPrio, prio: { high: string; med: string; low: string }) {
+  return p === "high" ? prio.high : p === "medium" ? prio.med : prio.low;
 }
 function prioColor(p: EventPrio) {
   return p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#94a3b8";
@@ -109,7 +111,7 @@ function nowStr() {
   return `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}:${d.getSeconds().toString().padStart(2,"0")}`;
 }
 let _eid = 0;
-function makeEvent(pool: typeof EVENT_POOL): LiveEvent {
+function makeEvent(pool: typeof EVENT_POOL_META): LiveEvent {
   const e = pool[Math.floor(Math.random() * pool.length)];
   return { ...e, id: `ev_${++_eid}`, ts: nowStr() };
 }
@@ -341,8 +343,10 @@ function ProjectRow({ p, idx, statusLabels }: { p: Project; idx: number; statusL
 
 // ─── Event Item ────────────────────────────────────────────────────────────────
 function EventItem({ ev }: { ev: LiveEvent }) {
+  const { t } = useLanguage();
   const ec = eventColor(ev.kind);
   const pc = prioColor(ev.prio);
+  const text = t.dashboard.eventPool[ev.idx] ?? { title: "", detail: "" };
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -356,12 +360,12 @@ function EventItem({ ev }: { ev: LiveEvent }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
-          <span className="text-xs font-bold text-foreground font-headline leading-tight">{ev.title}</span>
+          <span className="text-xs font-bold text-foreground font-headline leading-tight">{text.title}</span>
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background:`${pc}18`, color: pc }}>
-            {prioLabel(ev.prio)}
+            {prioLabel(ev.prio, t.dashboard.prio)}
           </span>
         </div>
-        <p className="text-xs text-muted-foreground font-body leading-snug truncate">{ev.detail}</p>
+        <p className="text-xs text-muted-foreground font-body leading-snug truncate">{text.detail}</p>
         <span className="text-[10px] text-muted-foreground/50 font-body">{ev.ts}</span>
       </div>
     </motion.div>
@@ -379,7 +383,7 @@ export default function Dashboard() {
   // Live event feed (max 12 shown)
   const [events, setEvents] = useState<LiveEvent[]>(() => {
     // Seed with 5 initial events
-    return Array.from({ length: 5 }, () => makeEvent(EVENT_POOL));
+    return Array.from({ length: 5 }, () => makeEvent(EVENT_POOL_META));
   });
   const [lastRefresh, setLastRefresh] = useState<string>(nowStr());
   const [totalOnline, setTotalOnline] = useState(0);
@@ -408,7 +412,7 @@ export default function Dashboard() {
   useEffect(() => {
     const id = setInterval(() => {
       setEvents(prev => {
-        const next = [makeEvent(EVENT_POOL), ...prev].slice(0, 12);
+        const next = [makeEvent(EVENT_POOL_META), ...prev].slice(0, 12);
         return next;
       });
     }, 7000);
