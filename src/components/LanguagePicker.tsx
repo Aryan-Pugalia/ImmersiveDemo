@@ -1,14 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { useLanguage, type Language } from "@/context/LanguageContext";
 
-const OPTIONS: { code: Language; flag: string; label: string }[] = [
-  { code: "en", flag: "🇺🇸", label: "EN" },
-  { code: "ko", flag: "🇰🇷", label: "KO" },
-  { code: "es", flag: "🇪🇸", label: "ES" },
-  { code: "fr", flag: "🇫🇷", label: "FR" },
-  { code: "ar", flag: "🇸🇦", label: "AR" },
-  { code: "zh", flag: "🇨🇳", label: "ZH" },
+interface Option {
+  code: Language;
+  /** ISO 3166-1 alpha-2 country code for flagcdn.com */
+  flagCode: string;
+  label: string;
+  name: string;
+}
+
+const OPTIONS: Option[] = [
+  { code: "en", flagCode: "us", label: "EN", name: "English"  },
+  { code: "ko", flagCode: "kr", label: "KO", name: "Korean"   },
+  { code: "es", flagCode: "es", label: "ES", name: "Spanish"  },
+  { code: "fr", flagCode: "fr", label: "FR", name: "French"   },
+  { code: "ar", flagCode: "sa", label: "AR", name: "Arabic"   },
+  { code: "zh", flagCode: "cn", label: "ZH", name: "Chinese"  },
 ];
+
+function FlagImg({ flagCode, name, className = "" }: { flagCode: string; name: string; className?: string }) {
+  return (
+    <img
+      src={`https://flagcdn.com/20x15/${flagCode}.png`}
+      srcSet={`https://flagcdn.com/40x30/${flagCode}.png 2x`}
+      width={20}
+      height={15}
+      alt={name}
+      className={`rounded-[2px] object-cover flex-shrink-0 ${className}`}
+    />
+  );
+}
 
 interface Props {
   variant?: "pill" | "dropdown";
@@ -35,7 +56,7 @@ export function LanguagePicker({ variant = "pill" }: Props) {
         className="text-xs font-bold font-body bg-card border border-border/40 rounded-full px-3 py-1.5 text-foreground focus:outline-none focus:border-primary/60 cursor-pointer"
       >
         {OPTIONS.map(o => (
-          <option key={o.code} value={o.code}>{o.flag} {o.label}</option>
+          <option key={o.code} value={o.code}>{o.label} – {o.name}</option>
         ))}
       </select>
     );
@@ -50,7 +71,7 @@ export function LanguagePicker({ variant = "pill" }: Props) {
         onClick={() => setOpen(v => !v)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-border/30 bg-muted/30 hover:border-primary/50 hover:bg-primary/5 transition-colors text-xs font-bold font-body text-foreground/80 hover:text-foreground"
       >
-        <span className="text-sm leading-none">{current.flag}</span>
+        <FlagImg flagCode={current.flagCode} name={current.name} />
         <span>{current.label}</span>
         <span className="text-[9px] opacity-50 -mr-0.5">▾</span>
       </button>
@@ -58,23 +79,27 @@ export function LanguagePicker({ variant = "pill" }: Props) {
       {/* Dropdown panel */}
       {open && (
         <div
-          className="absolute right-0 top-full mt-1.5 rounded-xl border border-border/30 bg-[hsl(0,0%,8%)] shadow-2xl overflow-hidden z-[200] min-w-[110px]"
+          className="absolute right-0 top-full mt-1.5 rounded-xl border border-border/30 bg-[hsl(0,0%,8%)] shadow-2xl overflow-hidden z-[200] min-w-[120px]"
           style={{ direction: "ltr" }}
         >
           {OPTIONS.map(o => (
             <button
               key={o.code}
               onClick={() => { setLanguage(o.code); setOpen(false); }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold font-body transition-colors hover:bg-primary/10 text-left ${
+              className={`group w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold font-body transition-colors hover:bg-primary/10 text-left ${
                 language === o.code
                   ? "text-primary bg-primary/5"
                   : "text-foreground/60 hover:text-foreground"
               }`}
             >
-              <span className="text-sm leading-none">{o.flag}</span>
-              <span>{o.label}</span>
+              <FlagImg flagCode={o.flagCode} name={o.name} />
+              <span className="tracking-wide">{o.label}</span>
+              {/* Full language name — fades in on hover */}
+              <span className="ml-1 text-[10px] font-normal opacity-0 group-hover:opacity-70 transition-opacity duration-150 whitespace-nowrap">
+                {o.name}
+              </span>
               {language === o.code && (
-                <span className="ml-auto text-primary text-[10px]">✓</span>
+                <span className="ml-auto text-primary text-[10px] flex-shrink-0">✓</span>
               )}
             </button>
           ))}
