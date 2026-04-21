@@ -116,6 +116,16 @@ export const zh: Translations = {
     },
     thisWeek: "↑ 本周新增2个",
     prio: { high: "高", med: "中", low: "低" },
+    projects: {
+      p1: "多语言语音 — 第7批",
+      p2: "自动驾驶 — Q2数据集",
+      p3: "医学扫描标注",
+      p4: "发票提取 — 亚太地区",
+      p5: "RLHF图像偏好",
+      p6: "视频时间标注",
+      p7: "韩语CX转录",
+      p8: "法语法律文档IDP",
+    },
     eventPool: [
       { title: "数据集已准备好下载",         detail: "多语言语音第7批 — ZH子集（847个片段，2.3 GB）" },
       { title: "截止日期处于风险 — 需立即处理", detail: "视频时间标注完成16%，截止日期4月20日" },

@@ -116,6 +116,16 @@ export const fr: Translations = {
     },
     thisWeek: "↑ 2 cette semaine",
     prio: { high: "HAUT", med: "MOY", low: "BAS" },
+    projects: {
+      p1: "Parole Multilingue — Lot 7",
+      p2: "Conduite Autonome — Set Q2",
+      p3: "Annotation de Scans Médicaux",
+      p4: "Extraction de Factures — APAC",
+      p5: "Préférence d'Image RLHF",
+      p6: "Annotation Temporelle Vidéo",
+      p7: "Transcription CX Coréenne",
+      p8: "IDP Documents Juridiques Français",
+    },
     eventPool: [
       { title: "Jeu de données prêt pour téléchargement",   detail: "Parole Multilingue Lot 7 — sous-ensemble ZH (847 segments, 2,3 Go)" },
       { title: "Délai à risque — attention immédiate",      detail: "Annotation Vidéo Temporelle à 16 %, échéance le 20 avril" },

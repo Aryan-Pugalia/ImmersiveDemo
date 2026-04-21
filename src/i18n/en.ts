@@ -128,6 +128,16 @@ export const en = {
     },
     thisWeek: "↑ 2 this week",
     prio: { high: "HIGH", med: "MED", low: "LOW" },
+    projects: {
+      p1: "Multilingual Speech — Batch 7",
+      p2: "Autonomous Driving — Q2 Set",
+      p3: "Medical Scan Annotation",
+      p4: "Invoice Extraction — APAC",
+      p5: "RLHF Image Preference",
+      p6: "Video Temporal Annotation",
+      p7: "Korean CX Transcription",
+      p8: "French Legal Document IDP",
+    } as Record<string, string>,
     eventPool: [
       { title: "Dataset ready for client download",    detail: "Multilingual Speech Batch 7 — ZH subset (847 segments, 2.3 GB)" },
       { title: "Deadline at risk — immediate attention", detail: "Video Temporal Annotation is 16% complete; due Apr 20" },

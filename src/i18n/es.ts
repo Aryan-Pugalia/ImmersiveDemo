@@ -116,6 +116,16 @@ export const es: Translations = {
     },
     thisWeek: "↑ 2 esta semana",
     prio: { high: "ALTO", med: "MED", low: "BAJO" },
+    projects: {
+      p1: "Habla Multilingüe — Lote 7",
+      p2: "Conducción Autónoma — Set Q2",
+      p3: "Anotación de Escáneres Médicos",
+      p4: "Extracción de Facturas — APAC",
+      p5: "Preferencia de Imagen RLHF",
+      p6: "Anotación Temporal de Vídeo",
+      p7: "Transcripción CX Coreana",
+      p8: "IDP Documentos Legales Franceses",
+    },
     eventPool: [
       { title: "Conjunto de datos listo para descarga",   detail: "Habla Multilingüe Lote 7 — subconjunto ZH (847 segmentos, 2.3 GB)" },
       { title: "Plazo en riesgo — atención inmediata",    detail: "Anotación Temporal de Vídeo al 16%, vence el 20 de abril" },

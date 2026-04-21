@@ -285,7 +285,7 @@ function KPICard({ label, value, sub, icon: Icon, accent, trend }: {
 }
 
 // ─── Project Row ───────────────────────────────────────────────────────────────
-function ProjectRow({ p, idx, statusLabels }: { p: Project; idx: number; statusLabels: Record<string,string> }) {
+function ProjectRow({ p, idx, statusLabels, projectName }: { p: Project; idx: number; statusLabels: Record<string,string>; projectName: string }) {
   const pct = Math.round((p.completed / p.totalTasks) * 100);
   const revPct = Math.round((p.inReview / p.totalTasks) * 100);
   const sc = statusColor(p.status);
@@ -300,7 +300,7 @@ function ProjectRow({ p, idx, statusLabels }: { p: Project; idx: number; statusL
         <div className="flex items-center gap-2.5">
           <span className="material-symbols-outlined text-lg text-foreground/40">{p.typeIcon}</span>
           <div>
-            <p className="text-sm font-bold text-foreground font-headline leading-tight">{p.name}</p>
+            <p className="text-sm font-bold text-foreground font-headline leading-tight">{projectName}</p>
             <p className="text-xs text-muted-foreground font-body">{p.client}</p>
           </div>
         </div>
@@ -530,7 +530,15 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {PROJECTS.map((p, i) => <ProjectRow key={p.id} p={p} idx={i} statusLabels={d.status}/>)}
+                  {PROJECTS.map((p, i) => (
+                    <ProjectRow
+                      key={p.id}
+                      p={p}
+                      idx={i}
+                      statusLabels={d.status}
+                      projectName={d.projects[p.id] ?? p.name}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>
