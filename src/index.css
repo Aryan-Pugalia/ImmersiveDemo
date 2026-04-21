@@ -314,21 +314,20 @@
   background: transparent;
   color: #ffffff;
   font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.25em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  padding: 0.82rem 2.75rem;
-  border: 2px solid rgba(170, 0, 182, 0.75);
+  padding: 0.5rem 2.2rem;
+  border: 1.5px solid rgba(170, 0, 182, 0.65);
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.15s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
 }
 
 .cta-btn:hover {
   background: #aa00b6;
   border-color: #aa00b6;
-  color: #ffffff;
   transform: translateY(-2px);
 }
 
