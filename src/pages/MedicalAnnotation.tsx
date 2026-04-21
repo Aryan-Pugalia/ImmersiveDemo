@@ -18,6 +18,7 @@ import type { SegmentedRegion } from "@/types/segmentation";
 import type { Annotation, DrawingTool, AnnotationCategory, TumorType, TumorStage } from "@/types/annotation";
 import { ArrowLeft, Brain, Scan, Activity, PenTool, ChevronRight, BarChart2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 type ViewMode = "ai" | "annotate";
 
@@ -25,6 +26,8 @@ const COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ec4899"
 
 export default function MedicalAnnotation() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const p = t.pages.medical;
   const { result, loading, error, analyze, setResult } = useSegmentation();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -182,7 +185,7 @@ export default function MedicalAnnotation() {
               TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-foreground/80 font-body">Medical Image Annotation</span>
+            <span className="text-sm text-foreground/80 font-body">{p.title}</span>
           </div>
           <div className="absolute bottom-0 left-0 h-[2px] w-full progress-bar-gradient" />
         </header>
@@ -197,14 +200,14 @@ export default function MedicalAnnotation() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 mb-6">
               <Activity className="w-3.5 h-3.5 text-primary" />
               <span className="text-sm font-medium text-muted-foreground font-body">
-                AI-Powered Medical Imaging
+                {p.aiTitle}
               </span>
             </div>
             <h1 className="font-headline text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-4 uppercase">
-              Medical Image Annotation
+              {p.title}
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg mx-auto font-body leading-relaxed">
-              Upload a medical scan to annotate tumors and regions of interest, then verify with AI analysis.
+              {t.tools.uploadPrompt}
             </p>
           </motion.div>
 
@@ -239,11 +242,11 @@ export default function MedicalAnnotation() {
               TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-foreground/80 font-body">Medical Image Annotation</span>
+            <span className="text-sm text-foreground/80 font-body">{p.title}</span>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-sm border-primary/50 text-primary">
-              {annotations.length} annotation{annotations.length !== 1 ? "s" : ""}
+              {annotations.length} {annotations.length !== 1 ? t.tools.annotations_plural : t.tools.annotations}
             </Badge>
             {annotations.length > 0 && (
               <Button
@@ -252,11 +255,11 @@ export default function MedicalAnnotation() {
                 className="gap-1.5 text-sm"
                 onClick={() => navigate("/qa-report/medical-annotation")}
               >
-                <BarChart2 className="h-3.5 w-3.5" /> QA Report
+                <BarChart2 className="h-3.5 w-3.5" /> {t.nav.qaReport}
               </Button>
             )}
             <Button variant="ghost" size="sm" onClick={reset} className="text-sm text-muted-foreground hover:text-foreground">
-              New Image
+              {p.newImage}
             </Button>
           </div>
         </div>
@@ -275,7 +278,7 @@ export default function MedicalAnnotation() {
               onClick={() => setMode("annotate")}
             >
               <PenTool className="w-3.5 h-3.5" />
-              Annotate
+              {p.modeAnnotate}
             </Button>
             <Button
               variant={mode === "ai" ? "default" : "ghost"}
@@ -289,7 +292,7 @@ export default function MedicalAnnotation() {
               }}
             >
               <Brain className="w-3.5 h-3.5" />
-              AI Verify
+              {p.modeAI}
             </Button>
           </div>
 
@@ -304,7 +307,7 @@ export default function MedicalAnnotation() {
           )}
 
           {mode === "ai" && loading && (
-            <span className="text-sm text-muted-foreground animate-pulse font-body">Analyzing image…</span>
+            <span className="text-sm text-muted-foreground animate-pulse font-body">{p.analyzing}</span>
           )}
           {mode === "ai" && error && (
             <span className="text-sm text-destructive font-body">{error}</span>

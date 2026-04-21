@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Play, Pause, Download, Save, Send,
@@ -439,6 +440,8 @@ function ExportModal({ task, segs, status, onClose }: {
 // ─── Task Queue ───────────────────────────────────────────────────────────────
 function TaskQueue({ onSelect }: { onSelect:(t:Task)=>void }) {
   const navigate = useNavigate();
+  const { t: lang } = useLanguage();
+  const pa = lang.pages.audio;
   const [filter, setFilter] = useState("all");
   const langs = ["all","zh","ar","hi","ko","fr","ja"];
   const filtered = filter==="all"?TASKS:TASKS.filter(t=>t.language===filter);
@@ -453,15 +456,15 @@ function TaskQueue({ onSelect }: { onSelect:(t:Task)=>void }) {
           <button onClick={()=>navigate("/use-cases")} className="flex items-center gap-2 text-foreground/60 hover:text-foreground text-sm">
             <ArrowLeft size={16}/> Use Cases
           </button>
-          <span className="font-headline font-bold text-foreground text-sm tracking-wide uppercase">AUD-401 · Audio Annotation</span>
+          <span className="font-headline font-bold text-foreground text-sm tracking-wide uppercase">{pa.breadcrumb}</span>
           <div className="w-24"/>
         </div>
         <div className="h-0.5 bg-gradient-to-r from-[#5b21b6] to-[#9071f0]"/>
       </div>
       <div className="max-w-5xl mx-auto w-full px-6 py-10">
         <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}}>
-          <h1 className="font-headline font-black text-4xl text-foreground text-center mb-2">Select a Task</h1>
-          <p className="text-foreground/50 text-center text-sm mb-8">12 sample tasks · 6 languages · Click any card to open the annotation workspace</p>
+          <h1 className="font-headline font-black text-4xl text-foreground text-center mb-2">{pa.selectTask}</h1>
+          <p className="text-foreground/50 text-center text-sm mb-8">{pa.subtitle} · Click any card to open the annotation workspace</p>
           <div className="flex items-center gap-2 flex-wrap justify-center mb-8">
             {langs.map(l=>(
               <button key={l} onClick={()=>setFilter(l)}
@@ -518,6 +521,8 @@ const STATUS_TO_WF: Record<AppStatus, WfStage> = {
 };
 
 function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
+  const { t: lang } = useLanguage();
+  const pa = lang.pages.audio;
   const [segs,        setSegs]       = useState<AnnotSeg[]>(()=>makeSegs(task));
   const [selectedId,  setSelectedId] = useState<string|null>(null);
   const [tab,         setTab]        = useState<WorkspaceTab>("transcript");
@@ -770,11 +775,11 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
                 <thead className="bg-[hsl(var(--md-surface-container-high))] text-foreground/40">
                   <tr>
                     <th className="px-3 py-2 text-left w-10">#</th>
-                    <th className="px-3 py-2 text-left w-24">Time</th>
-                    <th className="px-3 py-2 text-left w-20">Speaker</th>
-                    <th className="px-3 py-2 text-left">Source</th>
-                    <th className="px-3 py-2 text-left">English</th>
-                    <th className="px-3 py-2 text-left w-28">Issue</th>
+                    <th className="px-3 py-2 text-left w-24">{pa.colTime}</th>
+                    <th className="px-3 py-2 text-left w-20">{pa.colSpeaker}</th>
+                    <th className="px-3 py-2 text-left">{pa.colSource}</th>
+                    <th className="px-3 py-2 text-left">{pa.colEnglish}</th>
+                    <th className="px-3 py-2 text-left w-28">{pa.colIssue}</th>
                     {!readOnly&&<th className="px-3 py-2 text-center w-12">Del</th>}
                   </tr>
                 </thead>

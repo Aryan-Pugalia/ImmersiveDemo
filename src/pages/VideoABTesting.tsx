@@ -14,9 +14,12 @@ import {
   VideoRatings,
   EMPTY_RATINGS,
 } from "@/components/videotesting/vidData";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function VideoABTesting() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const p = t.pages.videoAB;
 
   const [taskIndex, setTaskIndex] = useState(0);
   const currentTask = VIDEO_TASKS[taskIndex];
@@ -80,13 +83,13 @@ export default function VideoABTesting() {
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             <span className="text-sm text-foreground/80 font-body whitespace-nowrap">
-              Video A/B Testing
+              {p.title}
             </span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <Badge variant="outline" className="text-sm border-primary/50 text-primary hidden md:inline-flex">
-              RLHF · Video Preference
+              {p.badge}
             </Badge>
             <Button
               variant="outline"
@@ -94,7 +97,7 @@ export default function VideoABTesting() {
               className="gap-1.5 text-sm"
               onClick={() => navigate("/qa-report/video-ab-testing")}
             >
-              <BarChart2 className="h-3.5 w-3.5" /> QA Report
+              <BarChart2 className="h-3.5 w-3.5" /> {t.nav.qaReport}
             </Button>
             <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-surface-raised">
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -126,7 +129,7 @@ export default function VideoABTesting() {
             {/* Controls bar */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Video A</span>
+                <span>{p.videoA}</span>
                 <div className="flex gap-1">
                   {(["A", "B"] as const).map((s) => (
                     <span
@@ -138,12 +141,12 @@ export default function VideoABTesting() {
                     </span>
                   ))}
                 </div>
-                <span>Video B</span>
+                <span>{p.videoB}</span>
               </div>
 
               <button
                 onClick={() => setSwapped((v) => !v)}
-                title="Swap video sides"
+                title={p.swapAria}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
                   swapped
                     ? "border-amber-600/50 bg-amber-600/10 text-amber-400"
@@ -151,8 +154,8 @@ export default function VideoABTesting() {
                 }`}
               >
                 <ArrowLeftRight className="h-4 w-4" />
-                Swap Sides
-                {swapped && <span className="text-amber-400">(swapped)</span>}
+                {p.swapSides}
+                {swapped && <span className="text-amber-400">{p.swapped}</span>}
               </button>
             </div>
 
@@ -213,6 +216,8 @@ function PromptCard({
   labelA: string;
   labelB: string;
 }) {
+  const { t } = useLanguage();
+  const p = t.pages.videoAB;
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
@@ -233,7 +238,7 @@ function PromptCard({
             Prompt
           </span>
           <span className="text-sm text-muted-foreground font-mono">
-            Task {taskNumber}
+            {p.task(taskNumber)}
           </span>
         </div>
         <p
@@ -247,12 +252,12 @@ function PromptCard({
           onClick={() => setExpanded((v) => !v)}
           className="text-sm text-primary/80 hover:text-primary mt-1.5"
         >
-          {expanded ? "Show less" : "Show more"}
+          {expanded ? p.showLess : p.showMore}
         </button>
       </div>
       <button
         onClick={handleCopy}
-        title="Copy prompt"
+        title={p.copyPrompt}
         className="shrink-0 mt-0.5 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
       >
         {copied ? (

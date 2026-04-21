@@ -14,11 +14,14 @@ import {
   TaskRatings,
   EMPTY_RATINGS,
 } from "@/components/imagetesting/abData";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ImageABTesting() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const p = t.pages.imageAB;
 
   // Which task is currently displayed
   const [taskIndex, setTaskIndex] = useState(0);
@@ -82,7 +85,7 @@ export default function ImageABTesting() {
               TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            <span className="text-sm text-foreground/80 font-body whitespace-nowrap">Image A/B Testing</span>
+            <span className="text-sm text-foreground/80 font-body whitespace-nowrap">{p.title}</span>
           </div>
 
           {/* Center: task navigator */}
@@ -135,7 +138,7 @@ export default function ImageABTesting() {
           {/* Right: badge + QA + annotator */}
           <div className="flex items-center gap-2 shrink-0">
             <Badge variant="outline" className="text-sm border-primary/50 text-primary hidden md:inline-flex">
-              RLHF · Preference
+              {p.badge}
             </Badge>
             <Button
               variant="outline"
@@ -143,7 +146,7 @@ export default function ImageABTesting() {
               className="gap-1.5 text-sm"
               onClick={() => navigate("/qa-report/image-ab-testing")}
             >
-              <BarChart2 className="h-3.5 w-3.5" /> QA Report
+              <BarChart2 className="h-3.5 w-3.5" /> {t.nav.qaReport}
             </Button>
             <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-surface-raised">
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -173,7 +176,7 @@ export default function ImageABTesting() {
             {/* Controls bar */}
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Image A</span>
+                <span>{p.imageA}</span>
                 <div className="flex gap-1">
                   {(["A", "B"] as const).map((s) => (
                     <span
@@ -185,7 +188,7 @@ export default function ImageABTesting() {
                     </span>
                   ))}
                 </div>
-                <span>Image B</span>
+                <span>{p.imageB}</span>
               </div>
 
               <button
@@ -198,8 +201,8 @@ export default function ImageABTesting() {
                 }`}
               >
                 <ArrowLeftRight className="h-4 w-4" />
-                Swap Sides
-                {swapped && <span className="text-amber-400">(swapped)</span>}
+                {p.swapSides}
+                {swapped && <span className="text-amber-400">{p.swapped}</span>}
               </button>
             </div>
 
@@ -223,7 +226,7 @@ export default function ImageABTesting() {
             {/* Task label row */}
             <div className="flex items-center justify-center gap-3 pb-2">
               <span className="text-sm text-muted-foreground">
-                Task {currentTask.taskNumber} of {AB_TASKS.length} —
+                {p.taskOf(currentTask.taskNumber, AB_TASKS.length)} —
               </span>
               <span className="text-sm font-medium text-foreground/80">
                 {currentTask.promptLabel}

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useInvoiceAnnotation } from "@/context/InvoiceAnnotationContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { LABELS, getLabelConfig } from "@/types/invoice-annotation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,8 @@ import { Download, AlertTriangle, CheckCircle, BarChart2 } from "lucide-react";
 export default function InvoiceReviewExport() {
   const { documents } = useInvoiceAnnotation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const p = t.pages.invoice;
 
   const requiredLabels = LABELS.filter((l) => l.required);
 
@@ -39,15 +42,15 @@ export default function InvoiceReviewExport() {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Review & Export</h1>
-          <p className="text-sm text-muted-foreground">Validate annotations and export structured data</p>
+          <h1 className="text-2xl font-bold">{p.reviewTitle}</h1>
+          <p className="text-sm text-muted-foreground">{p.reviewSubtitle}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => navigate("/qa-report/invoice-labeler")} className="gap-2">
-            <BarChart2 className="h-4 w-4" /> QA Report
+            <BarChart2 className="h-4 w-4" /> {t.nav.qaReport}
           </Button>
           <Button onClick={handleExport} className="gap-2">
-            <Download className="h-4 w-4" /> Export JSON
+            <Download className="h-4 w-4" /> {p.exportJson}
           </Button>
         </div>
       </div>
@@ -65,15 +68,15 @@ export default function InvoiceReviewExport() {
                 <CardTitle className="text-base">{doc.name}</CardTitle>
                 <div className="flex items-center gap-2">
                   {isValid ? (
-                    <Badge className="gap-1 bg-green-600"><CheckCircle className="h-3 w-3" /> Valid</Badge>
+                    <Badge className="gap-1 bg-green-600"><CheckCircle className="h-3 w-3" /> {p.valid}</Badge>
                   ) : (
-                    <Badge variant="destructive" className="gap-1"><AlertTriangle className="h-3 w-3" /> Incomplete</Badge>
+                    <Badge variant="destructive" className="gap-1"><AlertTriangle className="h-3 w-3" /> {p.incomplete}</Badge>
                   )}
                 </div>
               </div>
               {missingRequired.length > 0 && (
                 <p className="text-sm text-destructive mt-1">
-                  Missing: {missingRequired.map((r) => r.name).join(", ")}
+                  {p.missing} {missingRequired.map((r) => r.name).join(", ")}
                 </p>
               )}
             </CardHeader>
@@ -81,16 +84,18 @@ export default function InvoiceReviewExport() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Field</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead>Confidence</TableHead>
-                    <TableHead>Bounding Box</TableHead>
+                    <TableHead>{p.colField}</TableHead>
+                    <TableHead>{p.colValue}</TableHead>
+                    <TableHead>{p.colConfidence}</TableHead>
+                    <TableHead>{p.colBoundingBox}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {doc.annotations.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground text-sm py-6">No annotations</TableCell>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground text-sm py-6">
+                        {p.noAnnotationsEmpty}
+                      </TableCell>
                     </TableRow>
                   ) : (
                     doc.annotations.map((ann) => {
@@ -100,8 +105,12 @@ export default function InvoiceReviewExport() {
                           <TableCell>
                             <Badge style={{ backgroundColor: cfg.color, color: "#fff" }} className="text-sm">{cfg.name}</Badge>
                           </TableCell>
-                          <TableCell className="font-medium">{ann.value || <span className="text-muted-foreground italic">empty</span>}</TableCell>
-                          <TableCell className="capitalize">{ann.confidence}</TableCell>
+                          <TableCell className="font-medium">
+                            {ann.value || <span className="text-muted-foreground italic">{p.emptyValue}</span>}
+                          </TableCell>
+                          <TableCell className="capitalize">
+                            {ann.confidence === "high" ? p.confHigh : ann.confidence === "medium" ? p.confMed : p.confLow}
+                          </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
                             ({Math.round(ann.box.x)}, {Math.round(ann.box.y)}) {Math.round(ann.box.width)}×{Math.round(ann.box.height)}
                           </TableCell>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 import { Slider } from "@/components/ui/slider";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Html, PerspectiveCamera } from "@react-three/drei";
@@ -182,6 +183,7 @@ const INITIAL_BBOXES: BBox3D[] = [
 
 export default function LidarAnnotation() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [bboxes, setBboxes] = useState<BBox3D[]>(INITIAL_BBOXES);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tool, setTool] = useState<ToolMode>("select");
@@ -418,7 +420,7 @@ export default function LidarAnnotation() {
               TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight size={14} className="text-muted-foreground" />
-            <span className="text-foreground/80 text-sm">LiDAR 3D Annotation</span>
+            <span className="text-foreground/80 text-sm">{t.useCases["lidar-annotation"]?.title ?? "LiDAR 3D Annotation"}</span>
             <ChevronRight size={14} className="text-muted-foreground" />
             <span className="text-muted-foreground text-sm">scene_0042.pcd</span>
           </div>
@@ -457,7 +459,7 @@ export default function LidarAnnotation() {
               variant="outline"
               className="text-sm border-primary/50 text-primary"
             >
-              {bboxes.length} annotations
+              {bboxes.length} {t.tools.annotations_plural}
             </Badge>
             <Badge
               variant="outline"

@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ const QA_DATA: Record<
 };
 
 // ─── Score dial ─────────────────────────────────────────────────────────────
-function ScoreDial({ value }: { value: number }) {
+function ScoreDial({ value, qualityLabel }: { value: number; qualityLabel: string }) {
   const r = 42;
   const circ = 2 * Math.PI * r;
   const dash = (value / 100) * circ;
@@ -127,7 +128,7 @@ function ScoreDial({ value }: { value: number }) {
       </svg>
       <div className="absolute text-center">
         <p className="text-2xl font-bold" style={{ color }}>{value}%</p>
-        <p className="text-sm text-muted-foreground">Quality</p>
+        <p className="text-sm text-muted-foreground">{qualityLabel}</p>
       </div>
     </div>
   );
@@ -151,12 +152,14 @@ function AccuracyBar({ value }: { value: number }) {
 export default function QAReport() {
   const { useCaseId } = useParams<{ useCaseId: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const q = t.pages.qaReport;
   const data = QA_DATA[useCaseId ?? ""];
 
   if (!data) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Report not found.</p>
+        <p className="text-muted-foreground">{q.notFound}</p>
       </div>
     );
   }
@@ -178,10 +181,10 @@ export default function QAReport() {
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-sm text-foreground/80">{data.title}</span>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-sm text-foreground/60">QA Report</span>
+            <span className="text-sm text-foreground/60">{q.breadcrumb}</span>
           </div>
           <Button variant="outline" size="sm" onClick={() => window.print()} className="gap-2">
-            <Printer className="h-4 w-4" /> Export PDF
+            <Printer className="h-4 w-4" /> {q.exportPdf}
           </Button>
         </div>
         <div className="absolute bottom-0 left-0 h-[2px] w-full progress-bar-gradient" />
@@ -195,7 +198,7 @@ export default function QAReport() {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <Badge variant="outline" className="text-sm text-primary border-primary/30 font-mono">
-                QA REPORT
+                {q.badge}
               </Badge>
               <Badge variant="outline" className="text-sm text-muted-foreground">
                 {new Date().toLocaleDateString("en-GB", {
@@ -215,8 +218,8 @@ export default function QAReport() {
           {/* Dial */}
           <Card className="col-span-2 md:col-span-1">
             <CardContent className="p-4 flex flex-col items-center justify-center min-h-[148px]">
-              <ScoreDial value={data.overall} />
-              <p className="text-sm text-muted-foreground mt-1">Overall Quality</p>
+              <ScoreDial value={data.overall} qualityLabel={q.quality} />
+              <p className="text-sm text-muted-foreground mt-1">{q.overallQuality}</p>
             </CardContent>
           </Card>
 
@@ -225,10 +228,10 @@ export default function QAReport() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Target className="h-4 w-4 text-blue-400" />
-                <span className="text-sm text-muted-foreground font-medium">IoU Score</span>
+                <span className="text-sm text-muted-foreground font-medium">{q.iouScore}</span>
               </div>
               <p className="text-3xl font-bold text-blue-400">{data.iouScore}%</p>
-              <p className="text-sm text-muted-foreground mt-1">Bounding box overlap</p>
+              <p className="text-sm text-muted-foreground mt-1">{q.iouSub}</p>
             </CardContent>
           </Card>
 
@@ -237,10 +240,10 @@ export default function QAReport() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="h-4 w-4 text-purple-400" />
-                <span className="text-sm text-muted-foreground font-medium">Cohen's κ</span>
+                <span className="text-sm text-muted-foreground font-medium">{q.kappa}</span>
               </div>
               <p className="text-3xl font-bold text-purple-400">{data.kappaScore}</p>
-              <p className="text-sm text-muted-foreground mt-1">Inter-annotator agreement</p>
+              <p className="text-sm text-muted-foreground mt-1">{q.kappaSub}</p>
             </CardContent>
           </Card>
 
@@ -249,7 +252,7 @@ export default function QAReport() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <User className="h-4 w-4 text-amber-400" />
-                <span className="text-sm text-muted-foreground font-medium">Annotator</span>
+                <span className="text-sm text-muted-foreground font-medium">{q.annotator}</span>
               </div>
               <p className="text-base font-bold leading-tight">{data.annotator.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -258,7 +261,7 @@ export default function QAReport() {
                   className="text-sm text-green-400 border-green-500/30 gap-1"
                 >
                   <CheckCircle className="h-2.5 w-2.5" />
-                  {data.annotator.accuracy}% acc
+                  {data.annotator.accuracy}% {q.acc}
                 </Badge>
                 <Badge
                   variant="outline"
@@ -269,7 +272,7 @@ export default function QAReport() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1.5">
-                {data.annotator.tasks.toLocaleString()} total tasks
+                {data.annotator.tasks.toLocaleString()} {q.totalTasks}
               </p>
             </CardContent>
           </Card>
@@ -280,17 +283,17 @@ export default function QAReport() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-400" />
-              Per-Field Accuracy
+              {q.perField}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-6">Field / Class</TableHead>
-                  <TableHead>Accuracy</TableHead>
-                  <TableHead className="w-24 text-center">Samples</TableHead>
-                  <TableHead className="w-24 text-right pr-6">Issues</TableHead>
+                  <TableHead className="pl-6">{q.colField}</TableHead>
+                  <TableHead>{q.colAccuracy}</TableHead>
+                  <TableHead className="w-24 text-center">{q.colSamples}</TableHead>
+                  <TableHead className="w-24 text-right pr-6">{q.colIssues}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -322,8 +325,7 @@ export default function QAReport() {
 
         {/* Footer */}
         <p className="text-sm text-muted-foreground text-center pb-4 print:text-black">
-          Generated by TP.ai FABStudio ·{" "}
-          {new Date().toISOString().split("T")[0]} · Confidential
+          {q.footer(new Date().toISOString().split("T")[0])}
         </p>
       </div>
 

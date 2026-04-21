@@ -1,20 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { useInvoiceAnnotation } from "@/context/InvoiceAnnotationContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/StatusPill";
 import { FileText, CheckCircle, Clock, AlertCircle, ArrowRight, BarChart2 } from "lucide-react";
 
-const statusConfig = {
-  not_started: { label: "Not Started", variant: "outline" as const, icon: AlertCircle },
-  in_progress: { label: "In Progress", variant: "secondary" as const, icon: Clock },
-  complete: { label: "Complete", variant: "default" as const, icon: CheckCircle },
-};
-
 export default function InvoiceDashboard() {
   const { documents } = useInvoiceAnnotation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const p = t.pages.invoice;
+
+  const statusConfig = {
+    not_started: { label: p.statusNotStarted, variant: "outline" as const, icon: AlertCircle },
+    in_progress: { label: p.statusInProgress, variant: "secondary" as const, icon: Clock },
+    complete:    { label: p.statusComplete,   variant: "default" as const,  icon: CheckCircle },
+  };
 
   const total = documents.length;
   const complete = documents.filter((d) => d.status === "complete").length;
@@ -23,17 +26,17 @@ export default function InvoiceDashboard() {
   const totalAnnotations = documents.reduce((s, d) => s + d.annotations.length, 0);
 
   const stats = [
-    { label: "Total Documents", value: total, icon: FileText, color: "text-primary" },
-    { label: "Annotated", value: complete, icon: CheckCircle, color: "text-green-500" },
-    { label: "In Progress", value: inProgress, icon: Clock, color: "text-amber-500" },
-    { label: "Pending", value: pending, icon: AlertCircle, color: "text-muted-foreground" },
+    { label: p.totalDocs,  value: total,      icon: FileText,    color: "text-primary" },
+    { label: p.annotated,  value: complete,   icon: CheckCircle, color: "text-green-500" },
+    { label: p.inProgress, value: inProgress, icon: Clock,       color: "text-amber-500" },
+    { label: p.pending,    value: pending,    icon: AlertCircle, color: "text-muted-foreground" },
   ];
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Invoice Annotation Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Label and extract structured data from invoices and receipts</p>
+        <h1 className="text-3xl font-bold tracking-tight">{p.dashTitle}</h1>
+        <p className="text-muted-foreground mt-1">{p.dashSubtitle}</p>
       </div>
 
       {/* Stats */}
@@ -55,15 +58,15 @@ export default function InvoiceDashboard() {
       <Card>
         <CardContent className="p-5 flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-sm text-muted-foreground">Total Annotations Created</p>
+            <p className="text-sm text-muted-foreground">{p.totalAnnotations}</p>
             <p className="text-3xl font-bold">{totalAnnotations}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => navigate("/qa-report/invoice-labeler")} className="gap-1.5">
-              <BarChart2 className="h-4 w-4" /> QA Report
+              <BarChart2 className="h-4 w-4" /> {t.nav.qaReport}
             </Button>
             <Button variant="outline" onClick={() => navigate("review")}>
-              Review All <ArrowRight className="ml-2 h-4 w-4" />
+              {p.reviewAll} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </CardContent>
@@ -71,7 +74,7 @@ export default function InvoiceDashboard() {
 
       {/* Document list */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">Documents</h2>
+        <h2 className="text-xl font-semibold mb-4">{p.documents}</h2>
         <div className="grid gap-3">
           {documents.map((doc) => {
             const cfg = statusConfig[doc.status];
@@ -90,7 +93,8 @@ export default function InvoiceDashboard() {
                     <div>
                       <p className="font-medium">{doc.name}</p>
                       <p className="text-sm text-muted-foreground capitalize">
-                        {doc.type} · {doc.annotations.length} annotation{doc.annotations.length !== 1 ? "s" : ""}
+                        {doc.type} · {doc.annotations.length}{" "}
+                        {doc.annotations.length !== 1 ? t.tools.annotations_plural : t.tools.annotations}
                       </p>
                       <div className="mt-1.5">
                         <StatusPill documentStatus={doc.status} />

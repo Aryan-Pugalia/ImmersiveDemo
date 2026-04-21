@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useInvoiceAnnotation } from "@/context/InvoiceAnnotationContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { LABELS, LabelType, Annotation, BoundingBox, getLabelConfig } from "@/types/invoice-annotation";
 import { mockInvoiceContent } from "@/data/invoice-mock-documents";
 import { InvoiceRenderer } from "@/components/InvoiceRenderer";
@@ -23,6 +24,8 @@ export default function InvoiceAnnotateWorkspace() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getDocument, addAnnotation, updateAnnotation, deleteAnnotation, setDocumentStatus } = useInvoiceAnnotation();
+  const { t } = useLanguage();
+  const p = t.pages.invoice;
   const doc = getDocument(id!);
   const invoiceData = mockInvoiceContent[id!];
 
@@ -135,7 +138,7 @@ export default function InvoiceAnnotateWorkspace() {
   };
 
   if (!doc || !invoiceData) {
-    return <div className="p-8 text-muted-foreground">Document not found.</div>;
+    return <div className="p-8 text-muted-foreground">{p.docNotFound}</div>;
   }
 
   const selectedAnn = doc.annotations.find((a) => a.id === selectedAnnotation);
@@ -150,11 +153,11 @@ export default function InvoiceAnnotateWorkspace() {
           </Button>
           <div>
             <h1 className="text-xl font-bold">{doc.name}</h1>
-            <p className="text-sm text-muted-foreground">{doc.annotations.length} annotations</p>
+            <p className="text-sm text-muted-foreground">{doc.annotations.length} {t.tools.annotations_plural}</p>
           </div>
         </div>
         <Button onClick={handleMarkComplete} className="gap-2">
-          <Save className="h-4 w-4" /> Mark Complete
+          <Save className="h-4 w-4" /> {p.markComplete}
         </Button>
       </div>
 
@@ -165,18 +168,18 @@ export default function InvoiceAnnotateWorkspace() {
           <Card>
             <CardContent className="p-3 flex items-center gap-2 flex-wrap">
               <Button variant={tool === "select" ? "default" : "outline"} size="sm" onClick={() => setTool("select")} className="gap-1">
-                <MousePointer className="h-3.5 w-3.5" /> Select
+                <MousePointer className="h-3.5 w-3.5" /> {p.toolSelect}
               </Button>
               <Button variant={tool === "draw" ? "default" : "outline"} size="sm" onClick={() => setTool("draw")} className="gap-1">
-                <Square className="h-3.5 w-3.5" /> Draw
+                <Square className="h-3.5 w-3.5" /> {p.toolDraw}
               </Button>
               <div className="w-px h-6 bg-border mx-1" />
               <Button variant="outline" size="sm" onClick={handleUndo} disabled={undoStack.length === 0} className="gap-1">
-                <Undo2 className="h-3.5 w-3.5" /> Undo
+                <Undo2 className="h-3.5 w-3.5" /> {p.undo}
               </Button>
               {selectedAnnotation && (
                 <Button variant="destructive" size="sm" onClick={() => { deleteAnnotation(id!, selectedAnnotation); setSelectedAnnotation(null); }} className="gap-1">
-                  <Trash2 className="h-3.5 w-3.5" /> Delete
+                  <Trash2 className="h-3.5 w-3.5" /> {p.delete}
                 </Button>
               )}
               <div className="w-px h-6 bg-border mx-1" />
@@ -213,17 +216,17 @@ export default function InvoiceAnnotateWorkspace() {
           {/* Annotations Table */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Annotations</CardTitle>
+              <CardTitle className="text-sm">{t.tools.annotations_plural}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <ScrollArea className="max-h-52">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[130px]">Label</TableHead>
-                      <TableHead>Value</TableHead>
-                      <TableHead className="w-[90px]">Confidence</TableHead>
-                      <TableHead className="w-[60px]">Coords</TableHead>
+                      <TableHead className="w-[130px]">{p.colLabel}</TableHead>
+                      <TableHead>{p.colValue}</TableHead>
+                      <TableHead className="w-[90px]">{p.colConfidence}</TableHead>
+                      <TableHead className="w-[60px]">{p.colCoords}</TableHead>
                       <TableHead className="w-10"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -244,7 +247,7 @@ export default function InvoiceAnnotateWorkspace() {
                               value={ann.value}
                               onChange={(e) => updateAnnotation(id!, ann.id, { value: e.target.value })}
                               className="h-7 text-sm"
-                              placeholder="Enter extracted value…"
+                              placeholder={p.extractedValue + "…"}
                               onClick={(e) => e.stopPropagation()}
                             />
                           </TableCell>
@@ -254,7 +257,9 @@ export default function InvoiceAnnotateWorkspace() {
                                 ann.confidence === "high"   ? "bg-green-500" :
                                 ann.confidence === "medium" ? "bg-amber-500"  : "bg-red-500"
                               }`} />
-                              <span className="text-sm capitalize text-muted-foreground">{ann.confidence}</span>
+                              <span className="text-sm capitalize text-muted-foreground">
+                                {ann.confidence === "high" ? p.confHigh : ann.confidence === "medium" ? p.confMed : p.confLow}
+                              </span>
                             </span>
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
@@ -271,7 +276,7 @@ export default function InvoiceAnnotateWorkspace() {
                     {doc.annotations.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center text-muted-foreground text-sm py-6">
-                          No annotations yet. Select a label and draw on the document.
+                          {p.noAnnotations}
                         </TableCell>
                       </TableRow>
                     )}
@@ -287,7 +292,7 @@ export default function InvoiceAnnotateWorkspace() {
           {/* Label selector */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Field Labels</CardTitle>
+              <CardTitle className="text-sm">{p.fieldLabels}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-1.5">
               {LABELS.map((label) => (
@@ -300,7 +305,7 @@ export default function InvoiceAnnotateWorkspace() {
                 >
                   <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: label.color }} />
                   <span className="flex-1 text-left">{label.name}</span>
-                  {label.required && <span className="text-sm text-destructive font-medium">REQ</span>}
+                  {label.required && <span className="text-sm text-destructive font-medium">{p.req}</span>}
                 </button>
               ))}
             </CardContent>
@@ -310,15 +315,15 @@ export default function InvoiceAnnotateWorkspace() {
           {selectedAnn && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Annotation Properties</CardTitle>
+                <CardTitle className="text-sm">{p.annProperties}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <label className="text-sm text-muted-foreground">Label</label>
+                  <label className="text-sm text-muted-foreground">{p.colLabel}</label>
                   <p className="text-sm font-medium">{getLabelConfig(selectedAnn.label).name}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Extracted Value</label>
+                  <label className="text-sm text-muted-foreground">{p.extractedValue}</label>
                   <Input
                     value={selectedAnn.value}
                     onChange={(e) => updateAnnotation(id!, selectedAnn.id, { value: e.target.value })}
@@ -326,7 +331,9 @@ export default function InvoiceAnnotateWorkspace() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Confidence: {selectedAnn.confidence}</label>
+                  <label className="text-sm text-muted-foreground">
+                    {p.colConfidence}: {selectedAnn.confidence === "high" ? p.confHigh : selectedAnn.confidence === "medium" ? p.confMed : p.confLow}
+                  </label>
                   <Slider
                     min={0}
                     max={2}
@@ -336,7 +343,7 @@ export default function InvoiceAnnotateWorkspace() {
                     className="mt-2"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                    <span>Low</span><span>Medium</span><span>High</span>
+                    <span>{p.confLow}</span><span>{p.confMed}</span><span>{p.confHigh}</span>
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
