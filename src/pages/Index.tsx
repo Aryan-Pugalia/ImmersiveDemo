@@ -103,11 +103,10 @@ const Index = () => {
                 className="capability-card"
                 aria-hidden={i >= CAPABILITIES.length ? true : undefined}
               >
-                <div className="capability-card-header">
+                <div className="capability-title-header">
                   <div className={`capability-bullet ${cap.bullet === "purple" ? "bullet-purple" : "bullet-violet"}`} />
-                  <span className="capability-category">{cap.category}</span>
+                  <h3 className="capability-title">{cap.title}</h3>
                 </div>
-                <h3 className="capability-title">{cap.title}</h3>
                 <ul className="capability-subs">
                   {cap.subs.map((sub) => (
                     <li key={sub} className="capability-sub-item">
