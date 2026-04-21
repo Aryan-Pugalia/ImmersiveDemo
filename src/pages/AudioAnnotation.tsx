@@ -260,7 +260,7 @@ const AUDIO_TUTORIAL: TutStep[] = [
     body:"The right panel has a segment-by-segment transcript editor. Type exactly what you hear — use [inaudible] for unclear speech." },
   { title:"Translation Tab",      target:"aud-tab-translation", position:"bottom", action:"Switch to the Translation tab",
     body:"Add the English translation for each segment. Stay faithful to meaning rather than translating word-for-word. Keep proper nouns as heard." },
-  { title:"Submit for Review",    target:"aud-submit",     position:"bottom", action:"Click Submit when all segments are filled",
+  { title:"Submit for Review",    target:"aud-submit",     position:"left", action:"Click Submit when all segments are filled",
     body:"Once all segments have source text and a translation, click Submit. The task moves to AI Verify → QA Review → Delivered automatically." },
 ];
 
@@ -284,12 +284,29 @@ function AudioTutorial({ step, total, onNext, onSkip }: {
 
   const tipStyle = (): React.CSSProperties => {
     if (!rect) return { position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)" };
-    const g=16;
-    switch(step.position){
-      case "right":  return { position:"fixed", top:Math.max(8,rect.top), left:rect.left+rect.width+g, maxWidth:300 };
-      case "left":   return { position:"fixed", top:Math.max(8,rect.top), right:window.innerWidth-rect.left+g, maxWidth:300 };
-      case "top":    return { position:"fixed", bottom:window.innerHeight-rect.top+g, left:Math.max(8,rect.left), maxWidth:340 };
-      case "bottom": return { position:"fixed", top:rect.top+rect.height+g, left:Math.max(8,rect.left), maxWidth:340 };
+    const g = 16;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    // Clamp horizontal position so tooltip never bleeds past right or left edge
+    const clampLeft = (preferredLeft: number, maxW: number) =>
+      Math.max(8, Math.min(preferredLeft, vw - maxW - 8));
+    switch (step.position) {
+      case "right": {
+        const top = Math.max(8, Math.min(rect.top, vh - 200));
+        return { position:"fixed", top, left: Math.min(rect.left + rect.width + g, vw - 316), maxWidth: 300 };
+      }
+      case "left": {
+        const top = Math.max(8, Math.min(rect.top, vh - 200));
+        return { position:"fixed", top, right: vw - rect.left + g, maxWidth: 300 };
+      }
+      case "top": {
+        const bottom = vh - rect.top + g;
+        return { position:"fixed", bottom: Math.max(8, bottom), left: clampLeft(rect.left, 340), maxWidth: 340 };
+      }
+      case "bottom": {
+        const top = rect.top + rect.height + g;
+        return { position:"fixed", top: Math.min(top, vh - 220), left: clampLeft(rect.left, 340), maxWidth: 340 };
+      }
     }
   };
 
