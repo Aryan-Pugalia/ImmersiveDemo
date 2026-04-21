@@ -90,7 +90,7 @@
 
 /* Gradient underline */
 .gradient-underline {
-  background: linear-gradient(90deg, #7055e8 0%, #9071f0 100%);
+  background: linear-gradient(90deg, #5b21b6 0%, #9071f0 100%);
   height: 2px;
   width: 100%;
   display: block;
@@ -99,7 +99,7 @@
 
 /* Progress bar gradient */
 .progress-bar-gradient {
-  background: linear-gradient(90deg, #7055e8 0%, #9071f0 100%);
+  background: linear-gradient(90deg, #5b21b6 0%, #9071f0 100%);
 }
 
 /* Industrial card styles */
@@ -167,7 +167,7 @@
 
 .header-divider {
   height: 2px;
-  background: linear-gradient(90deg, #7055e8 0%, #9071f0 100%);
+  background: linear-gradient(90deg, #5b21b6 0%, #9071f0 100%);
 }
 
 /* ── Banner ── */
