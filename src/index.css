@@ -231,6 +231,15 @@
   margin-bottom: 0.3rem;
 }
 
+.label-service-logo {
+  display: block;
+  height: 18px;
+  width: auto;
+  object-fit: contain;
+  margin: 0 auto 0.5rem auto;
+  opacity: 0.92;
+}
+
 .label-introducing {
   display: block;
   font-size: 0.8rem;
