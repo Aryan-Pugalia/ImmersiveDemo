@@ -48,12 +48,12 @@ const UseCaseSelection = () => {
                   </div>
                   <div>
                     <p className="text-sm font-headline font-bold text-foreground">Alex Johnson</p>
-                    <p className="text-xs font-body text-foreground/50">Annotator</p>
+                    <p className="text-sm font-body text-foreground/50">Annotator</p>
                   </div>
                 </div>
                 <div className="border-t border-border/20 pt-2">
-                  <span className="text-[10px] font-body uppercase tracking-[0.2em] text-foreground/30">Role</span>
-                  <span className="block text-xs font-body text-primary mt-0.5">Data Annotator</span>
+                  <span className="text-sm font-body uppercase tracking-[0.2em] text-foreground/30">Role</span>
+                  <span className="block text-sm font-body text-primary mt-0.5">Data Annotator</span>
                 </div>
               </div>
             )}
@@ -75,7 +75,7 @@ const UseCaseSelection = () => {
             <div className="gradient-underline mx-auto w-24"></div>
           </div>
           <p className="mt-6 text-foreground/60 font-body text-center max-w-xl text-lg">
-            Select the foundational machine learning task for your current data batch. Our industrial-grade pipeline handles the rest.
+            Choose a use case to get started. Each one comes with a guided workflow, built-in quality checks, and a review report.
           </p>
         </div>
 
@@ -91,21 +91,21 @@ const UseCaseSelection = () => {
                 <span className="material-symbols-outlined text-4xl text-foreground/40 card-icon-hover">
                   {useCase.icon}
                 </span>
-                <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-foreground/30 font-body">
+                <span className="text-sm font-bold tracking-[0.2em] uppercase text-foreground/30 font-body">
                   ID: {useCase.idTag}
                 </span>
               </div>
               <h3 className="text-[18px] font-bold font-headline text-foreground mb-3 uppercase tracking-wide">
                 {useCase.title}
               </h3>
-              <p className="text-foreground/60 text-sm leading-relaxed mb-8 flex-grow font-body">
+              <p className="text-foreground/60 text-base leading-relaxed mb-8 flex-grow font-body">
                 {useCase.description}
               </p>
               <div className="flex flex-wrap gap-2">
-                <span className="bg-background text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 border border-primary/20 rounded-full">
+                <span className="bg-background text-primary text-sm font-bold uppercase tracking-widest px-3 py-1 border border-primary/20 rounded-full">
                   {useCase.categoryTag}
                 </span>
-                <span className="bg-background text-foreground/40 text-[10px] font-bold uppercase tracking-widest px-3 py-1 border border-border rounded-full">
+                <span className="bg-background text-foreground/40 text-sm font-bold uppercase tracking-widest px-3 py-1 border border-border rounded-full">
                   {useCase.secondaryTag}
                 </span>
               </div>

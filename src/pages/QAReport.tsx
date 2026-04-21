@@ -70,6 +70,41 @@ const QA_DATA: Record<
     summary:
       "1,150 point cloud frames annotated across 3 scenes. 3D IoU ≥ 0.85 on all vehicle classes. Dataset cleared and delivered.",
   },
+  "video-ab-testing": {
+    title: "Video A/B Testing",
+    overall: 84.1,
+    iouScore: 81.6,
+    kappaScore: 0.79,
+    stage: "audit",
+    annotator: { name: "Alex Johnson", accuracy: 88.2, tasks: 1, avgTime: "7m 12s" },
+    fields: [
+      { name: "Realism / Aesthetics",   accuracy: 90.3, samples: 1, issues: 0 },
+      { name: "Temporal Stability",     accuracy: 85.7, samples: 1, issues: 0 },
+      { name: "Audio Quality & Sync",   accuracy: 82.4, samples: 1, issues: 1 },
+      { name: "Prompt Alignment",       accuracy: 87.1, samples: 1, issues: 0 },
+      { name: "Overall Preference",     accuracy: 76.8, samples: 1, issues: 1 },
+      { name: "Imperfection Detection", accuracy: 66.7, samples: 6, issues: 2 },
+    ],
+    summary:
+      "1 video pair (GPT-Sora v1 vs Runway Gen-3) evaluated across 5 rubric dimensions + a 6-item imperfection checklist. 4 of 6 hidden flaws detected — bike-curb clip and lip-desync missed. Flagged for expert arbitration on overall preference.",
+  },
+  "image-ab-testing": {
+    title: "Image A/B Testing",
+    overall: 87.3,
+    iouScore: 84.7,
+    kappaScore: 0.81,
+    stage: "audit",
+    annotator: { name: "Alex Johnson", accuracy: 89.4, tasks: 3, avgTime: "4m 12s" },
+    fields: [
+      { name: "Realism / Aesthetics", accuracy: 91.2, samples: 3, issues: 0 },
+      { name: "Layout / Composition", accuracy: 88.6, samples: 3, issues: 1 },
+      { name: "Artifacts / Quality",  accuracy: 93.1, samples: 3, issues: 0 },
+      { name: "Prompt Alignment",     accuracy: 85.4, samples: 3, issues: 1 },
+      { name: "Overall Preference",   accuracy: 78.9, samples: 3, issues: 1 },
+    ],
+    summary:
+      "3 image pairs evaluated across 5 rating dimensions. 1 human–AI conflict detected on Cyberpunk task (low AI confidence 64%). 2 tasks fully aligned. Routed to QA for arbitration.",
+  },
 };
 
 // ─── Score dial ─────────────────────────────────────────────────────────────
@@ -92,7 +127,7 @@ function ScoreDial({ value }: { value: number }) {
       </svg>
       <div className="absolute text-center">
         <p className="text-2xl font-bold" style={{ color }}>{value}%</p>
-        <p className="text-[10px] text-muted-foreground">Quality</p>
+        <p className="text-sm text-muted-foreground">Quality</p>
       </div>
     </div>
   );
@@ -107,7 +142,7 @@ function AccuracyBar({ value }: { value: number }) {
       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} />
       </div>
-      <span className="text-xs tabular-nums w-10 text-right text-foreground/80">{value}%</span>
+      <span className="text-sm tabular-nums w-10 text-right text-foreground/80">{value}%</span>
     </div>
   );
 }
@@ -159,17 +194,17 @@ export default function QAReport() {
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <Badge variant="outline" className="text-[10px] text-primary border-primary/30 font-mono">
+              <Badge variant="outline" className="text-sm text-primary border-primary/30 font-mono">
                 QA REPORT
               </Badge>
-              <Badge variant="outline" className="text-[10px] text-muted-foreground">
+              <Badge variant="outline" className="text-sm text-muted-foreground">
                 {new Date().toLocaleDateString("en-GB", {
                   day: "2-digit", month: "short", year: "numeric",
                 })}
               </Badge>
             </div>
             <h1 className="text-3xl font-bold tracking-tight font-headline">{data.title}</h1>
-            <p className="text-muted-foreground text-sm mt-1.5 max-w-xl">{data.summary}</p>
+            <p className="text-muted-foreground text-base mt-1.5 max-w-xl">{data.summary}</p>
           </div>
           <StatusPill stage={data.stage} size="md" />
         </div>
@@ -181,7 +216,7 @@ export default function QAReport() {
           <Card className="col-span-2 md:col-span-1">
             <CardContent className="p-4 flex flex-col items-center justify-center min-h-[148px]">
               <ScoreDial value={data.overall} />
-              <p className="text-[11px] text-muted-foreground mt-1">Overall Quality</p>
+              <p className="text-sm text-muted-foreground mt-1">Overall Quality</p>
             </CardContent>
           </Card>
 
@@ -190,10 +225,10 @@ export default function QAReport() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Target className="h-4 w-4 text-blue-400" />
-                <span className="text-xs text-muted-foreground font-medium">IoU Score</span>
+                <span className="text-sm text-muted-foreground font-medium">IoU Score</span>
               </div>
               <p className="text-3xl font-bold text-blue-400">{data.iouScore}%</p>
-              <p className="text-[10px] text-muted-foreground mt-1">Bounding box overlap</p>
+              <p className="text-sm text-muted-foreground mt-1">Bounding box overlap</p>
             </CardContent>
           </Card>
 
@@ -202,10 +237,10 @@ export default function QAReport() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="h-4 w-4 text-purple-400" />
-                <span className="text-xs text-muted-foreground font-medium">Cohen's κ</span>
+                <span className="text-sm text-muted-foreground font-medium">Cohen's κ</span>
               </div>
               <p className="text-3xl font-bold text-purple-400">{data.kappaScore}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">Inter-annotator agreement</p>
+              <p className="text-sm text-muted-foreground mt-1">Inter-annotator agreement</p>
             </CardContent>
           </Card>
 
@@ -214,26 +249,26 @@ export default function QAReport() {
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
                 <User className="h-4 w-4 text-amber-400" />
-                <span className="text-xs text-muted-foreground font-medium">Annotator</span>
+                <span className="text-sm text-muted-foreground font-medium">Annotator</span>
               </div>
               <p className="text-base font-bold leading-tight">{data.annotator.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 <Badge
                   variant="outline"
-                  className="text-[10px] text-green-400 border-green-500/30 gap-1"
+                  className="text-sm text-green-400 border-green-500/30 gap-1"
                 >
                   <CheckCircle className="h-2.5 w-2.5" />
                   {data.annotator.accuracy}% acc
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="text-[10px] text-muted-foreground border-border/30 gap-1"
+                  className="text-sm text-muted-foreground border-border/30 gap-1"
                 >
                   <Clock className="h-2.5 w-2.5" />
                   {data.annotator.avgTime}
                 </Badge>
               </div>
-              <p className="text-[10px] text-muted-foreground mt-1.5">
+              <p className="text-sm text-muted-foreground mt-1.5">
                 {data.annotator.tasks.toLocaleString()} total tasks
               </p>
             </CardContent>
@@ -265,12 +300,12 @@ export default function QAReport() {
                     <TableCell className="w-56">
                       <AccuracyBar value={f.accuracy} />
                     </TableCell>
-                    <TableCell className="text-center text-xs text-muted-foreground">
+                    <TableCell className="text-center text-sm text-muted-foreground">
                       {f.samples}
                     </TableCell>
                     <TableCell className="text-right pr-6">
                       {f.issues > 0 ? (
-                        <span className="text-xs text-amber-400 flex items-center justify-end gap-1">
+                        <span className="text-sm text-amber-400 flex items-center justify-end gap-1">
                           <AlertTriangle className="h-3 w-3" />
                           {f.issues}
                         </span>
@@ -286,7 +321,7 @@ export default function QAReport() {
         </Card>
 
         {/* Footer */}
-        <p className="text-[10px] text-muted-foreground text-center pb-4 print:text-black">
+        <p className="text-sm text-muted-foreground text-center pb-4 print:text-black">
           Generated by TP.ai FABStudio ·{" "}
           {new Date().toISOString().split("T")[0]} · Confidential
         </p>

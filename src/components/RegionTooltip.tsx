@@ -35,18 +35,18 @@ export function RegionTooltip({ region, position, onClose }: RegionTooltipProps)
             />
             <h4 className="text-sm font-semibold text-foreground">{region.name}</h4>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-2">
             {region.description}
           </p>
           <div className="flex items-center gap-1">
-            <span className="text-xs text-muted-foreground">Confidence:</span>
+            <span className="text-sm text-muted-foreground">Confidence:</span>
             <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-primary"
                 style={{ width: `${region.confidence * 100}%` }}
               />
             </div>
-            <span className="text-xs font-medium text-foreground">
+            <span className="text-sm font-medium text-foreground">
               {Math.round(region.confidence * 100)}%
             </span>
           </div>

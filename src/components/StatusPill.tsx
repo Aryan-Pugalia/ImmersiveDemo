@@ -38,7 +38,7 @@ export function StatusPill({ stage, documentStatus, size = "sm" }: StatusPillPro
           <div key={s.id} className="flex items-center gap-0.5">
             <div
               className={`flex items-center gap-1 rounded-full px-2 py-0.5 border transition-colors ${
-                size === "md" ? "text-[11px]" : "text-[10px]"
+                size === "md" ? "text-sm" : "text-sm"
               } font-medium ${
                 isDone
                   ? "bg-green-500/15 text-green-400 border-green-500/25"

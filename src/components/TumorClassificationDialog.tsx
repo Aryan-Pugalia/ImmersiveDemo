@@ -115,13 +115,13 @@ export function TumorClassificationDialog({
         <div className="space-y-4">
           {/* Category */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Category</Label>
+            <Label className="text-sm text-muted-foreground">Category</Label>
             <div className="flex flex-wrap gap-1.5">
               {CATEGORIES.map((c) => (
                 <Badge
                   key={c.value}
                   variant={category === c.value ? "default" : "outline"}
-                  className="cursor-pointer text-xs"
+                  className="cursor-pointer text-sm"
                   onClick={() => setCategory(c.value)}
                 >
                   {c.label}
@@ -132,7 +132,7 @@ export function TumorClassificationDialog({
 
           {/* Label */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Label</Label>
+            <Label className="text-sm text-muted-foreground">Label</Label>
             <Input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
@@ -145,7 +145,7 @@ export function TumorClassificationDialog({
           {isTumor && (
             <>
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Tumor Type</Label>
+                <Label className="text-sm text-muted-foreground">Tumor Type</Label>
                 <Select value={tumorType} onValueChange={(v) => setTumorType(v as TumorType)}>
                   <SelectTrigger className="h-8 text-sm">
                     <SelectValue />
@@ -162,7 +162,7 @@ export function TumorClassificationDialog({
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Stage</Label>
+                <Label className="text-sm text-muted-foreground">Stage</Label>
                 <Select value={tumorStage} onValueChange={(v) => setTumorStage(v as TumorStage)}>
                   <SelectTrigger className="h-8 text-sm">
                     <SelectValue />
@@ -182,7 +182,7 @@ export function TumorClassificationDialog({
 
           {/* Confidence */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">
+            <Label className="text-sm text-muted-foreground">
               Annotation Confidence:{" "}
               <span className={`font-bold ${confidenceColor(confidence)}`}>{confidence}%</span>
             </Label>
@@ -193,7 +193,7 @@ export function TumorClassificationDialog({
               max={100}
               step={5}
             />
-            <div className="flex justify-between text-[10px] text-muted-foreground">
+            <div className="flex justify-between text-sm text-muted-foreground">
               <span>Low</span>
               <span>Moderate</span>
               <span>High</span>
@@ -202,7 +202,7 @@ export function TumorClassificationDialog({
 
           {/* Annotator */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Annotator Name (optional)</Label>
+            <Label className="text-sm text-muted-foreground">Annotator Name (optional)</Label>
             <Input
               value={annotatorName}
               onChange={(e) => setAnnotatorName(e.target.value)}
@@ -213,7 +213,7 @@ export function TumorClassificationDialog({
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Clinical Notes</Label>
+            <Label className="text-sm text-muted-foreground">Clinical Notes</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

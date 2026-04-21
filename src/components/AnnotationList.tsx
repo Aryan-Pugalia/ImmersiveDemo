@@ -88,9 +88,9 @@ export function AnnotationList({
       {/* Stats */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-xs text-muted-foreground">Overlay Opacity: {opacity}%</Label>
+          <Label className="text-sm text-muted-foreground">Overlay Opacity: {opacity}%</Label>
           {tumorCount > 0 && (
-            <Badge variant="outline" className="text-[10px] border-red-500/30 text-red-400">
+            <Badge variant="outline" className="text-sm border-red-500/30 text-red-400">
               {tumorCount} tumor{tumorCount > 1 ? "s" : ""}
             </Badge>
           )}
@@ -110,7 +110,7 @@ export function AnnotationList({
           Annotations ({annotations.length})
         </h3>
         {annotations.length === 0 && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Draw a bounding box or ellipse on the image to annotate a region. You'll be prompted to classify it.
           </p>
         )}
@@ -137,35 +137,35 @@ export function AnnotationList({
                         value={editLabel}
                         onChange={(e) => setEditLabel(e.target.value)}
                         placeholder="Label"
-                        className="h-7 text-xs"
+                        className="h-7 text-sm"
                         autoFocus
                       />
                       {ann.category === "tumor" && (
                         <>
                           <Select value={editTumorType} onValueChange={(v) => setEditTumorType(v as TumorType)}>
-                            <SelectTrigger className="h-7 text-xs">
+                            <SelectTrigger className="h-7 text-sm">
                               <SelectValue placeholder="Tumor type" />
                             </SelectTrigger>
                             <SelectContent>
                               {["benign","malignant","metastatic","cystic","necrotic","calcified","unknown"].map((t) => (
-                                <SelectItem key={t} value={t} className="text-xs">{t}</SelectItem>
+                                <SelectItem key={t} value={t} className="text-sm">{t}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                           <Select value={editTumorStage} onValueChange={(v) => setEditTumorStage(v as TumorStage)}>
-                            <SelectTrigger className="h-7 text-xs">
+                            <SelectTrigger className="h-7 text-sm">
                               <SelectValue placeholder="Stage" />
                             </SelectTrigger>
                             <SelectContent>
                               {["I","II","III","IV","uncertain"].map((s) => (
-                                <SelectItem key={s} value={s} className="text-xs">Stage {s}</SelectItem>
+                                <SelectItem key={s} value={s} className="text-sm">Stage {s}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </>
                       )}
                       <div className="space-y-1">
-                        <Label className="text-[10px] text-muted-foreground">Confidence: {editConfidence}%</Label>
+                        <Label className="text-sm text-muted-foreground">Confidence: {editConfidence}%</Label>
                         <Slider
                           value={[editConfidence]}
                           onValueChange={(v) => setEditConfidence(v[0])}
@@ -176,7 +176,7 @@ export function AnnotationList({
                         value={editNotes}
                         onChange={(e) => setEditNotes(e.target.value)}
                         placeholder="Clinical notes"
-                        className="text-xs min-h-[50px]"
+                        className="text-sm min-h-[50px]"
                       />
                       <div className="flex gap-1 flex-wrap">
                         {COLORS.map((c) => (
@@ -207,7 +207,7 @@ export function AnnotationList({
                           style={{ backgroundColor: ann.color }}
                         />
                         <CatIcon className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-xs text-foreground flex-1 truncate">
+                        <span className="text-sm text-foreground flex-1 truncate">
                           {ann.label || "Unlabeled"}
                         </span>
                         <span className={`h-2 w-2 rounded-full flex-shrink-0 ${
@@ -242,7 +242,7 @@ export function AnnotationList({
                         </div>
                       )}
                       {ann.annotatorName && (
-                        <p className="text-[10px] text-muted-foreground ml-5">
+                        <p className="text-sm text-muted-foreground ml-5">
                           by {ann.annotatorName}
                         </p>
                       )}

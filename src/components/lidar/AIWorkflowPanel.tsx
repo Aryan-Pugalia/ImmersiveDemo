@@ -105,7 +105,7 @@ export function AIWorkflowPanel({
                     <Icon size={14} />
                   </div>
                   <span
-                    className="mt-1 text-[10px] font-medium whitespace-nowrap"
+                    className="mt-1 text-sm font-medium whitespace-nowrap"
                     style={{
                       color:
                         isCurrent ? "hsl(var(--primary))" :
@@ -135,12 +135,12 @@ export function AIWorkflowPanel({
       {/* Stage-specific content */}
       {stage === "annotating" && (
         <div className="px-3 pb-3 flex flex-col gap-3">
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Draw bounding boxes over all visible objects (cars, pedestrians,
             cyclists, vegetation). When finished, submit for AI verification.
           </p>
           <div className="flex flex-col gap-2">
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Annotations placed</span>
               <span className="font-mono text-foreground">{humanBoxes.length}</span>
             </div>
@@ -160,7 +160,7 @@ export function AIWorkflowPanel({
         <div className="px-3 pb-3 flex flex-col gap-3">
           {!aiRan ? (
             <>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 The AI model will generate reference bounding boxes from the
                 point cloud and compare them against your annotations.
               </p>
@@ -179,7 +179,7 @@ export function AIWorkflowPanel({
               </div>
 
               {/* AI overlay toggle */}
-              <label className="flex items-center justify-between text-xs px-2 py-2 rounded border border-border">
+              <label className="flex items-center justify-between text-sm px-2 py-2 rounded border border-border">
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <Eye size={13} /> Show AI boxes
                 </span>
@@ -224,7 +224,7 @@ export function AIWorkflowPanel({
 
       {stage === "qa_review" && stats && (
         <div className="px-3 pb-3 flex flex-col gap-3">
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             {stats.needsQA} annotation{stats.needsQA !== 1 ? "s" : ""} flagged
             for QA review. A senior reviewer inspects these before the batch
             is delivered.
@@ -262,7 +262,7 @@ export function AIWorkflowPanel({
         <div className="px-3 pb-3 flex flex-col gap-3">
           <div className="flex items-center gap-2 p-3 rounded-lg border border-green-500/30 bg-green-500/5">
             <CheckCircle2 className="text-green-500" size={18} />
-            <div className="text-xs leading-tight">
+            <div className="text-sm leading-tight">
               <div className="font-semibold text-foreground">Batch delivered</div>
               <div className="text-muted-foreground">
                 Annotations signed off and exported to dataset.
@@ -306,7 +306,7 @@ function MetricTile({
     tone === "good" ? "#22c55e" : tone === "warn" ? "#f59e0b" : "hsl(var(--primary))";
   return (
     <div className="rounded-md border border-border p-2">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-sm uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="text-sm font-bold mt-0.5" style={{ color: toneColor }}>
         {value}
       </div>
@@ -325,7 +325,7 @@ function ComparisonRowView({ row }: { row: ComparisonRow }) {
       : { Icon: XCircle, color: "#ef4444", text: "Missed" };
 
   return (
-    <div className="flex items-center justify-between text-[11px] px-2 py-1.5 rounded border border-border">
+    <div className="flex items-center justify-between text-sm px-2 py-1.5 rounded border border-border">
       <div className="flex items-center gap-2 min-w-0">
         <Icon size={12} style={{ color }} />
         <span className="truncate text-foreground">{row.aiBox.label}</span>
@@ -335,7 +335,7 @@ function ComparisonRowView({ row }: { row: ComparisonRow }) {
       </div>
       <Badge
         variant="outline"
-        className="text-[10px] px-1.5 py-0 h-4"
+        className="text-sm px-1.5 py-0 h-4"
         style={{ color, borderColor: color + "66" }}
       >
         {text}

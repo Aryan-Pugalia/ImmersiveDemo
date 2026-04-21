@@ -66,12 +66,12 @@ const UseCaseDetail = () => {
                   </div>
                   <div>
                     <p className="text-sm font-headline font-bold text-foreground">Alex Johnson</p>
-                    <p className="text-xs font-body text-foreground/50">Annotator</p>
+                    <p className="text-sm font-body text-foreground/50">Annotator</p>
                   </div>
                 </div>
                 <div className="border-t border-border/20 pt-2">
-                  <span className="text-[10px] font-body uppercase tracking-[0.2em] text-foreground/30">Role</span>
-                  <span className="block text-xs font-body text-primary mt-0.5">Data Annotator</span>
+                  <span className="text-sm font-body uppercase tracking-[0.2em] text-foreground/30">Role</span>
+                  <span className="block text-sm font-body text-primary mt-0.5">Data Annotator</span>
                 </div>
               </div>
             )}
@@ -89,7 +89,7 @@ const UseCaseDetail = () => {
             {useCase.icon}
           </span>
           <div className="inline-block mb-4">
-            <span className="bg-background text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 border border-primary/20 rounded-full">
+            <span className="bg-background text-primary text-sm font-bold uppercase tracking-widest px-3 py-1 border border-primary/20 rounded-full">
               {useCase.categoryTag}
             </span>
           </div>

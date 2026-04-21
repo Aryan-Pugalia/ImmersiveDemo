@@ -196,7 +196,7 @@ export default function GuidedTutorial({
       >
         <div className="bg-card border border-border rounded-xl p-4 shadow-xl">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-primary">
+            <span className="text-sm font-medium text-primary">
               Step {currentStep + 1} of {TUTORIAL_STEPS.length}
             </span>
             <button
@@ -209,27 +209,27 @@ export default function GuidedTutorial({
           </div>
 
           <h3 className="text-sm font-bold text-foreground mb-1">{step.title}</h3>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
             {step.description}
           </p>
 
           {step.action && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20">
               <ChevronRight size={12} className="text-primary shrink-0" />
-              <span className="text-xs font-medium text-primary">{step.action}</span>
+              <span className="text-sm font-medium text-primary">{step.action}</span>
             </div>
           )}
 
           <div className="mt-3 flex items-center gap-2">
             <button
               onClick={onAdvance}
-              className="flex-1 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+              className="flex-1 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
             >
               Next
             </button>
             <button
               onClick={onSkip}
-              className="px-3 py-2 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               Skip tutorial
             </button>

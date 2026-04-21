@@ -40,6 +40,26 @@ export const useCases: UseCase[] = [
     categoryTag: "Document AI",
     secondaryTag: "IDP",
   },
+  {
+    id: "8",
+    slug: "image-ab-testing",
+    title: "Image A/B Testing",
+    description: "Evaluate AI-generated image pairs against text prompts — rate realism, composition, and prompt alignment to build RLHF preference datasets.",
+    icon: "compare",
+    idTag: "IMG-201",
+    categoryTag: "RLHF / GenAI",
+    secondaryTag: "Preference",
+  },
+  {
+    id: "9",
+    slug: "video-ab-testing",
+    title: "Video A/B Testing",
+    description: "Compare AI-generated video pairs with synced playback, frame stepping, and audio solo — flag temporal artifacts and A/V sync issues for preference learning.",
+    icon: "movie",
+    idTag: "VID-301",
+    categoryTag: "RLHF / Video GenAI",
+    secondaryTag: "Multimodal",
+  },
 ];
 
 export function getUseCaseBySlug(slug: string): UseCase | undefined {

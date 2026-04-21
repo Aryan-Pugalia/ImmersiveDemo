@@ -72,7 +72,7 @@ export default function InvoiceReviewExport() {
                 </div>
               </div>
               {missingRequired.length > 0 && (
-                <p className="text-xs text-destructive mt-1">
+                <p className="text-sm text-destructive mt-1">
                   Missing: {missingRequired.map((r) => r.name).join(", ")}
                 </p>
               )}
@@ -98,11 +98,11 @@ export default function InvoiceReviewExport() {
                       return (
                         <TableRow key={ann.id}>
                           <TableCell>
-                            <Badge style={{ backgroundColor: cfg.color, color: "#fff" }} className="text-[10px]">{cfg.name}</Badge>
+                            <Badge style={{ backgroundColor: cfg.color, color: "#fff" }} className="text-sm">{cfg.name}</Badge>
                           </TableCell>
                           <TableCell className="font-medium">{ann.value || <span className="text-muted-foreground italic">empty</span>}</TableCell>
                           <TableCell className="capitalize">{ann.confidence}</TableCell>
-                          <TableCell className="text-xs text-muted-foreground">
+                          <TableCell className="text-sm text-muted-foreground">
                             ({Math.round(ann.box.x)}, {Math.round(ann.box.y)}) {Math.round(ann.box.width)}×{Math.round(ann.box.height)}
                           </TableCell>
                         </TableRow>

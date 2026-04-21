@@ -44,7 +44,7 @@ export default function InvoiceDashboard() {
               <s.icon className={`h-8 w-8 ${s.color}`} />
               <div>
                 <p className="text-2xl font-bold">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
               </div>
             </CardContent>
           </Card>
@@ -89,7 +89,7 @@ export default function InvoiceDashboard() {
                     </div>
                     <div>
                       <p className="font-medium">{doc.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">
+                      <p className="text-sm text-muted-foreground capitalize">
                         {doc.type} · {doc.annotations.length} annotation{doc.annotations.length !== 1 ? "s" : ""}
                       </p>
                       <div className="mt-1.5">

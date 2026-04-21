@@ -121,14 +121,14 @@ export function ControlsPanel({
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1.5">
           <Layers className="w-4 h-4 text-primary" />
-          <Badge variant="secondary" className="text-xs">{imageType}</Badge>
+          <Badge variant="secondary" className="text-sm">{imageType}</Badge>
         </div>
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-sm">
           <Activity className="w-3 h-3 mr-1" />
           {regions.length} region{regions.length !== 1 ? "s" : ""}
         </Badge>
         {findings.length > 0 && (
-          <Badge variant="outline" className="text-xs border-red-500/30 text-red-400">
+          <Badge variant="outline" className="text-sm border-red-500/30 text-red-400">
             <AlertTriangle className="w-3 h-3 mr-1" />
             {findings.length} finding{findings.length !== 1 ? "s" : ""}
           </Badge>
@@ -138,11 +138,11 @@ export function ControlsPanel({
       {/* Summary */}
       <div className="rounded-xl border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground mb-2">AI Analysis Summary</h3>
-        <p className="text-xs text-muted-foreground leading-relaxed">{summary}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{summary}</p>
         <div className="mt-3 flex items-center gap-2">
           <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Avg. confidence:</span>
-          <span className={`text-xs font-bold ${confidenceColor(avgConfidence)}`}>
+          <span className="text-sm text-muted-foreground">Avg. confidence:</span>
+          <span className={`text-sm font-bold ${confidenceColor(avgConfidence)}`}>
             {Math.round(avgConfidence * 100)}%
           </span>
         </div>
@@ -159,7 +159,7 @@ export function ControlsPanel({
             )}
             Annotation Comparison
           </h3>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {matchedCount} of {annotations.length} annotation{annotations.length !== 1 ? "s" : ""} matched
             with AI-detected regions (IoU &gt; 20%)
           </p>
@@ -167,7 +167,7 @@ export function ControlsPanel({
             {matchResults.map((m) => (
               <div
                 key={m.annotation.id}
-                className={`rounded-lg border p-2 text-xs ${
+                className={`rounded-lg border p-2 text-sm ${
                   m.iou > 0.5
                     ? "border-green-500/20 bg-green-500/5"
                     : m.iou > 0.2
@@ -217,7 +217,7 @@ export function ControlsPanel({
           <Switch checked={overlayVisible} onCheckedChange={onToggleOverlay} />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">Opacity: {opacity}%</Label>
+          <Label className="text-sm text-muted-foreground">Opacity: {opacity}%</Label>
           <Slider
             value={[opacity]}
             onValueChange={(v) => onOpacityChange(v[0])}
@@ -243,7 +243,7 @@ export function ControlsPanel({
                     className="w-3 h-3 rounded-sm flex-shrink-0"
                     style={{ backgroundColor: region.color }}
                   />
-                  <span className="text-xs font-medium text-foreground flex-1 truncate">
+                  <span className="text-sm font-medium text-foreground flex-1 truncate">
                     {region.name}
                   </span>
                   <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${sev.cls}`}>
@@ -251,7 +251,7 @@ export function ControlsPanel({
                     {sev.label}
                   </Badge>
                 </div>
-                <p className="text-[11px] text-muted-foreground pl-5 leading-relaxed">
+                <p className="text-sm text-muted-foreground pl-5 leading-relaxed">
                   {region.description}
                 </p>
                 <div className="pl-5 flex items-center gap-2">
@@ -259,7 +259,7 @@ export function ControlsPanel({
                     value={region.confidence * 100}
                     className="h-1.5 flex-1"
                   />
-                  <span className={`text-[10px] font-bold ${confidenceColor(region.confidence)}`}>
+                  <span className={`text-sm font-bold ${confidenceColor(region.confidence)}`}>
                     {Math.round(region.confidence * 100)}%
                   </span>
                 </div>

@@ -130,7 +130,7 @@ function BoundingBox3D({
         zIndexRange={[1, 0]}
       >
         <div
-          className="px-2 py-0.5 rounded text-xs font-bold whitespace-nowrap"
+          className="px-2 py-0.5 rounded text-sm font-bold whitespace-nowrap"
           style={{
             background: bbox.color,
             color: "#000",
@@ -420,7 +420,7 @@ export default function LidarAnnotation() {
             <ChevronRight size={14} className="text-muted-foreground" />
             <span className="text-foreground/80 text-sm">LiDAR 3D Annotation</span>
             <ChevronRight size={14} className="text-muted-foreground" />
-            <span className="text-muted-foreground text-xs">scene_0042.pcd</span>
+            <span className="text-muted-foreground text-sm">scene_0042.pcd</span>
           </div>
           <div className="flex items-center gap-2">
             {/* View mode toggle */}
@@ -455,13 +455,13 @@ export default function LidarAnnotation() {
             </button>
             <Badge
               variant="outline"
-              className="text-xs border-primary/50 text-primary"
+              className="text-sm border-primary/50 text-primary"
             >
               {bboxes.length} annotations
             </Badge>
             <Badge
               variant="outline"
-              className="text-xs border-border text-muted-foreground"
+              className="text-sm border-border text-muted-foreground"
             >
               {pointCount.toLocaleString()} pts
             </Badge>
@@ -569,7 +569,7 @@ export default function LidarAnnotation() {
         {/* Workflow */}
         <div className="border-b border-border">
           <div className="px-4 pt-3 pb-1 flex items-center gap-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Workflow
             </span>
           </div>
@@ -589,7 +589,7 @@ export default function LidarAnnotation() {
         <div className="p-4 border-b border-border" data-tutorial="label-grid">
           <div className="flex items-center gap-2 mb-3">
             <Tag size={14} className="text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Label Class
             </span>
           </div>
@@ -601,7 +601,7 @@ export default function LidarAnnotation() {
                 <button
                   key={label.name}
                   onClick={() => handleSetLabel(label)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all border"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border"
                   style={{
                     background: isActive ? label.color + "22" : "transparent",
                     borderColor: isActive ? label.color : "hsl(0, 0%, 13%)",
@@ -620,7 +620,7 @@ export default function LidarAnnotation() {
         <div className="p-4 border-b border-border" data-tutorial="annotations-list">
           <div className="flex items-center gap-2 mb-3">
             <Layers size={14} className="text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Annotations
             </span>
           </div>
@@ -678,7 +678,7 @@ export default function LidarAnnotation() {
               </div>
             ))}
             {bboxes.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-4">
+              <p className="text-sm text-muted-foreground text-center py-4">
                 No annotations yet. Select a label and use the box tool.
               </p>
             )}
@@ -688,10 +688,10 @@ export default function LidarAnnotation() {
         {/* Selected bbox properties */}
         {selectedBBox && (
           <div className="p-4" data-tutorial="properties-panel">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Properties
             </span>
-            <div className="mt-3 space-y-3 text-xs text-muted-foreground">
+            <div className="mt-3 space-y-3 text-sm text-muted-foreground">
               <div className="flex justify-between">
                 <span>Label</span>
                 <span
@@ -832,7 +832,7 @@ function ViewToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-colors ${
+      className={`flex items-center gap-1 px-2 py-1 rounded text-sm font-medium transition-colors ${
         active
           ? "bg-primary text-primary-foreground"
           : "text-muted-foreground hover:text-foreground hover:bg-muted"

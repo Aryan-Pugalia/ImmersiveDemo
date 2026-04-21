@@ -150,7 +150,7 @@ export default function InvoiceAnnotateWorkspace() {
           </Button>
           <div>
             <h1 className="text-xl font-bold">{doc.name}</h1>
-            <p className="text-xs text-muted-foreground">{doc.annotations.length} annotations</p>
+            <p className="text-sm text-muted-foreground">{doc.annotations.length} annotations</p>
           </div>
         </div>
         <Button onClick={handleMarkComplete} className="gap-2">
@@ -183,7 +183,7 @@ export default function InvoiceAnnotateWorkspace() {
               <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setZoom((z) => Math.min(z + 0.25, 2))}>
                 <ZoomIn className="h-3.5 w-3.5" />
               </Button>
-              <span className="text-xs text-muted-foreground w-10 text-center">{Math.round(zoom * 100)}%</span>
+              <span className="text-sm text-muted-foreground w-10 text-center">{Math.round(zoom * 100)}%</span>
               <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setZoom((z) => Math.max(z - 0.25, 0.5))}>
                 <ZoomOut className="h-3.5 w-3.5" />
               </Button>
@@ -237,13 +237,13 @@ export default function InvoiceAnnotateWorkspace() {
                           onClick={() => setSelectedAnnotation(ann.id)}
                         >
                           <TableCell>
-                            <Badge style={{ backgroundColor: cfg.color, color: "#fff" }} className="text-[10px]">{cfg.name}</Badge>
+                            <Badge style={{ backgroundColor: cfg.color, color: "#fff" }} className="text-sm">{cfg.name}</Badge>
                           </TableCell>
                           <TableCell>
                             <Input
                               value={ann.value}
                               onChange={(e) => updateAnnotation(id!, ann.id, { value: e.target.value })}
-                              className="h-7 text-xs"
+                              className="h-7 text-sm"
                               placeholder="Enter extracted value…"
                               onClick={(e) => e.stopPropagation()}
                             />
@@ -254,10 +254,10 @@ export default function InvoiceAnnotateWorkspace() {
                                 ann.confidence === "high"   ? "bg-green-500" :
                                 ann.confidence === "medium" ? "bg-amber-500"  : "bg-red-500"
                               }`} />
-                              <span className="text-xs capitalize text-muted-foreground">{ann.confidence}</span>
+                              <span className="text-sm capitalize text-muted-foreground">{ann.confidence}</span>
                             </span>
                           </TableCell>
-                          <TableCell className="text-[10px] text-muted-foreground">
+                          <TableCell className="text-sm text-muted-foreground">
                             {Math.round(ann.box.x)},{Math.round(ann.box.y)}
                           </TableCell>
                           <TableCell>
@@ -270,7 +270,7 @@ export default function InvoiceAnnotateWorkspace() {
                     })}
                     {doc.annotations.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground text-xs py-6">
+                        <TableCell colSpan={5} className="text-center text-muted-foreground text-sm py-6">
                           No annotations yet. Select a label and draw on the document.
                         </TableCell>
                       </TableRow>
@@ -300,7 +300,7 @@ export default function InvoiceAnnotateWorkspace() {
                 >
                   <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: label.color }} />
                   <span className="flex-1 text-left">{label.name}</span>
-                  {label.required && <span className="text-[10px] text-destructive font-medium">REQ</span>}
+                  {label.required && <span className="text-sm text-destructive font-medium">REQ</span>}
                 </button>
               ))}
             </CardContent>
@@ -314,11 +314,11 @@ export default function InvoiceAnnotateWorkspace() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <label className="text-xs text-muted-foreground">Label</label>
+                  <label className="text-sm text-muted-foreground">Label</label>
                   <p className="text-sm font-medium">{getLabelConfig(selectedAnn.label).name}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">Extracted Value</label>
+                  <label className="text-sm text-muted-foreground">Extracted Value</label>
                   <Input
                     value={selectedAnn.value}
                     onChange={(e) => updateAnnotation(id!, selectedAnn.id, { value: e.target.value })}
@@ -326,7 +326,7 @@ export default function InvoiceAnnotateWorkspace() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">Confidence: {selectedAnn.confidence}</label>
+                  <label className="text-sm text-muted-foreground">Confidence: {selectedAnn.confidence}</label>
                   <Slider
                     min={0}
                     max={2}
@@ -335,11 +335,11 @@ export default function InvoiceAnnotateWorkspace() {
                     onValueChange={([v]) => updateAnnotation(id!, selectedAnn.id, { confidence: confidenceLevels[v] })}
                     className="mt-2"
                   />
-                  <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
                     <span>Low</span><span>Medium</span><span>High</span>
                   </div>
                 </div>
-                <div className="text-[10px] text-muted-foreground">
+                <div className="text-sm text-muted-foreground">
                   Box: ({Math.round(selectedAnn.box.x)}, {Math.round(selectedAnn.box.y)}) {Math.round(selectedAnn.box.width)}×{Math.round(selectedAnn.box.height)}
                 </div>
               </CardContent>

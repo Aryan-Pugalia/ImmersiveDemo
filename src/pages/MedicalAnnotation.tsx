@@ -196,7 +196,7 @@ export default function MedicalAnnotation() {
           >
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 mb-6">
               <Activity className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-medium text-muted-foreground font-body">
+              <span className="text-sm font-medium text-muted-foreground font-body">
                 AI-Powered Medical Imaging
               </span>
             </div>
@@ -242,20 +242,20 @@ export default function MedicalAnnotation() {
             <span className="text-sm text-foreground/80 font-body">Medical Image Annotation</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs border-primary/50 text-primary">
+            <Badge variant="outline" className="text-sm border-primary/50 text-primary">
               {annotations.length} annotation{annotations.length !== 1 ? "s" : ""}
             </Badge>
             {annotations.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1.5 text-xs"
+                className="gap-1.5 text-sm"
                 onClick={() => navigate("/qa-report/medical-annotation")}
               >
                 <BarChart2 className="h-3.5 w-3.5" /> QA Report
               </Button>
             )}
-            <Button variant="ghost" size="sm" onClick={reset} className="text-xs text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="sm" onClick={reset} className="text-sm text-muted-foreground hover:text-foreground">
               New Image
             </Button>
           </div>
@@ -271,7 +271,7 @@ export default function MedicalAnnotation() {
             <Button
               variant={mode === "annotate" ? "default" : "ghost"}
               size="sm"
-              className="h-7 text-xs gap-1 rounded-sm"
+              className="h-7 text-sm gap-1 rounded-sm"
               onClick={() => setMode("annotate")}
             >
               <PenTool className="w-3.5 h-3.5" />
@@ -280,7 +280,7 @@ export default function MedicalAnnotation() {
             <Button
               variant={mode === "ai" ? "default" : "ghost"}
               size="sm"
-              className="h-7 text-xs gap-1 rounded-sm"
+              className="h-7 text-sm gap-1 rounded-sm"
               onClick={() => {
                 setMode("ai");
                 if (!result && !loading && imageFile) {
