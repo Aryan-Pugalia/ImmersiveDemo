@@ -16,6 +16,7 @@ import InvoiceAnnotateWorkspace from "./pages/invoice/InvoiceAnnotateWorkspace.t
 import InvoiceReviewExport from "./pages/invoice/InvoiceReviewExport.tsx";
 import QAReport from "./pages/QAReport.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AudioAnnotation from "./pages/AudioAnnotation.tsx";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="annotate/:id" element={<InvoiceAnnotateWorkspace />} />
             <Route path="review" element={<InvoiceReviewExport />} />
           </Route>
+          <Route path="/use-cases/audio-annotation" element={<AudioAnnotation />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />
           <Route path="/qa-report/:useCaseId" element={<QAReport />} />
           <Route path="*" element={<NotFound />} />

@@ -60,6 +60,16 @@ export const useCases: UseCase[] = [
     categoryTag: "RLHF / Video GenAI",
     secondaryTag: "Multimodal",
   },
+  {
+    id: "10",
+    slug: "audio-annotation",
+    title: "Audio Transcription & Translation",
+    description: "Transcribe multilingual speech and translate to English — with speaker diarization, segment timing, audio quality flags, and full QC reviewer workflow.",
+    icon: "mic",
+    idTag: "AUD-401",
+    categoryTag: "Speech / NLP",
+    secondaryTag: "Multilingual",
+  },
 ];
 
 export function getUseCaseBySlug(slug: string): UseCase | undefined {
