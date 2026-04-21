@@ -311,7 +311,7 @@
 }
 
 .cta-btn {
-  background: #aa00b6;
+  background: transparent;
   color: #ffffff;
   font-family: inherit;
   font-size: 0.95rem;
@@ -319,27 +319,20 @@
   letter-spacing: 0.25em;
   text-transform: uppercase;
   padding: 0.82rem 2.75rem;
-  border: none;
-  border-radius: 2px;
+  border: 2px solid rgba(170, 0, 182, 0.75);
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.22s ease, transform 0.15s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.15s ease;
 }
 
 .cta-btn:hover {
-  background: #c500d3;
+  background: #aa00b6;
+  border-color: #aa00b6;
+  color: #ffffff;
   transform: translateY(-2px);
 }
 
 .cta-btn:active { transform: translateY(0); }
-
-.cta-underline {
-  width: 44px;
-  height: 2px;
-  border-radius: 1px;
-  background: linear-gradient(90deg, #8800a0, #cc00d9, #8800a0);
-  margin-top: 1.1rem;
-  opacity: 0.65;
-}
 
 /* ── Capabilities section ── */
 .capabilities-section {

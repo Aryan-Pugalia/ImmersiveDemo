@@ -82,7 +82,6 @@ const Index = () => {
           <button className="cta-btn" onClick={() => navigate("/use-cases")}>
             Let's Go
           </button>
-          <div className="cta-underline" aria-hidden="true" />
         </div>
       </div>
 
