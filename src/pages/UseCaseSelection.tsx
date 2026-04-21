@@ -67,16 +67,13 @@ const UseCaseSelection = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-16 md:py-24">
         {/* Heading */}
-        <div className="flex flex-col items-center mb-16 md:mb-24">
+        <div className="flex flex-col items-center mb-8">
           <div className="inline-block">
             <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground tracking-tight text-center">
               Select Your Pipeline
             </h1>
             <div className="gradient-underline mx-auto w-24"></div>
           </div>
-          <p className="mt-6 text-foreground/60 font-body text-center max-w-xl text-lg">
-            Choose a use case to get started. Each one comes with a guided workflow, built-in quality checks, and a review report.
-          </p>
         </div>
 
         {/* Use Case Cards Grid */}
