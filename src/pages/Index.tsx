@@ -1,43 +1,15 @@
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
+import { LanguagePicker } from "@/components/LanguagePicker";
 
-const CAPABILITIES = [
-  {
-    bullet: "purple",
-    category: "Text & NLP",
-    title: "Text & NLP",
-    subs: ["Named Entity Recognition", "Intent Classification", "Summarisation QA", "Coreference Resolution"],
-  },
-  {
-    bullet: "violet",
-    category: "Computer Vision",
-    title: "Computer Vision",
-    subs: ["Object Detection", "Instance Segmentation", "Keypoint Annotation", "Image Classification"],
-  },
-  {
-    bullet: "purple",
-    category: "Video Annotation",
-    title: "Video Annotation",
-    subs: ["Object Tracking", "Action Recognition", "Scene Segmentation", "Event Detection"],
-  },
-  {
-    bullet: "violet",
-    category: "3D Sensor Fusion",
-    title: "3D Sensor Fusion",
-    subs: ["LiDAR Point Clouds", "Radar Fusion", "HD Map Labelling", "Obstacle Classification"],
-  },
-  {
-    bullet: "purple",
-    category: "Audio & Speech",
-    title: "Audio & Speech",
-    subs: ["Speech Transcription", "Speaker Diarisation", "Sound Event Detection", "Emotion Labelling"],
-  },
-  {
-    bullet: "violet",
-    category: "RLHF & Red Teaming",
-    title: "RLHF & Red Teaming",
-    subs: ["Preference Ranking", "Constitutional AI Review", "Adversarial Prompting", "Safety Evaluation"],
-  },
-];
+const CAP_KEYS = [
+  "Text & NLP",
+  "Computer Vision",
+  "Video Annotation",
+  "3D Sensor Fusion",
+  "Audio & Speech",
+  "RLHF & Red Teaming",
+] as const;
 
 const CheckIcon = () => (
   <svg className="capability-check" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -45,17 +17,25 @@ const CheckIcon = () => (
   </svg>
 );
 
+const BULLET_COLORS = ["purple", "violet", "purple", "violet", "purple", "violet"] as const;
+
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="page">
 
       {/* ── Header ── */}
       <header className="site-header">
-        <div className="header-inner">
-          <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="header-wordmark" />
-          <img src="/TP-logo.png" alt="TP" className="header-icon" />
+        <div className="header-inner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="header-wordmark" />
+            <img src="/TP-logo.png" alt="TP" className="header-icon" />
+          </div>
+          <div style={{ paddingRight: "1.5rem" }}>
+            <LanguagePicker />
+          </div>
         </div>
         <div className="header-divider" />
       </header>
@@ -67,7 +47,7 @@ const Index = () => {
         <div className="banner-glow" aria-hidden="true" />
         <div className="banner-content">
           <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="label-service-logo" />
-          <span className="label-introducing">Introducing</span>
+          <span className="label-introducing">{t.landing.introducing}</span>
           <h1 className="banner-title">TP.ai <span className="title-fab">FAB</span>Studio</h1>
         </div>
       </section>
@@ -79,7 +59,7 @@ const Index = () => {
         </div>
         <div className="cta-overlay">
           <button className="cta-btn" onClick={() => navigate("/use-cases")}>
-            Let's Go
+            {t.landing.cta}
           </button>
         </div>
       </div>
@@ -87,34 +67,38 @@ const Index = () => {
       {/* ── Capabilities ── */}
       <section className="capabilities-section" aria-label="Capabilities">
         <div className="capabilities-header">
-          <span className="capabilities-label">Capabilities</span>
-          <h2 className="capabilities-heading">Everything You Need To Train Frontier Models</h2>
+          <span className="capabilities-label">{t.landing.capabilitiesLabel}</span>
+          <h2 className="capabilities-heading">{t.landing.capabilitiesHeading}</h2>
         </div>
 
         <div className="marquee-outer">
           <div className="marquee-fade-left" aria-hidden="true" />
           <div className="marquee-fade-right" aria-hidden="true" />
           <div className="marquee-track" aria-label="Capabilities showcase">
-            {[...CAPABILITIES, ...CAPABILITIES].map((cap, i) => (
-              <article
-                key={i}
-                className="capability-card"
-                aria-hidden={i >= CAPABILITIES.length ? true : undefined}
-              >
-                <div className="capability-title-header">
-                  <div className={`capability-bullet ${cap.bullet === "purple" ? "bullet-purple" : "bullet-violet"}`} />
-                  <h3 className="capability-title">{cap.title}</h3>
-                </div>
-                <ul className="capability-subs">
-                  {cap.subs.map((sub) => (
-                    <li key={sub} className="capability-sub-item">
-                      <CheckIcon />
-                      {sub}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+            {[...CAP_KEYS, ...CAP_KEYS].map((key, i) => {
+              const cap = t.capabilities[key];
+              const bullet = BULLET_COLORS[i % CAP_KEYS.length];
+              return (
+                <article
+                  key={i}
+                  className="capability-card"
+                  aria-hidden={i >= CAP_KEYS.length ? true : undefined}
+                >
+                  <div className="capability-title-header">
+                    <div className={`capability-bullet ${bullet === "purple" ? "bullet-purple" : "bullet-violet"}`} />
+                    <h3 className="capability-title">{cap.title}</h3>
+                  </div>
+                  <ul className="capability-subs">
+                    {cap.subs.map((sub) => (
+                      <li key={sub} className="capability-sub-item">
+                        <CheckIcon />
+                        {sub}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>

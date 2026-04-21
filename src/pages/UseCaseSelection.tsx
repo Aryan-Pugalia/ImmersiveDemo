@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCases } from "@/data/useCases";
+import { useLanguage } from "@/context/LanguageContext";
+import { LanguagePicker } from "@/components/LanguagePicker";
 
 const UseCaseSelection = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -34,12 +37,13 @@ const UseCaseSelection = () => {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <LanguagePicker />
             <button
               onClick={() => navigate("/dashboard")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 hover:border-primary/70 hover:bg-primary/10 transition-colors text-xs font-bold text-primary font-body uppercase tracking-wider"
             >
               <span className="material-symbols-outlined" style={{ fontSize:"14px" }}>monitoring</span>
-              Dashboard
+              {t.nav.dashboard}
             </button>
             <div className="relative" ref={profileRef}>
             <button
@@ -60,8 +64,8 @@ const UseCaseSelection = () => {
                   </div>
                 </div>
                 <div className="border-t border-border/20 pt-2">
-                  <span className="text-sm font-body uppercase tracking-[0.2em] text-foreground/30">Role</span>
-                  <span className="block text-sm font-body text-primary mt-0.5">Data Annotator</span>
+                  <span className="text-sm font-body uppercase tracking-[0.2em] text-foreground/30">{t.useCasesPage.role}</span>
+                  <span className="block text-sm font-body text-primary mt-0.5">{t.useCasesPage.roleValue}</span>
                 </div>
               </div>
             )}
@@ -79,7 +83,7 @@ const UseCaseSelection = () => {
         <div className="flex flex-col items-center mb-8">
           <div className="inline-block">
             <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground tracking-tight text-center">
-              Select Your Pipeline
+              {t.useCasesPage.heading}
             </h1>
             <div className="gradient-underline mx-auto w-24"></div>
           </div>
@@ -102,10 +106,10 @@ const UseCaseSelection = () => {
                 </span>
               </div>
               <h3 className="text-[18px] font-bold font-headline text-foreground mb-2 uppercase tracking-wide">
-                {useCase.title}
+                {t.useCases[useCase.slug]?.title ?? useCase.title}
               </h3>
               <p className="text-foreground/60 text-base leading-relaxed mb-4 flex-grow font-body">
-                {useCase.description}
+                {t.useCases[useCase.slug]?.description ?? useCase.description}
               </p>
               <div className="flex flex-wrap gap-2">
                 <span className="bg-background text-primary text-sm font-bold uppercase tracking-widest px-3 py-1 border border-primary/20 rounded-full">

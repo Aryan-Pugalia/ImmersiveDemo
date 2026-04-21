@@ -1,0 +1,130 @@
+import type { Translations } from "./en";
+
+export const ko: Translations = {
+  // ── Nav / common ──────────────────────────────────────────────────────────
+  nav: {
+    dashboard: "대시보드",
+    back: "뒤로",
+    newImage: "새 이미지",
+    qaReport: "QA 보고서",
+  },
+
+  // ── Landing (Index) ───────────────────────────────────────────────────────
+  landing: {
+    introducing: "소개합니다",
+    cta: "시작하기",
+    capabilitiesLabel: "핵심 역량",
+    capabilitiesHeading: "프론티어 모델 학습에 필요한 모든 것",
+  },
+
+  // ── Use-cases page ────────────────────────────────────────────────────────
+  useCasesPage: {
+    heading: "파이프라인 선택",
+    role: "역할",
+    roleValue: "데이터 어노테이터",
+  },
+
+  // ── Use-case cards ────────────────────────────────────────────────────────
+  useCases: {
+    "lidar-annotation": {
+      title: "라이다 3D 어노테이션",
+      description: "자율주행, 로봇공학, 공간 분석 파이프라인을 위해 3D 포인트 클라우드에 바운딩 박스를 어노테이션합니다.",
+    },
+    "medical-annotation": {
+      title: "의료 이미지 어노테이션",
+      description: "X선, MRI, CT 등 의료 스캔에서 종양, 병변, 관심 영역을 AI 보조 검증과 함께 어노테이션합니다.",
+    },
+    "invoice-labeler": {
+      title: "인보이스 레이블러",
+      description: "바운딩 박스 어노테이션과 JSON 내보내기로 인보이스 및 영수증에서 벤더, 합계, 항목 등 구조화된 필드를 레이블링하고 추출합니다.",
+    },
+    "image-ab-testing": {
+      title: "이미지 A/B 테스트",
+      description: "텍스트 프롬프트 대비 AI 생성 이미지 쌍을 평가하고 RLHF 선호도 데이터셋을 구축합니다.",
+    },
+    "video-ab-testing": {
+      title: "비디오 A/B 테스트",
+      description: "AI 생성 비디오 쌍을 비교하고 시간적 아티팩트와 A/V 동기화 문제를 선호도 학습을 위해 표시합니다.",
+    },
+    "audio-annotation": {
+      title: "음성 전사 및 번역",
+      description: "화자 분리, 구간 타이밍, 오디오 품질 플래그, QC 검토 워크플로우를 통해 다국어 음성을 전사하고 영어로 번역합니다.",
+    },
+  },
+
+  // ── Capabilities marquee ──────────────────────────────────────────────────
+  capabilities: {
+    "Text & NLP":        { title: "텍스트 & NLP",        subs: ["개체명 인식", "의도 분류", "요약 QA", "상호참조 해결"] },
+    "Computer Vision":   { title: "컴퓨터 비전",          subs: ["객체 감지", "인스턴스 분할", "키포인트 어노테이션", "이미지 분류"] },
+    "Video Annotation":  { title: "비디오 어노테이션",     subs: ["객체 추적", "행동 인식", "장면 분할", "이벤트 감지"] },
+    "3D Sensor Fusion":  { title: "3D 센서 퓨전",         subs: ["라이다 포인트 클라우드", "레이더 퓨전", "HD 맵 레이블링", "장애물 분류"] },
+    "Audio & Speech":    { title: "오디오 & 음성",         subs: ["음성 전사", "화자 분리", "음향 이벤트 감지", "감정 레이블링"] },
+    "RLHF & Red Teaming":{ title: "RLHF & 레드팀",        subs: ["선호도 순위", "Constitutional AI 검토", "적대적 프롬프팅", "안전성 평가"] },
+  },
+
+  // ── Annotation tool common strings ────────────────────────────────────────
+  tools: {
+    annotate: "어노테이션",
+    aiVerify: "AI 검증",
+    qaReview: "QA 검토",
+    delivered: "완료",
+    submit: "제출",
+    export: "내보내기",
+    save: "저장",
+    transcript: "전사",
+    translation: "번역",
+    play: "재생",
+    pause: "일시정지",
+    annotations: "어노테이션",
+    annotations_plural: "어노테이션",
+    uploadPrompt: "의료 스캔을 업로드하여 종양 및 관심 영역을 어노테이션하고 AI로 검증하세요.",
+    aiPowered: "AI 보조 의료 영상",
+  },
+
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+  dashboard: {
+    title: "운영 현황",
+    subtitle: "모든 활성 어노테이션 프로젝트의 실시간 현황",
+    live: "실시간 · 업데이트",
+    onlineLabel: "온라인",
+    kpi: {
+      activeProjects: "활성 프로젝트",
+      activeProjectsSub: (done: number, total: number) => `총 ${total}개 · ${done}개 완료`,
+      completion: "전체 완료율",
+      completionSub: (done: number, total: number) => `${total.toLocaleString()}개 중 ${done.toLocaleString()}개 완료`,
+      attention: "주의 필요",
+      attentionSub: "위험 또는 지연 프로젝트",
+      ready: "다운로드 준비",
+      readySub: "클라이언트 수령 대기 데이터셋",
+    },
+    projectTracker: "프로젝트 추적기",
+    liveEvents: "실시간 이벤트",
+    autoUpdating: "자동 업데이트",
+    filterAll: "전체",
+    filterReady: "준비",
+    filterFlagged: "표시됨",
+    filterCompleted: "완료",
+    liveMap: "실시간 어노테이터 활동",
+    annotators: "명 온라인",
+    hoverHint: "버블 위에 마우스를 올려 상세 정보 확인",
+    activeAnnotators: "명 활동 중",
+    throughput: "7일 처리량",
+    tasksToday: "오늘 작업",
+    footerNote: "모든 데이터는 데모 목적으로 시뮬레이션된 것입니다 · TP.ai FABStudio 플랫폼 대시보드",
+    status: {
+      onTrack: "정상",
+      atRisk: "위험",
+      delayed: "지연",
+      completed: "완료",
+    },
+    col: {
+      project: "프로젝트 / 클라이언트",
+      language: "언어",
+      progress: "진행률",
+      status: "상태",
+      due: "마감",
+      team: "팀",
+    },
+    thisWeek: "↑ 이번 주 2개",
+  },
+};

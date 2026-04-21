@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/context/LanguageContext";
+import { LanguagePicker } from "@/components/LanguagePicker";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ProjStatus = "on_track" | "at_risk" | "delayed" | "completed";
@@ -81,12 +83,7 @@ function statusColor(s: ProjStatus) {
        : s === "at_risk"   ? "#f59e0b"
        :                     "#ef4444";
 }
-function statusLabel(s: ProjStatus) {
-  return s === "completed" ? "Completed"
-       : s === "on_track"  ? "On Track"
-       : s === "at_risk"   ? "At Risk"
-       :                     "Delayed";
-}
+// statusLabel is now provided via t.dashboard.status in components
 function eventColor(k: EventKind) {
   return k === "ready"     ? "#22c55e"
        : k === "flagged"   ? "#ef4444"
@@ -121,7 +118,7 @@ function makeEvent(pool: typeof EVENT_POOL): LiveEvent {
 // Country borders fetched from the public-domain Natural Earth 110m topojson
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-function WorldMap({ cities, activeUsers }: { cities: CityNode[]; activeUsers: number[] }) {
+function WorldMap({ cities, activeUsers, labels }: { cities: CityNode[]; activeUsers: number[]; labels: { liveMap: string; annotators: string; hoverHint: string; activeAnnotators: string } }) {
   const [hovered, setHovered] = useState<number | null>(null);
   // Dynamic import so we don't break the build if the package isn't installed yet
   const [RSM, setRSM] = useState<any>(null);
@@ -137,11 +134,11 @@ function WorldMap({ cities, activeUsers }: { cities: CityNode[]; activeUsers: nu
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/20">
         <div className="flex items-center gap-2">
           <Globe size={15} className="text-primary" />
-          <span className="text-sm font-bold text-foreground font-headline uppercase tracking-wide">Live Annotator Activity</span>
+          <span className="text-sm font-bold text-foreground font-headline uppercase tracking-wide">{labels.liveMap}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
-          <span className="text-xs text-muted-foreground font-body">{totalOnline} annotators online</span>
+          <span className="text-xs text-muted-foreground font-body">{totalOnline} {labels.annotators}</span>
         </div>
       </div>
 
@@ -222,7 +219,7 @@ function WorldMap({ cities, activeUsers }: { cities: CityNode[]; activeUsers: nu
                         <text y={-r - 26} textAnchor="middle" fontSize="9.5" fontWeight="700" fill="white"
                           style={{ fontFamily:"sans-serif" }}>{city.name}</text>
                         <text y={-r - 14} textAnchor="middle" fontSize="8.5" fill="#9071f0"
-                          style={{ fontFamily:"sans-serif" }}>{users} active annotators</text>
+                          style={{ fontFamily:"sans-serif" }}>{users} {labels.activeAnnotators}</text>
                       </g>
                     )}
                   </Marker>
@@ -238,7 +235,7 @@ function WorldMap({ cities, activeUsers }: { cities: CityNode[]; activeUsers: nu
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary/70 inline-block"/>&lt; 15</span>
         <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded-full bg-primary/80 inline-block"/>&gt; 15</span>
         <span className="flex items-center gap-1.5"><span className="w-5 h-5 rounded-full bg-primary/90 inline-block"/>&gt; 40</span>
-        <span className="ml-auto italic opacity-60">Hover a bubble for details</span>
+        <span className="ml-auto italic opacity-60">{labels.hoverHint}</span>
       </div>
     </div>
   );
@@ -286,7 +283,7 @@ function KPICard({ label, value, sub, icon: Icon, accent, trend }: {
 }
 
 // ─── Project Row ───────────────────────────────────────────────────────────────
-function ProjectRow({ p, idx }: { p: Project; idx: number }) {
+function ProjectRow({ p, idx, statusLabels }: { p: Project; idx: number; statusLabels: Record<string,string> }) {
   const pct = Math.round((p.completed / p.totalTasks) * 100);
   const revPct = Math.round((p.inReview / p.totalTasks) * 100);
   const sc = statusColor(p.status);
@@ -311,7 +308,6 @@ function ProjectRow({ p, idx }: { p: Project; idx: number }) {
       </td>
       <td className="py-3 px-4">
         <div className="flex flex-col gap-1 min-w-[100px]">
-          {/* Stacked progress: completed + in-review */}
           <div className="h-2 rounded-full bg-muted/40 overflow-hidden flex">
             <div className="h-full rounded-l-full transition-all duration-700" style={{ width:`${pct}%`, background: sc }} />
             <div className="h-full transition-all duration-700" style={{ width:`${revPct}%`, background:"#f59e0b", opacity:0.65 }} />
@@ -326,7 +322,7 @@ function ProjectRow({ p, idx }: { p: Project; idx: number }) {
         <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full font-body"
           style={{ background:`${sc}18`, color: sc }}>
           <span className="w-1.5 h-1.5 rounded-full" style={{ background: sc }}/>
-          {statusLabel(p.status)}
+          {statusLabels[p.status]}
         </span>
       </td>
       <td className="py-3 px-4 hidden lg:table-cell">
@@ -375,6 +371,8 @@ function EventItem({ ev }: { ev: LiveEvent }) {
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const d = t.dashboard;
 
   // Live user counts per city (fluctuate every ~5 s)
   const [userCounts, setUserCounts] = useState<number[]>(CITIES.map(c => c.base));
@@ -440,16 +438,17 @@ export default function Dashboard() {
               TP.ai <span style={{ color:"#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-foreground/80 font-body">Project Dashboard</span>
+            <span className="text-sm text-foreground/80 font-body">{d.title}</span>
           </div>
           <div className="flex items-center gap-3">
+            <LanguagePicker />
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-body">
               <RefreshCw size={11} className="text-green-400"/>
-              <span>Live · updated {lastRefresh}</span>
+              <span>{d.live} {lastRefresh}</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
-              <span className="text-xs font-bold text-primary font-body">{totalOnline} online</span>
+              <span className="text-xs font-bold text-primary font-body">{totalOnline} {d.onlineLabel}</span>
             </div>
           </div>
         </div>
@@ -461,38 +460,38 @@ export default function Dashboard() {
 
         {/* Page title */}
         <div>
-          <h1 className="text-2xl font-bold font-headline text-foreground uppercase tracking-wide">Operations Overview</h1>
-          <p className="text-sm text-muted-foreground font-body mt-0.5">Real-time status across all active annotation projects</p>
+          <h1 className="text-2xl font-bold font-headline text-foreground uppercase tracking-wide">{d.title}</h1>
+          <p className="text-sm text-muted-foreground font-body mt-0.5">{d.subtitle}</p>
         </div>
 
         {/* KPI row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
-            label="Active Projects"
+            label={d.kpi.activeProjects}
             value={PROJECTS.filter(p=>p.status!=="completed").length}
-            sub={`${PROJECTS.length} total · ${PROJECTS.filter(p=>p.status==="completed").length} completed`}
+            sub={d.kpi.activeProjectsSub(PROJECTS.filter(p=>p.status==="completed").length, PROJECTS.length)}
             icon={BarChart3}
             accent="#818cf8"
-            trend="↑ 2 this week"
+            trend={d.thisWeek}
           />
           <KPICard
-            label="Overall Completion"
+            label={d.kpi.completion}
             value={`${completionPct}%`}
-            sub={`${totalDone.toLocaleString()} of ${totalTasks.toLocaleString()} tasks done`}
+            sub={d.kpi.completionSub(totalDone, totalTasks)}
             icon={TrendingUp}
             accent="#22c55e"
           />
           <KPICard
-            label="Needs Attention"
+            label={d.kpi.attention}
             value={atRiskCount}
-            sub="Projects at risk or delayed"
+            sub={d.kpi.attentionSub}
             icon={AlertTriangle}
             accent={atRiskCount > 0 ? "#ef4444" : "#22c55e"}
           />
           <KPICard
-            label="Ready for Download"
+            label={d.kpi.ready}
             value={readyCount}
-            sub="Datasets awaiting client pickup"
+            sub={d.kpi.readySub}
             icon={Download}
             accent="#f59e0b"
           />
@@ -506,28 +505,28 @@ export default function Dashboard() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border/20">
               <div className="flex items-center gap-2">
                 <Activity size={15} className="text-primary"/>
-                <span className="text-sm font-bold font-headline uppercase tracking-wide text-foreground">Project Tracker</span>
+                <span className="text-sm font-bold font-headline uppercase tracking-wide text-foreground">{d.projectTracker}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-green-400/80"/><span className="text-xs text-muted-foreground font-body">On Track</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 ml-1"/><span className="text-xs text-muted-foreground font-body">At Risk</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-red-400/80 ml-1"/><span className="text-xs text-muted-foreground font-body">Delayed</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-green-400/80"/><span className="text-xs text-muted-foreground font-body">{d.status.onTrack}</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 ml-1"/><span className="text-xs text-muted-foreground font-body">{d.status.atRisk}</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-red-400/80 ml-1"/><span className="text-xs text-muted-foreground font-body">{d.status.delayed}</span>
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/15 text-left">
-                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body">Project / Client</th>
-                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body hidden md:table-cell">Language</th>
-                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body">Progress</th>
-                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body">Status</th>
-                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body hidden lg:table-cell">Due</th>
-                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body hidden lg:table-cell">Team</th>
+                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body">{d.col.project}</th>
+                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body hidden md:table-cell">{d.col.language}</th>
+                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body">{d.col.progress}</th>
+                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body">{d.col.status}</th>
+                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body hidden lg:table-cell">{d.col.due}</th>
+                    <th className="py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground font-body hidden lg:table-cell">{d.col.team}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {PROJECTS.map((p, i) => <ProjectRow key={p.id} p={p} idx={i}/>)}
+                  {PROJECTS.map((p, i) => <ProjectRow key={p.id} p={p} idx={i} statusLabels={d.status}/>)}
                 </tbody>
               </table>
             </div>
@@ -535,10 +534,10 @@ export default function Dashboard() {
             <div className="flex items-center gap-4 px-5 py-3 border-t border-border/20 bg-muted/10">
               <div className="flex items-center gap-2">
                 <Zap size={12} className="text-primary"/>
-                <span className="text-xs text-muted-foreground font-body">7-day throughput</span>
+                <span className="text-xs text-muted-foreground font-body">{d.throughput}</span>
               </div>
               <Sparkline data={THROUGHPUT}/>
-              <span className="text-xs font-bold text-primary font-body ml-auto">{THROUGHPUT[THROUGHPUT.length-1]} tasks today</span>
+              <span className="text-xs font-bold text-primary font-body ml-auto">{THROUGHPUT[THROUGHPUT.length-1]} {d.tasksToday}</span>
             </div>
           </div>
 
@@ -547,16 +546,16 @@ export default function Dashboard() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border/20 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Bell size={15} className="text-primary"/>
-                <span className="text-sm font-bold font-headline uppercase tracking-wide text-foreground">Live Events</span>
+                <span className="text-sm font-bold font-headline uppercase tracking-wide text-foreground">{d.liveEvents}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse"/>
-                <span className="text-xs text-muted-foreground font-body">auto-updating</span>
+                <span className="text-xs text-muted-foreground font-body">{d.autoUpdating}</span>
               </div>
             </div>
             {/* Filter pills */}
             <div className="flex gap-1.5 px-5 py-2.5 border-b border-border/10 flex-shrink-0">
-              {(["All","Ready","Flagged","Completed"] as const).map(f => (
+              {([d.filterAll, d.filterReady, d.filterFlagged, d.filterCompleted]).map(f => (
                 <button key={f} className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border font-body transition-colors hover:border-primary/60 hover:text-primary"
                   style={{ borderColor:"hsl(var(--border)/0.3)", color:"hsl(var(--muted-foreground))" }}>
                   {f}
@@ -572,11 +571,11 @@ export default function Dashboard() {
         </div>
 
         {/* World map */}
-        <WorldMap cities={CITIES} activeUsers={userCounts}/>
+        <WorldMap cities={CITIES} activeUsers={userCounts} labels={{ liveMap: d.liveMap, annotators: d.annotators, hoverHint: d.hoverHint, activeAnnotators: d.activeAnnotators }}/>
 
         {/* Footer note */}
         <p className="text-center text-xs text-muted-foreground/40 font-body pb-4">
-          All data is simulated for demonstration purposes · TP.ai FABStudio Platform Dashboard
+          {d.footerNote}
         </p>
       </div>
     </div>
