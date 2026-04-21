@@ -17,6 +17,7 @@ import InvoiceReviewExport from "./pages/invoice/InvoiceReviewExport.tsx";
 import QAReport from "./pages/QAReport.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AudioAnnotation from "./pages/AudioAnnotation.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="review" element={<InvoiceReviewExport />} />
           </Route>
           <Route path="/use-cases/audio-annotation" element={<AudioAnnotation />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />
           <Route path="/qa-report/:useCaseId" element={<QAReport />} />
           <Route path="*" element={<NotFound />} />
