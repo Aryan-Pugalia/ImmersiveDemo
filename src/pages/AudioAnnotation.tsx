@@ -143,48 +143,6 @@ function makeWaveBars(seed: string, count=80): number[] {
   return Array.from({length:count},(_,i)=>{ h=(h*1664525+1013904223)|0; const b=0.15+0.6*Math.abs(Math.sin(i*0.35+(h&0xffff)/65536)); return Math.min(1,b+0.05*((h>>16)/65536)); });
 }
 
-// ─── Web Audio oscillator (100 % reliable, no permission needed) ──────────────
-function playVoiceTone(speaker: string, durationSec: number, audioCtx: AudioContext) {
-  try {
-    const ctx   = audioCtx;
-    const now   = ctx.currentTime;
-    const dur   = Math.max(0.4, durationSec);
-    const f0    = speaker === "S2" ? 210 : 130; // rough female/male F0
-
-    const osc   = ctx.createOscillator();
-    osc.type    = "sawtooth";
-    osc.frequency.value = f0;
-
-    // Mild vibrato
-    const lfo  = ctx.createOscillator();
-    const lfoG = ctx.createGain();
-    lfo.frequency.value = 5.5;
-    lfoG.gain.value     = 6;
-    lfo.connect(lfoG);
-    lfoG.connect(osc.frequency);
-
-    // Two formant band-passes
-    const f1 = ctx.createBiquadFilter(); f1.type="bandpass"; f1.frequency.value=900;  f1.Q.value=2.5;
-    const f2 = ctx.createBiquadFilter(); f2.type="bandpass"; f2.frequency.value=2300; f2.Q.value=3.5;
-
-    const g1  = ctx.createGain(); g1.gain.value=0.55;
-    const g2  = ctx.createGain(); g2.gain.value=0.35;
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0, now);
-    env.gain.linearRampToValueAtTime(0.22, now+0.06);
-    env.gain.setValueAtTime(0.22, now+dur-0.12);
-    env.gain.linearRampToValueAtTime(0, now+dur);
-
-    osc.connect(f1); osc.connect(f2);
-    f1.connect(g1);  f2.connect(g2);
-    g1.connect(env); g2.connect(env);
-    env.connect(ctx.destination);
-
-    lfo.start(now); osc.start(now);
-    lfo.stop(now+dur); osc.stop(now+dur);
-  } catch { /* silent fail */ }
-}
-
 // ─── Workflow stepper ─────────────────────────────────────────────────────────
 type WfStage = "annotate" | "ai_verify" | "qa_review" | "delivered";
 const WF_STAGES: { id: WfStage; label: string; Icon: React.ComponentType<{size?:number}> }[] = [
@@ -574,7 +532,6 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
   const rafRef       = useRef<number|null>(null);
   const startRef     = useRef<{ts:number;base:number}|null>(null);
   const isPlayingRef = useRef(false);
-  const audioCtxRef  = useRef<AudioContext|null>(null);
   const totalMs      = task.durationSec * 1000;
   const rtl          = !!LANG_META[task.language]?.rtl;
   const currentMs    = Math.round(playhead * totalMs);
@@ -610,7 +567,6 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
   // Clean up on unmount
   useEffect(()=>()=>{
     if("speechSynthesis" in window) window.speechSynthesis.cancel();
-    audioCtxRef.current?.close();
   },[]);
 
   const seekToMs = useCallback((ms:number)=>{
@@ -619,57 +575,18 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
     if("speechSynthesis" in window) window.speechSynthesis.cancel();
   },[totalMs]);
 
-  const getAudioCtx = (): AudioContext => {
-    if (!audioCtxRef.current || audioCtxRef.current.state==="closed")
-      audioCtxRef.current = new AudioContext();
-    if (audioCtxRef.current.state==="suspended") audioCtxRef.current.resume();
-    return audioCtxRef.current;
-  };
-
-  // ── PLAY button handler — direct user gesture for both audio APIs ──────────
+  // ── PLAY button handler — Web Speech API (direct user gesture required) ──────
   const handleTogglePlay = () => {
     if (isPlaying) {
       setIsPlaying(false);
       if("speechSynthesis" in window) window.speechSynthesis.cancel();
-      audioCtxRef.current?.suspend();
       return;
     }
 
     setIsPlaying(true);
     startRef.current = { ts:performance.now(), base:playhead };
 
-    // 1. Web Audio API oscillator tones (always works, no permission needed)
-    try {
-      const ctx = getAudioCtx();
-      const remaining = segs.filter(s=>s.endMs>currentMs).sort((a,b)=>a.startMs-b.startMs);
-      remaining.forEach(seg => {
-        const offset = Math.max(0,(seg.startMs-currentMs)/1000);
-        const dur    = (seg.endMs-seg.startMs)/1000;
-        // Schedule oscillator for each segment's time slot
-        const osc  = ctx.createOscillator();
-        const env  = ctx.createGain();
-        const f1   = ctx.createBiquadFilter();
-        const f2   = ctx.createBiquadFilter();
-        osc.type   = "sawtooth";
-        osc.frequency.value = seg.speaker==="S2"?210:130;
-        f1.type="bandpass"; f1.frequency.value=900;  f1.Q.value=2.5;
-        f2.type="bandpass"; f2.frequency.value=2300; f2.Q.value=3.5;
-        const g1=ctx.createGain(); g1.gain.value=0.55;
-        const g2=ctx.createGain(); g2.gain.value=0.35;
-        const now=ctx.currentTime+offset;
-        env.gain.setValueAtTime(0,now);
-        env.gain.linearRampToValueAtTime(0.18,now+0.06);
-        env.gain.setValueAtTime(0.18,now+dur-0.1);
-        env.gain.linearRampToValueAtTime(0,now+dur);
-        osc.connect(f1); osc.connect(f2);
-        f1.connect(g1); f2.connect(g2);
-        g1.connect(env); g2.connect(env);
-        env.connect(ctx.destination);
-        osc.start(now); osc.stop(now+dur);
-      });
-    } catch { /* silent */ }
-
-    // 2. Speech synthesis (speaks the actual text, language-matched)
+    // Speech synthesis speaks each segment's source text in the correct language
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       const voices    = window.speechSynthesis.getVoices();
