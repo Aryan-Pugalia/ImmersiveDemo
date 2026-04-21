@@ -69,7 +69,6 @@ const Index = () => {
           <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="label-service-logo" />
           <span className="label-introducing">Introducing</span>
           <h1 className="banner-title">TP.ai <span className="title-fab">FAB</span>Studio</h1>
-          <p className="banner-subtitle">The next generation of industrial-grade data pipelines.</p>
         </div>
       </section>
 
