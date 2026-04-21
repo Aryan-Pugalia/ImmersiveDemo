@@ -29,12 +29,10 @@ const Index = () => {
       {/* ── Header ── */}
       <header className="site-header">
         <div className="header-inner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="header-wordmark" />
-            <img src="/TP-logo.png" alt="TP" className="header-icon" />
-          </div>
-          <div style={{ paddingRight: "1.5rem" }}>
+          <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="header-wordmark" />
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingRight: "1.5rem" }}>
             <LanguagePicker />
+            <img src="/TP-logo.png" alt="TP" className="header-icon" />
           </div>
         </div>
         <div className="header-divider" />
