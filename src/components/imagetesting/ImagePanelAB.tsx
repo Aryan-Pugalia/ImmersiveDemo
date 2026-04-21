@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { ZoomIn, ZoomOut, Maximize2, X, RotateCcw } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Props {
   imageUrl: string;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function ImagePanelAB({ imageUrl, label, side }: Props) {
+  const { t } = useLanguage();
   const [scale, setScale] = useState(1);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
   const [imgError, setImgError] = useState(false);
@@ -87,7 +89,7 @@ export function ImagePanelAB({ imageUrl, label, side }: Props) {
           className="text-sm font-bold px-3 py-1 rounded-full text-white"
           style={{ background: accentColor }}
         >
-          Image {label}
+          {t.pages.imageAB.imagePrefix} {label}
         </span>
         <div className="flex items-center gap-0.5">
           <PanelBtn title="Zoom in" onClick={() => zoom(0.3)}>
@@ -133,7 +135,7 @@ export function ImagePanelAB({ imageUrl, label, side }: Props) {
         ) : (
           <img
             src={imageUrl}
-            alt={`Image ${label}`}
+            alt={`${t.pages.imageAB.imagePrefix} ${label}`}
             style={imageStyle}
             draggable={false}
             onError={() => setImgError(true)}

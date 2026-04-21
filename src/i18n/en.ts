@@ -241,6 +241,38 @@ export const en = {
       imageA: "Image A",
       imageB: "Image B",
       taskOf: (n: number, total: number) => `Task ${n} of ${total}`,
+      // workflow stepper (same labels)
+      stageEvaluate: "Evaluate",
+      stageAIReview: "AI Review",
+      stageQAReview: "QA Review",
+      stageDelivered: "Delivered",
+      // section headers
+      sectionQuality: "Image Quality",
+      sectionAlignment: "Prompt Alignment",
+      sectionOverall: "Overall",
+      // rating dims for IMAGE (different from video!)
+      dimRealismLabel: "Realism / Aesthetics",
+      dimRealismDesc: "Overall visual quality, sharpness, and artistic appeal",
+      dimCompositionLabel: "Layout / Composition",
+      dimCompositionDesc: "Subject placement, framing, and visual balance",
+      dimArtifactsLabel: "Artifacts / Quality",
+      dimArtifactsDesc: "Presence of distortions, anatomical errors, or rendering glitches",
+      dimPromptLabel: "Prompt Alignment",
+      dimPromptDesc: "How accurately the image follows the written prompt",
+      dimOverallLabel: "Overall Preference",
+      dimOverallDesc: "Your final holistic choice between the two images",
+      // instruction
+      evalIntro: "Rate both images across 5 dimensions. Use the task navigator above to switch between tasks.",
+      tasksComplete: (done: number, total: number) => `${done}/${total} tasks complete.`,
+      // buttons
+      nextTask: "Next Task",
+      submitAll: "Submit All for AI Review",
+      remaining: (n: number) => `(${n} remaining)`,
+      runAI: "Run AI Analysis",
+      allClear: "All Clear — Mark Delivered",
+      newBatch: "New Batch",
+      // image frame prefix
+      imagePrefix: "Image",
     },
     videoAB: {
       title: "Video A/B Testing",
@@ -254,6 +286,39 @@ export const en = {
       showLess: "Show less",
       copyPrompt: "Copy prompt",
       task: (n: number) => `Task ${n}`,
+      // workflow stepper
+      stageEvaluate: "Evaluate",
+      stageAIReview: "AI Review",
+      stageQAReview: "QA Review",
+      stageDelivered: "Delivered",
+      // section headers in rating panel
+      sectionVideo: "Video Quality",
+      sectionAudio: "Audio & Sync",
+      sectionAlignment: "Prompt Alignment",
+      sectionOverall: "Overall",
+      // rating dimension labels + descriptions
+      dimRealismLabel: "Realism / Aesthetics",
+      dimRealismDesc: "Visual fidelity, lighting, cinematic quality",
+      dimTemporalLabel: "Temporal Stability",
+      dimTemporalDesc: "Flicker, jitter, warping, frame-to-frame consistency",
+      dimAudioLabel: "Audio Quality & Sync",
+      dimAudioDesc: "Audio clarity, ambience, A/V sync with events on screen",
+      dimPromptLabel: "Prompt Alignment",
+      dimPromptDesc: "How faithfully the video matches the written prompt",
+      dimOverallLabel: "Overall Preference",
+      dimOverallDesc: "Your final holistic choice between the two videos",
+      // instruction text
+      evalIntro: "Rate each video pair across 5 dimensions. Watch frame-by-frame for temporal artifacts and A/V sync issues.",
+      tasksComplete: (done: number, total: number) => `${done}/${total} tasks complete.`,
+      // buttons
+      nextTask: "Next Task",
+      submitAll: "Submit All for AI Review",
+      remaining: (n: number) => `(${n} remaining)`,
+      runAI: "Run AI Analysis",
+      allClear: "All Clear — Mark Delivered",
+      newBatch: "New Batch",
+      // video frame prefix
+      videoPrefix: "Video",
     },
     audio: {
       title: "Audio Transcription & Translation",

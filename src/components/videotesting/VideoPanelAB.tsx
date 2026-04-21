@@ -16,6 +16,7 @@ import {
   Maximize2,
   X,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 export interface VideoPairPlayerProps {
@@ -43,6 +44,7 @@ export const VideoPairPanel = forwardRef<
   { leftUrl, rightUrl, fps, hasAudio, labelA = "A", labelB = "B" },
   ref
 ) {
+  const { t } = useLanguage();
   const leftRef = useRef<HTMLVideoElement>(null);
   const rightRef = useRef<HTMLVideoElement>(null);
   const rafRef = useRef<number>(0);
@@ -286,7 +288,7 @@ export const VideoPairPanel = forwardRef<
           title="Play / Pause"
         >
           {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-          {isPlaying ? "Pause" : "Play"}
+          {isPlaying ? t.tools.pause : t.tools.play}
         </button>
 
         <ControlBtn onClick={() => stepFrame(1)} title="Step forward 1 frame (→)">
@@ -388,7 +390,7 @@ export const VideoPairPanel = forwardRef<
               className="absolute top-3 left-3 px-3 py-1 rounded-full text-sm font-bold text-white"
               style={{ background: fullscreenSide === "A" ? "#6366f1" : "#7c3aed" }}
             >
-              Video {fullscreenSide}
+              {t.pages.videoAB.videoPrefix} {fullscreenSide}
             </span>
           </div>
         </div>
@@ -423,6 +425,8 @@ function VideoFrame({
   onSolo: () => void;
   onFullscreen: () => void;
 }) {
+  const { t } = useLanguage();
+  const p = t.pages.videoAB;
   return (
     <div
       className="relative flex flex-col h-full bg-[hsl(0,0%,5%)] overflow-hidden rounded-xl border"
@@ -437,7 +441,7 @@ function VideoFrame({
           className="text-sm font-bold px-3 py-1 rounded-full text-white"
           style={{ background: accent }}
         >
-          Video {label}
+          {p.videoPrefix} {label}
         </span>
         <div className="flex items-center gap-0.5">
           <button

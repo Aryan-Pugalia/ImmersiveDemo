@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   AB_TASKS,
   RATING_DIMS,
@@ -73,6 +74,15 @@ export function ABWorkflowPanel({
   onRatingChange,
   onOpenQAReport,
 }: Props) {
+  const { t } = useLanguage();
+  const p = t.pages.imageAB;
+  const stageLabels: Record<string, string> = {
+    evaluate: p.stageEvaluate,
+    ai_review: p.stageAIReview,
+    qa_review: p.stageQAReview,
+    delivered: p.stageDelivered,
+  };
+
   const currentStageIndex = STAGES.findIndex((s) => s.id === stage);
 
   const qaResults: TaskQAResult[] = useMemo(
@@ -137,7 +147,7 @@ export function ABWorkflowPanel({
                         isDone    ? "hsl(0,0%,85%)" : "hsl(0,0%,55%)",
                     }}
                   >
-                    {s.label}
+                    {stageLabels[s.id]}
                   </span>
                 </div>
                 {i < STAGES.length - 1 && (
@@ -160,9 +170,9 @@ export function ABWorkflowPanel({
       {stage === "evaluate" && (
         <div className="flex-1 overflow-y-auto px-4 pb-5 pt-4 flex flex-col gap-4">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Rate both images across 5 dimensions. Use the task navigator above to switch between tasks.{" "}
+            {p.evalIntro}{" "}
             <span className="text-foreground/70 font-medium">
-              {completedCount}/{AB_TASKS.length} tasks complete.
+              {p.tasksComplete(completedCount, AB_TASKS.length)}
             </span>
           </p>
 
@@ -207,7 +217,7 @@ export function ABWorkflowPanel({
               }
               onClick={onNextTask}
             >
-              Next Task
+              {p.nextTask}
               <ChevronRight size={16} />
             </Button>
           ) : (
@@ -217,10 +227,10 @@ export function ABWorkflowPanel({
               disabled={completedCount < totalTasks}
               onClick={() => onStageChange("ai_review")}
             >
-              Submit All for AI Review
+              {p.submitAll}
               {completedCount < totalTasks && (
                 <span className="ml-2 text-sm opacity-70">
-                  ({totalTasks - completedCount} remaining)
+                  {p.remaining(totalTasks - completedCount)}
                 </span>
               )}
             </Button>
@@ -237,7 +247,7 @@ export function ABWorkflowPanel({
                 The AI model will analyse each image pair against the prompt and your ratings, generating reference verdicts for comparison.
               </p>
               <Button className="w-full h-10 gap-2 text-sm" onClick={onRunAI}>
-                <Play size={16} /> Run AI Analysis
+                <Play size={16} /> {p.runAI}
               </Button>
             </div>
           ) : stats ? (
@@ -272,7 +282,7 @@ export function ABWorkflowPanel({
                   </Button>
                 ) : (
                   <Button className="w-full h-10 text-sm" onClick={() => onStageChange("delivered")}>
-                    All Clear — Mark Delivered
+                    {p.allClear}
                   </Button>
                 )}
               </div>
@@ -305,10 +315,10 @@ export function ABWorkflowPanel({
           </div>
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1 gap-2 text-sm" onClick={onOpenQAReport}>
-              <BarChart2 size={16} /> QA Report
+              <BarChart2 size={16} /> {t.nav.qaReport}
             </Button>
             <Button variant="secondary" className="flex-1 text-sm" onClick={() => onStageChange("evaluate")}>
-              New Batch
+              {p.newBatch}
             </Button>
           </div>
         </div>
@@ -326,11 +336,20 @@ function RatingForm({
   ratings: TaskRatings;
   onChange: (key: RatingDimKey | "strength" | "confidence" | "rationale", val: unknown) => void;
 }) {
+  const { t } = useLanguage();
+  const p = t.pages.imageAB;
   const sections = ["quality", "alignment", "overall"] as const;
   const sectionLabels: Record<string, string> = {
-    quality: "Image Quality",
-    alignment: "Prompt Alignment",
-    overall: "Overall",
+    quality: p.sectionQuality,
+    alignment: p.sectionAlignment,
+    overall: p.sectionOverall,
+  };
+  const dimLabels: Record<string, { label: string; description: string }> = {
+    realism:          { label: p.dimRealismLabel,     description: p.dimRealismDesc },
+    composition:      { label: p.dimCompositionLabel, description: p.dimCompositionDesc },
+    artifacts:        { label: p.dimArtifactsLabel,   description: p.dimArtifactsDesc },
+    prompt_alignment: { label: p.dimPromptLabel,      description: p.dimPromptDesc },
+    overall:          { label: p.dimOverallLabel,     description: p.dimOverallDesc },
   };
 
   return (
@@ -348,7 +367,7 @@ function RatingForm({
               {dims.map((dim) => (
                 <RatingRow
                   key={dim.key}
-                  dim={dim}
+                  dim={{ ...dim, label: dimLabels[dim.key]?.label ?? dim.label }}
                   value={ratings[dim.key]}
                   onChange={(v) => onChange(dim.key, v)}
                 />
@@ -625,19 +644,34 @@ function QAReviewPanel({
       </div>
 
       {/* Pinned action buttons — always visible at bottom */}
-      <div className="px-4 pb-5 pt-3 shrink-0 border-t border-border/20 flex gap-2">
-        <Button variant="outline" className="flex-1 gap-2 text-sm" onClick={onOpenQAReport}>
-          <BarChart2 size={16} /> QA Report
-        </Button>
-        <Button
-          className="flex-1 text-sm"
-          disabled={!allResolved}
-          onClick={onDeliver}
-          title={!allResolved ? "Resolve all flagged tasks first" : ""}
-        >
-          Approve &amp; Deliver
-        </Button>
-      </div>
+      <QARatingPanelActions onOpenQAReport={onOpenQAReport} onDeliver={onDeliver} allResolved={allResolved} />
+    </div>
+  );
+}
+
+function QARatingPanelActions({
+  onOpenQAReport,
+  onDeliver,
+  allResolved,
+}: {
+  onOpenQAReport: () => void;
+  onDeliver: () => void;
+  allResolved: boolean;
+}) {
+  const { t } = useLanguage();
+  return (
+    <div className="px-4 pb-5 pt-3 shrink-0 border-t border-border/20 flex gap-2">
+      <Button variant="outline" className="flex-1 gap-2 text-sm" onClick={onOpenQAReport}>
+        <BarChart2 size={16} /> {t.nav.qaReport}
+      </Button>
+      <Button
+        className="flex-1 text-sm"
+        disabled={!allResolved}
+        onClick={onDeliver}
+        title={!allResolved ? "Resolve all flagged tasks first" : ""}
+      >
+        Approve &amp; Deliver
+      </Button>
     </div>
   );
 }
