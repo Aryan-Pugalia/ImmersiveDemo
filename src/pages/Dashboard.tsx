@@ -75,11 +75,6 @@ const EVENT_POOL: Omit<LiveEvent, "id" | "ts">[] = [
 const THROUGHPUT = [112, 98, 145, 133, 167, 121, 188];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const MAP_W = 1000, MAP_H = 460;
-function project(lon: number, lat: number) {
-  return { x: ((lon + 180) / 360) * MAP_W, y: ((90 - lat) / 180) * MAP_H };
-}
-
 function statusColor(s: ProjStatus) {
   return s === "completed" ? "#22c55e"
        : s === "on_track"  ? "#818cf8"
@@ -122,58 +117,19 @@ function makeEvent(pool: typeof EVENT_POOL): LiveEvent {
   return { ...e, id: `ev_${++_eid}`, ts: nowStr() };
 }
 
-// ─── World Map SVG ────────────────────────────────────────────────────────────
-// City screen coords (W=1000, H=460, equirectangular):
-//   New York  (294,126)  London    (500, 98)  Paris     (506,105)
-//   Cairo     (587,153)  Casablanca(479,144)  Nairobi   (602,234)
-//   Hyderabad (718,186)  Beijing   (823,128)  Seoul     (853,134)
-//   Tokyo     (888,139)  Manila    (836,193)  SaoPaulo  (371,290)
-//   Bogota    (294,218)  Sydney    (920,317)
-const CONTINENTS = [
-  // North America — east coast passes ~x=295 at y=126 so New York (294,126) sits inside
-  { d:"M 40,82 L 64,60 L 75,50 L 96,44 L 132,34 L 170,26 L 198,22 L 228,24 L 254,35 L 276,48 L 292,64 L 320,80 L 362,107 L 358,117 L 310,117 L 300,123 L 294,131 L 284,149 L 276,166 L 266,183 L 263,205 L 249,211 L 237,205 L 223,193 L 207,179 L 195,159 L 184,139 L 164,123 L 149,107 L 129,91 L 101,83 L 75,79 Z" },
-  // Greenland
-  { d:"M 284,22 L 320,16 L 357,22 L 374,38 L 367,57 L 342,67 L 310,67 L 283,56 L 273,39 Z" },
-  // Iceland
-  { d:"M 412,46 L 428,40 L 445,44 L 449,55 L 441,63 L 422,63 L 410,55 Z" },
-  // South America — must contain Bogotá (294,218) and São Paulo (371,290)
-  { d:"M 267,208 L 300,194 L 342,195 L 364,205 L 404,229 L 410,269 L 402,295 L 392,307 L 369,331 L 350,345 L 322,368 L 300,361 L 285,339 L 277,305 L 272,263 L 269,227 Z" },
-  // Europe — mainland; contains Paris (506,105)
-  { d:"M 454,61 L 475,53 L 502,51 L 522,55 L 542,63 L 554,77 L 549,93 L 559,109 L 549,123 L 529,133 L 509,135 L 488,129 L 467,119 L 453,107 L 447,91 Z" },
-  // British Isles — separate island; contains London (500,98)
-  { d:"M 455,81 L 477,71 L 506,73 L 510,89 L 504,103 L 489,109 L 463,105 L 451,93 Z" },
-  // Ireland
-  { d:"M 438,82 L 451,76 L 456,84 L 452,94 L 440,96 L 433,89 Z" },
-  // Scandinavia
-  { d:"M 500,50 L 518,44 L 538,48 L 554,62 L 552,76 L 542,63 L 522,55 Z" },
-  // Africa — NE corner extended to x=607 so Cairo (587,153) is inside; Nairobi (602,234) inside
-  { d:"M 455,137 L 481,131 L 511,133 L 543,137 L 571,143 L 597,141 L 607,155 L 615,163 L 621,181 L 619,205 L 609,221 L 609,253 L 595,283 L 579,309 L 555,333 L 525,351 L 497,357 L 469,345 L 449,321 L 441,293 L 441,264 L 447,233 L 453,201 L 457,171 Z" },
-  // Arabian Peninsula (Asia extension — connects to Asia main at x=597,y=141)
-  { d:"M 597,141 L 627,154 L 636,169 L 641,197 L 633,219 L 617,229 L 605,223 L 597,201 L 591,179 L 595,161 Z" },
-  // Asia main — right boundary at y=128 is x=883, so Beijing (823,128) and Seoul (853,134) inside
-  { d:"M 573,67 L 635,53 L 713,51 L 787,53 L 841,61 L 889,75 L 907,93 L 901,115 L 877,135 L 853,151 L 819,163 L 784,171 L 751,175 L 717,179 L 684,176 L 654,167 L 627,154 L 601,139 L 577,123 L 559,103 L 559,81 Z" },
-  // India — widened to x=757 at y=186 so Hyderabad (718,186) is inside
-  { d:"M 691,169 L 731,165 L 761,174 L 757,191 L 725,201 L 715,211 L 706,235 L 699,233 L 695,211 L 693,189 Z" },
-  // Sri Lanka
-  { d:"M 706,235 L 716,232 L 720,240 L 713,246 L 705,242 Z" },
-  // Malay Peninsula + Indochina
-  { d:"M 717,179 L 749,184 L 765,201 L 761,221 L 743,229 L 723,221 L 717,207 Z" },
-  // Japan — contains Tokyo (888,139)
-  { d:"M 874,127 L 893,121 L 908,131 L 909,149 L 897,157 L 876,150 L 869,137 Z" },
-  // Philippines — contains Manila (836,193)
-  { d:"M 824,188 L 844,183 L 857,197 L 853,213 L 835,217 L 821,207 Z" },
-  // Borneo
-  { d:"M 762,200 L 800,194 L 820,202 L 822,222 L 806,234 L 782,232 L 764,218 Z" },
-  // Sumatra
-  { d:"M 736,206 L 762,200 L 764,218 L 750,228 L 730,222 Z" },
-  // Australia — contains Sydney (920,317)
-  { d:"M 801,279 L 859,269 L 915,275 L 943,293 L 947,319 L 939,346 L 915,361 L 874,366 L 835,359 L 805,338 L 794,311 Z" },
-  // New Zealand
-  { d:"M 951,325 L 962,317 L 971,327 L 965,339 L 953,339 Z" },
-];
+// ─── World Map (react-simple-maps + Natural Earth atlas) ─────────────────────
+// Country borders fetched from the public-domain Natural Earth 110m topojson
+const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 function WorldMap({ cities, activeUsers }: { cities: CityNode[]; activeUsers: number[] }) {
   const [hovered, setHovered] = useState<number | null>(null);
+  // Dynamic import so we don't break the build if the package isn't installed yet
+  const [RSM, setRSM] = useState<any>(null);
+  useEffect(() => {
+    import("react-simple-maps").then(m => setRSM(m)).catch(() => setRSM(null));
+  }, []);
+
+  const totalOnline = activeUsers.reduce((a, b) => a + b, 0);
 
   return (
     <div className="relative w-full rounded-xl overflow-hidden" style={{ background: "hsl(0,0%,5%)", border: "1px solid hsl(var(--border)/0.2)" }}>
@@ -185,73 +141,101 @@ function WorldMap({ cities, activeUsers }: { cities: CityNode[]; activeUsers: nu
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
-          <span className="text-xs text-muted-foreground font-body">{activeUsers.reduce((a,b)=>a+b,0)} annotators online</span>
+          <span className="text-xs text-muted-foreground font-body">{totalOnline} annotators online</span>
         </div>
       </div>
 
-      <svg
-        viewBox={`0 0 ${MAP_W} ${MAP_H}`}
-        className="w-full"
-        style={{ display:"block" }}
-      >
-        {/* Ocean background */}
-        <rect width={MAP_W} height={MAP_H} fill="hsl(0,0%,6%)" />
-
-        {/* Subtle grid */}
-        <defs>
-          <pattern id="mapgrid" width="50" height="50" patternUnits="userSpaceOnUse">
-            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="hsl(0,0%,12%)" strokeWidth="0.5"/>
-          </pattern>
-        </defs>
-        <rect width={MAP_W} height={MAP_H} fill="url(#mapgrid)" />
-
-        {/* Equator + Prime Meridian guides */}
-        <line x1="0" y1={MAP_H/2} x2={MAP_W} y2={MAP_H/2} stroke="hsl(0,0%,14%)" strokeWidth="0.8" strokeDasharray="4 6"/>
-        <line x1={MAP_W/2} y1="0" x2={MAP_W/2} y2={MAP_H} stroke="hsl(0,0%,14%)" strokeWidth="0.8" strokeDasharray="4 6"/>
-
-        {/* Continents */}
-        {CONTINENTS.map((c, i) => (
-          <path key={i} d={c.d} fill="hsl(0,0%,16%)" stroke="hsl(0,0%,22%)" strokeWidth="0.8"/>
-        ))}
-
-        {/* City bubbles */}
-        {cities.map((city, i) => {
-          const { x, y } = project(city.lon, city.lat);
-          const users = activeUsers[i] ?? city.base;
-          const r = Math.max(6, Math.min(28, 5 + users * 0.32));
-          const isHov = hovered === i;
+      {/* Map body */}
+      <div style={{ background:"hsl(0,0%,6%)" }}>
+        {!RSM ? (
+          /* Fallback while loading */
+          <div className="flex items-center justify-center h-64 text-muted-foreground text-sm font-body">
+            Loading map… (run <code className="mx-1 px-1 bg-muted rounded text-xs">npm install react-simple-maps</code> if this persists)
+          </div>
+        ) : (() => {
+          const { ComposableMap, Geographies, Geography, Marker } = RSM;
           return (
-            <g key={city.name} style={{ cursor:"pointer" }} onMouseEnter={()=>setHovered(i)} onMouseLeave={()=>setHovered(null)}>
-              {/* Pulse ring */}
-              <circle cx={x} cy={y} r={r + 6} fill="none" stroke="#9071f0" strokeWidth="1" opacity="0.25">
-                <animate attributeName="r" values={`${r+4};${r+14};${r+4}`} dur="2.8s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.25;0;0.25" dur="2.8s" repeatCount="indefinite"/>
-              </circle>
-              {/* Core bubble */}
-              <circle cx={x} cy={y} r={r} fill="#9071f0" opacity={isHov ? 0.95 : 0.72}/>
-              {/* User count */}
-              <text x={x} y={y+1} textAnchor="middle" dominantBaseline="middle"
-                fontSize={users >= 20 ? 9 : 8} fontWeight="700" fill="white" opacity="0.95"
-                style={{ pointerEvents:"none", fontFamily:"sans-serif" }}>
-                {users}
-              </text>
-              {/* Tooltip on hover */}
-              {isHov && (
-                <g>
-                  <rect x={x - 52} y={y - r - 38} width="104" height="30" rx="5"
-                    fill="hsl(0,0%,8%)" stroke="hsl(var(--border)/0.4)" strokeWidth="1"/>
-                  <text x={x} y={y - r - 27} textAnchor="middle" fontSize="9" fontWeight="700" fill="white" style={{ fontFamily:"sans-serif" }}>{city.name}</text>
-                  <text x={x} y={y - r - 16} textAnchor="middle" fontSize="8" fill="#9071f0" style={{ fontFamily:"sans-serif" }}>{users} active annotators</text>
-                </g>
-              )}
-            </g>
+            <ComposableMap
+              projection="geoEqualEarth"
+              projectionConfig={{ scale: 158, center: [10, 5] }}
+              style={{ width:"100%", height:"auto" }}
+            >
+              <Geographies geography={GEO_URL}>
+                {({ geographies }: { geographies: any[] }) =>
+                  geographies.map((geo: any) => (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill="hsl(0,0%,18%)"
+                      stroke="hsl(0,0%,28%)"
+                      strokeWidth={0.4}
+                      style={{
+                        default: { outline:"none" },
+                        hover:   { fill:"hsl(0,0%,23%)", outline:"none" },
+                        pressed: { outline:"none" },
+                      }}
+                    />
+                  ))
+                }
+              </Geographies>
+
+              {cities.map((city, i) => {
+                const users = activeUsers[i] ?? city.base;
+                const r = Math.max(5, Math.min(22, 4 + users * 0.26));
+                const isHov = hovered === i;
+                return (
+                  <Marker
+                    key={city.name}
+                    coordinates={[city.lon, city.lat] as [number, number]}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                  >
+                    {/* Pulse ring */}
+                    <circle r={r + 5} fill="none" stroke="#9071f0" strokeWidth="1" opacity="0.28" style={{ pointerEvents:"none" }}>
+                      <animate attributeName="r"       values={`${r+3};${r+13};${r+3}`} dur="3s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.28;0;0.28"             dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    {/* Core bubble */}
+                    <circle
+                      r={r}
+                      fill="#9071f0"
+                      opacity={isHov ? 0.97 : 0.78}
+                      style={{ cursor:"pointer" }}
+                    />
+                    {/* Count label */}
+                    <text
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      y={0.5}
+                      fontSize={r > 9 ? 8 : 7}
+                      fontWeight="700"
+                      fill="white"
+                      style={{ pointerEvents:"none", fontFamily:"sans-serif", userSelect:"none" }}
+                    >
+                      {users}
+                    </text>
+                    {/* Hover tooltip */}
+                    {isHov && (
+                      <g style={{ pointerEvents:"none" }}>
+                        <rect x={-54} y={-r - 38} width="108" height="30" rx="5"
+                          fill="hsl(0,0%,8%)" stroke="rgba(144,113,240,0.45)" strokeWidth="1"/>
+                        <text y={-r - 26} textAnchor="middle" fontSize="9.5" fontWeight="700" fill="white"
+                          style={{ fontFamily:"sans-serif" }}>{city.name}</text>
+                        <text y={-r - 14} textAnchor="middle" fontSize="8.5" fill="#9071f0"
+                          style={{ fontFamily:"sans-serif" }}>{users} active annotators</text>
+                      </g>
+                    )}
+                  </Marker>
+                );
+              })}
+            </ComposableMap>
           );
-        })}
-      </svg>
+        })()}
+      </div>
 
       {/* Legend */}
       <div className="px-5 py-2.5 border-t border-border/20 flex items-center gap-5 text-xs text-muted-foreground font-body">
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary/70 inline-block"/>&lt; 15 annotators</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary/70 inline-block"/>&lt; 15</span>
         <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded-full bg-primary/80 inline-block"/>&gt; 15</span>
         <span className="flex items-center gap-1.5"><span className="w-5 h-5 rounded-full bg-primary/90 inline-block"/>&gt; 40</span>
         <span className="ml-auto italic opacity-60">Hover a bubble for details</span>
