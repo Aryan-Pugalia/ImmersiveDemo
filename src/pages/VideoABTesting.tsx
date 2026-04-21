@@ -118,10 +118,7 @@ export default function VideoABTesting() {
             {/* Prompt card */}
             <PromptCard
               taskNumber={currentTask.taskNumber}
-              label={currentTask.promptLabel}
               prompt={currentTask.prompt}
-              modelA={modelAText}
-              modelB={modelBText}
               labelA={labelA}
               labelB={labelB}
             />
@@ -175,15 +172,6 @@ export default function VideoABTesting() {
               />
             </div>
 
-            {/* Task label row */}
-            <div className="flex items-center justify-center gap-3 pb-2">
-              <span className="text-sm text-muted-foreground">
-                Task {currentTask.taskNumber} of {VIDEO_TASKS.length} —
-              </span>
-              <span className="text-sm font-medium text-foreground/80">
-                {currentTask.promptLabel}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -216,18 +204,12 @@ export default function VideoABTesting() {
 // ─── Prompt Card ────────────────────────────────────────────────────────────
 function PromptCard({
   taskNumber,
-  label,
   prompt,
-  modelA,
-  modelB,
   labelA,
   labelB,
 }: {
   taskNumber: number;
-  label: string;
   prompt: string;
-  modelA: string;
-  modelB: string;
   labelA: string;
   labelB: string;
 }) {
@@ -251,19 +233,7 @@ function PromptCard({
             Prompt
           </span>
           <span className="text-sm text-muted-foreground font-mono">
-            Task {taskNumber} · {label}
-          </span>
-          <span
-            className="text-sm font-bold px-2 py-0.5 rounded text-white"
-            style={{ background: "#6366f1" }}
-          >
-            {labelA}: {modelA}
-          </span>
-          <span
-            className="text-sm font-bold px-2 py-0.5 rounded text-white"
-            style={{ background: "#7c3aed" }}
-          >
-            {labelB}: {modelB}
+            Task {taskNumber}
           </span>
         </div>
         <p

@@ -25,19 +25,19 @@ export const VIDEO_TASKS: VideoTask[] = [
   {
     id: "vid_chatgpt_vs_runway",
     taskNumber: 1,
-    promptLabel: "ChatGPT Sora vs Runway Gen-3",
+    promptLabel: "Street Scene · Video Pair 1",
     prompt: SHARED_PROMPT,
-    videoA: "/videos/ab-testing/chatgpt_1.mp4",
-    videoB: "/videos/ab-testing/runway.mp4",
-    modelA: "GPT-Sora checkpoint v1",
-    modelB: "Runway Gen-3 Alpha",
+    videoA: "/videos/ab-testing/runway.mp4",
+    videoB: "/videos/ab-testing/chatgpt_1.mp4",
+    modelA: "Model A",
+    modelB: "Model B",
     hasAudio: true,
     fps: 24,
     aiVerdict: {
-      winner: "B",
+      winner: "A",
       confidence: 0.71,
       reasoning:
-        "Video B (Runway) produces more realistic lighting continuity and a coherent handheld camera feel. The bicycle chain sound and footstep timing are more authentic, and the briefcase swing respects gravity more naturally. Video A (Sora) has visible exposure inconsistencies on the cyclist and a slight hand-raise desync. Confidence is moderate — the lip-mutter mismatch is present in both, so flagged for human review.",
+        "Video A produces more realistic lighting continuity and a coherent handheld camera feel. The bicycle chain sound and footstep timing are more authentic, and the briefcase swing respects gravity more naturally. Video B has visible exposure inconsistencies on the cyclist and a slight hand-raise desync. Confidence is moderate — the lip-mutter mismatch is present in both, so flagged for human review.",
     },
   },
 ];
