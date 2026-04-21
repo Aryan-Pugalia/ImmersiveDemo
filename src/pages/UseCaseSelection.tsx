@@ -82,9 +82,9 @@ const UseCaseSelection = () => {
             <Link
               key={useCase.id}
               to={`/use-cases/${useCase.slug}`}
-              className="industrial-card p-8 rounded-[12px] flex flex-col h-full group no-underline"
+              className="industrial-card p-5 rounded-[12px] flex flex-col h-full group no-underline"
             >
-              <div className="flex justify-between items-start mb-8">
+              <div className="flex justify-between items-start mb-3">
                 <span className="material-symbols-outlined text-4xl text-foreground/40 card-icon-hover">
                   {useCase.icon}
                 </span>
@@ -92,10 +92,10 @@ const UseCaseSelection = () => {
                   ID: {useCase.idTag}
                 </span>
               </div>
-              <h3 className="text-[18px] font-bold font-headline text-foreground mb-3 uppercase tracking-wide">
+              <h3 className="text-[18px] font-bold font-headline text-foreground mb-2 uppercase tracking-wide">
                 {useCase.title}
               </h3>
-              <p className="text-foreground/60 text-base leading-relaxed mb-8 flex-grow font-body">
+              <p className="text-foreground/60 text-base leading-relaxed mb-4 flex-grow font-body">
                 {useCase.description}
               </p>
               <div className="flex flex-wrap gap-2">
