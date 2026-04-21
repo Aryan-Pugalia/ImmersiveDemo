@@ -415,7 +415,7 @@ export default function LidarAnnotation() {
               className="text-white font-bold text-sm tracking-wide cursor-pointer hover:text-white/80 transition-colors"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
+              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight size={14} className="text-muted-foreground" />
             <span className="text-foreground/80 text-sm">LiDAR 3D Annotation</span>

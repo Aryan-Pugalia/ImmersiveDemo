@@ -76,7 +76,7 @@ export default function VideoABTesting() {
               className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
+              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             <span className="text-sm text-foreground/80 font-body whitespace-nowrap">

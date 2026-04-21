@@ -48,7 +48,7 @@ const UseCaseDetail = () => {
               <span className="material-symbols-outlined text-foreground">arrow_back</span>
             </button>
             <span className="text-xl font-bold tracking-tight text-white font-headline">
-              TP.ai <span style={{ color: "#aa00b6" }}>FAB</span>Studio
+              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
           </div>
           <div className="relative" ref={profileRef}>

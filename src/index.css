@@ -21,7 +21,7 @@
     --popover: 0 0% 10%;
     --popover-foreground: 30 5% 89%;
 
-    --primary: 296 100% 36%;
+    --primary: 255 81% 69%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 263 100% 83%;
@@ -38,7 +38,7 @@
 
     --border: 0 0% 13%;
     --input: 0 0% 13%;
-    --ring: 296 100% 36%;
+    --ring: 255 81% 69%;
 
     --radius: 0.75rem;
 
@@ -55,12 +55,12 @@
 
     --sidebar-background: 0 0% 7.5%;
     --sidebar-foreground: 30 5% 89%;
-    --sidebar-primary: 296 100% 36%;
+    --sidebar-primary: 255 81% 69%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 12%;
     --sidebar-accent-foreground: 30 5% 89%;
     --sidebar-border: 0 0% 13%;
-    --sidebar-ring: 296 100% 36%;
+    --sidebar-ring: 255 81% 69%;
   }
 }
 
@@ -90,7 +90,7 @@
 
 /* Gradient underline */
 .gradient-underline {
-  background: linear-gradient(90deg, #8754F3 0%, #aa00b6 100%);
+  background: linear-gradient(90deg, #7055e8 0%, #9071f0 100%);
   height: 2px;
   width: 100%;
   display: block;
@@ -99,7 +99,7 @@
 
 /* Progress bar gradient */
 .progress-bar-gradient {
-  background: linear-gradient(90deg, #8754F3 0%, #aa00b6 100%);
+  background: linear-gradient(90deg, #7055e8 0%, #9071f0 100%);
 }
 
 /* Industrial card styles */
@@ -110,13 +110,13 @@
 }
 
 .industrial-card:hover {
-  border-color: #aa00b6;
+  border-color: #9071f0;
   transform: translateY(-5px);
   box-shadow: 0 0 20px rgba(170, 0, 182, 0.1);
 }
 
 .industrial-card:hover .card-icon-hover {
-  color: #aa00b6;
+  color: #9071f0;
 }
 
 .card-icon-hover {
@@ -167,7 +167,7 @@
 
 .header-divider {
   height: 2px;
-  background: linear-gradient(90deg, #8754F3 0%, #aa00b6 100%);
+  background: linear-gradient(90deg, #7055e8 0%, #9071f0 100%);
 }
 
 /* ── Banner ── */
@@ -227,7 +227,7 @@
   font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.16em;
-  color: #aa00b6;
+  color: #9071f0;
   margin-bottom: 0.3rem;
 }
 
@@ -260,7 +260,7 @@
   text-shadow: 0 0 40px rgba(170,0,182,0.25), 0 2px 20px rgba(0,0,0,0.5);
 }
 
-.title-fab { color: #aa00b6; }
+.title-fab { color: #9071f0; }
 
 .banner-subtitle {
   font-size: clamp(0.95rem, 1.7vw, 1.15rem);
@@ -335,8 +335,8 @@
 }
 
 .cta-btn:hover {
-  background: #aa00b6;
-  border-color: #aa00b6;
+  background: #9071f0;
+  border-color: #9071f0;
   transform: translateY(-2px);
 }
 
@@ -366,7 +366,7 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.3em;
-  color: #aa00b6;
+  color: #9071f0;
   text-transform: uppercase;
   margin-bottom: 0.35rem;
 }
@@ -475,7 +475,7 @@
 }
 
 .bullet-purple {
-  background: #aa00b6;
+  background: #9071f0;
   box-shadow: 0 0 6px rgba(170, 0, 182, 0.65);
 }
 
@@ -535,7 +535,7 @@
 .capability-check {
   width: 13px;
   height: 13px;
-  color: #aa00b6;
+  color: #9071f0;
   flex-shrink: 0;
 }
 
