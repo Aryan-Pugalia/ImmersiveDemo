@@ -70,6 +70,16 @@ export const useCases: UseCase[] = [
     categoryTag: "Speech / NLP",
     secondaryTag: "Multilingual",
   },
+  {
+    id: "11",
+    slug: "dating-trust-safety",
+    title: "Dating Trust & Safety",
+    description: "Experience catfish detection end-to-end — annotate a profile, watch AI score it, then QA-review and override. Human-in-the-loop Trust & Safety at scale.",
+    icon: "verified_user",
+    idTag: "T&S-501",
+    categoryTag: "Trust & Safety",
+    secondaryTag: "Catfish Detection",
+  },
 ];
 
 export function getUseCaseBySlug(slug: string): UseCase | undefined {
