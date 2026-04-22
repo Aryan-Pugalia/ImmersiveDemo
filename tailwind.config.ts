@@ -57,6 +57,8 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Workflow-panel surface
+        "surface-raised": "hsl(var(--surface-raised))",
         // MD3 surface tokens
         "md-surface": "hsl(var(--md-surface))",
         "md-surface-container": "hsl(var(--md-surface-container))",

@@ -62,6 +62,9 @@
     --sidebar-border: 0 0% 13%;
     --sidebar-ring: 255 81% 69%;
 
+    /* ── Workflow-panel raised surface ── */
+    --surface-raised: 0 0% 9%;
+
     /* ── Surface tokens (dark defaults) ── */
     --s0: hsl(0,0%,4%);   /* page background */
     --s1: hsl(0,0%,5%);   /* header / near-black surface */
@@ -91,6 +94,8 @@
     --primary: 255 65% 42%;
     --primary-foreground: 0 0% 100%;
     --ring: 255 65% 42%;
+
+    --surface-raised: 0 0% 90%;
 
     --s0: hsl(0,0%,94%);
     --s1: hsl(0,0%,96%);

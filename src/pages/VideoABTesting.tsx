@@ -183,7 +183,7 @@ export default function VideoABTesting() {
         {/* Right: workflow */}
         <aside
           className="w-[420px] shrink-0 border-l border-border/20 overflow-hidden flex flex-col"
-          style={{ background: "hsl(0,0%,5.5%)" }}
+          style={{ background: "var(--s1)" }}
         >
           <VideoWorkflowPanel
             currentTaskId={currentTask.id}
@@ -260,7 +260,7 @@ function PromptCard({
       <button
         onClick={handleCopy}
         title={p.copyPrompt}
-        className="shrink-0 mt-0.5 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
+        className="shrink-0 mt-0.5 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/10 transition-colors"
       >
         {copied ? (
           <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
