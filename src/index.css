@@ -156,6 +156,8 @@ html.light .text-foreground\/50:not(.dark-surface *) { color: hsl(220 15% 12% / 
 /* Violet / purple */
 html.light .text-violet-300:not(.dark-surface *) { color: #6d28d9 !important; } /* violet-700 */
 html.light .text-violet-400:not(.dark-surface *) { color: #5b21b6 !important; } /* violet-800 */
+html.light .text-purple-300:not(.dark-surface *) { color: #7e22ce !important; } /* purple-700 */
+html.light .text-purple-400:not(.dark-surface *) { color: #6b21a8 !important; } /* purple-800 */
 /* Red */
 html.light .text-red-300:not(.dark-surface *)    { color: #b91c1c !important; } /* red-700    */
 html.light .text-red-400:not(.dark-surface *)    { color: #991b1b !important; } /* red-800    */
@@ -167,6 +169,8 @@ html.light .text-green-400:not(.dark-surface *)  { color: #166534 !important; } 
 /* Amber / orange */
 html.light .text-amber-300:not(.dark-surface *)  { color: #b45309 !important; } /* amber-700  */
 html.light .text-amber-400:not(.dark-surface *)  { color: #92400e !important; } /* amber-800  */
+html.light .text-amber-300\/90:not(.dark-surface *) { color: #b45309 !important; }
+html.light .text-amber-400\/90:not(.dark-surface *) { color: #92400e !important; }
 html.light .text-orange-300:not(.dark-surface *) { color: #c2410c !important; } /* orange-700 */
 html.light .text-orange-400:not(.dark-surface *) { color: #9a3412 !important; } /* orange-800 */
 /* Blue / indigo */

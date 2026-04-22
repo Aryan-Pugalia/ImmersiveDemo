@@ -134,7 +134,7 @@ export function VideoWorkflowPanel({
                     className="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors"
                     style={{
                       borderColor:
-                        isDone || isCurrent ? "hsl(var(--primary))" : "hsl(0,0%,22%)",
+                        isDone || isCurrent ? "hsl(var(--primary))" : "hsl(var(--border))",
                       background: isCurrent
                         ? "hsl(var(--primary) / 0.15)"
                         : isDone
@@ -144,7 +144,7 @@ export function VideoWorkflowPanel({
                         ? "hsl(var(--primary))"
                         : isDone
                         ? "#fff"
-                        : "hsl(0,0%,55%)",
+                        : "hsl(var(--muted-foreground))",
                     }}
                   >
                     <Icon size={18} />
@@ -155,8 +155,8 @@ export function VideoWorkflowPanel({
                       color: isCurrent
                         ? "hsl(var(--primary))"
                         : isDone
-                        ? "hsl(0,0%,85%)"
-                        : "hsl(0,0%,55%)",
+                        ? "hsl(var(--foreground))"
+                        : "hsl(var(--muted-foreground))",
                     }}
                   >
                     {stageLabels[s.id]}
@@ -169,7 +169,7 @@ export function VideoWorkflowPanel({
                       background:
                         i < currentStageIndex
                           ? "hsl(var(--primary))"
-                          : "hsl(0,0%,22%)",
+                          : "hsl(var(--border))",
                     }}
                   />
                 )}
@@ -212,7 +212,7 @@ export function VideoWorkflowPanel({
                       ? "hsl(var(--primary))"
                       : active
                       ? "hsl(var(--primary) / 0.35)"
-                      : "hsl(0,0%,18%)",
+                      : "hsl(var(--border))",
                   }}
                 />
               );
@@ -484,7 +484,7 @@ function RatingForm({
           placeholder="Describe key differences, artifacts noticed, sync issues, etc."
           rows={2}
           className="w-full border border-border rounded p-2 text-sm text-foreground placeholder-muted-foreground/50 resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
-          style={{ background: "hsl(0,0%,9%)" }}
+          style={{ background: "var(--s5)" }}
         />
       </div>
     </div>
@@ -941,7 +941,7 @@ function QAResolutionCard({
               placeholder="Add arbitration note…"
               rows={2}
               className="w-full border border-border rounded-lg p-2.5 text-sm text-foreground placeholder-muted-foreground/50 resize-none focus:outline-none focus:ring-1 focus:ring-primary/40"
-              style={{ background: "hsl(0,0%,9%)" }}
+              style={{ background: "var(--s5)" }}
             />
           </div>
 
