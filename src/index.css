@@ -83,9 +83,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 12%;
     --muted: 0 0% 90%;
-    --muted-foreground: 220 10% 45%;
-    --border: 0 0% 82%;
-    --input: 0 0% 82%;
+    --muted-foreground: 220 10% 38%; /* darkened from 45% → 38% for better contrast */
+    --border: 0 0% 78%;
+    --input: 0 0% 78%;
+
+    /* Primary darkened from 69% lightness → 42% for WCAG AA on white (≥4.5:1) */
+    --primary: 255 65% 42%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 255 65% 42%;
 
     --s0: hsl(0,0%,94%);
     --s1: hsl(0,0%,96%);
@@ -111,26 +116,75 @@
   }
 }
 
-/* ── Light mode: adapt white text/borders for content areas ── */
-/* Elements inside .dark-surface (headers) are excluded — they stay white-on-dark */
-html.light .text-white:not(.dark-surface *) { color: hsl(220 15% 12%) !important; }
-html.light .text-white\/80:not(.dark-surface *) { color: rgba(17,20,30,0.80) !important; }
-html.light .text-white\/70:not(.dark-surface *) { color: rgba(17,20,30,0.70) !important; }
-html.light .text-white\/60:not(.dark-surface *) { color: rgba(17,20,30,0.60) !important; }
-html.light .text-white\/50:not(.dark-surface *) { color: rgba(17,20,30,0.50) !important; }
-html.light .text-white\/40:not(.dark-surface *) { color: rgba(17,20,30,0.40) !important; }
-html.light .text-white\/30:not(.dark-surface *) { color: rgba(17,20,30,0.30) !important; }
-html.light .text-white\/20:not(.dark-surface *) { color: rgba(17,20,30,0.20) !important; }
-html.light .text-white\/10:not(.dark-surface *) { color: rgba(17,20,30,0.10) !important; }
-/* Buttons with colored bg keep white text */
-html.light .bg-emerald-500 .text-white,
-html.light .bg-red-500 .text-white,
-html.light .bg-amber-500 .text-white,
-html.light .bg-violet-600 .text-white,
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE — text, border, and color-class overrides
+   .dark-surface elements (page headers) are excluded throughout
+   so header text stays white-on-dark regardless of theme.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── white/opacity text → dark equivalents ── */
+html.light .text-white:not(.dark-surface *)      { color: hsl(220 15% 12%) !important; }
+html.light .text-white\/80:not(.dark-surface *)  { color: rgba(17,20,30,0.82) !important; }
+html.light .text-white\/70:not(.dark-surface *)  { color: rgba(17,20,30,0.72) !important; }
+html.light .text-white\/60:not(.dark-surface *)  { color: rgba(17,20,30,0.62) !important; }
+html.light .text-white\/50:not(.dark-surface *)  { color: rgba(17,20,30,0.55) !important; }
+html.light .text-white\/45:not(.dark-surface *)  { color: rgba(17,20,30,0.52) !important; }
+/* /30 and /40 were previously too faint — bump to 55%/62% opacity */
+html.light .text-white\/40:not(.dark-surface *)  { color: rgba(17,20,30,0.55) !important; }
+html.light .text-white\/30:not(.dark-surface *)  { color: rgba(17,20,30,0.50) !important; }
+html.light .text-white\/20:not(.dark-surface *)  { color: rgba(17,20,30,0.35) !important; }
+html.light .text-white\/10:not(.dark-surface *)  { color: rgba(17,20,30,0.18) !important; }
+
+/* ── foreground opacity — boost low opacities for readability ── */
+html.light .text-foreground\/30:not(.dark-surface *) { color: hsl(220 15% 12% / 0.55) !important; }
+html.light .text-foreground\/40:not(.dark-surface *) { color: hsl(220 15% 12% / 0.60) !important; }
+html.light .text-foreground\/45:not(.dark-surface *) { color: hsl(220 15% 12% / 0.65) !important; }
+html.light .text-foreground\/50:not(.dark-surface *) { color: hsl(220 15% 12% / 0.70) !important; }
+
+/* ── Pastel colors → accessible dark equivalents (WCAG AA ≥ 4.5:1 on white) ── */
+/* Violet / purple */
+html.light .text-violet-300:not(.dark-surface *) { color: #6d28d9 !important; } /* violet-700 */
+html.light .text-violet-400:not(.dark-surface *) { color: #5b21b6 !important; } /* violet-800 */
+/* Red */
+html.light .text-red-300:not(.dark-surface *)    { color: #b91c1c !important; } /* red-700    */
+html.light .text-red-400:not(.dark-surface *)    { color: #991b1b !important; } /* red-800    */
+/* Emerald / green */
+html.light .text-emerald-300:not(.dark-surface *){ color: #047857 !important; } /* emerald-700*/
+html.light .text-emerald-400:not(.dark-surface *){ color: #065f46 !important; } /* emerald-800*/
+html.light .text-green-300:not(.dark-surface *)  { color: #15803d !important; } /* green-700  */
+html.light .text-green-400:not(.dark-surface *)  { color: #166534 !important; } /* green-800  */
+/* Amber / orange */
+html.light .text-amber-300:not(.dark-surface *)  { color: #b45309 !important; } /* amber-700  */
+html.light .text-amber-400:not(.dark-surface *)  { color: #92400e !important; } /* amber-800  */
+html.light .text-orange-300:not(.dark-surface *) { color: #c2410c !important; } /* orange-700 */
+html.light .text-orange-400:not(.dark-surface *) { color: #9a3412 !important; } /* orange-800 */
+/* Blue / indigo */
+html.light .text-blue-300:not(.dark-surface *)   { color: #1d4ed8 !important; } /* blue-700   */
+html.light .text-blue-400:not(.dark-surface *)   { color: #1e40af !important; } /* blue-800   */
+html.light .text-indigo-300:not(.dark-surface *) { color: #4338ca !important; } /* indigo-700 */
+html.light .text-indigo-400:not(.dark-surface *) { color: #3730a3 !important; } /* indigo-800 */
+/* Cyan / teal */
+html.light .text-cyan-300:not(.dark-surface *)   { color: #0e7490 !important; } /* cyan-700   */
+html.light .text-cyan-400:not(.dark-surface *)   { color: #155e75 !important; } /* cyan-800   */
+html.light .text-teal-300:not(.dark-surface *)   { color: #0f766e !important; } /* teal-700   */
+html.light .text-teal-400:not(.dark-surface *)   { color: #115e59 !important; } /* teal-800   */
+/* Pink / rose */
+html.light .text-pink-300:not(.dark-surface *)   { color: #be185d !important; } /* pink-700   */
+html.light .text-pink-400:not(.dark-surface *)   { color: #9d174d !important; } /* pink-800   */
+html.light .text-rose-300:not(.dark-surface *)   { color: #be123c !important; } /* rose-700   */
+html.light .text-rose-400:not(.dark-surface *)   { color: #9f1239 !important; } /* rose-800   */
+/* Yellow */
+html.light .text-yellow-300:not(.dark-surface *) { color: #a16207 !important; } /* yellow-700 */
+html.light .text-yellow-400:not(.dark-surface *) { color: #854d0e !important; } /* yellow-800 */
+
+/* ── Buttons with colored bg always keep white text ── */
 html.light [class*="bg-emerald-5"] .text-white,
 html.light [class*="bg-red-5"] .text-white,
-html.light [class*="bg-amber-5"] .text-white { color: white !important; }
-/* Adapt white/XX borders in content */
+html.light [class*="bg-amber-5"] .text-white,
+html.light [class*="bg-violet-6"] .text-white,
+html.light [class*="bg-blue-5"] .text-white    { color: white !important; }
+
+/* ── White/opacity borders → dark equivalents ── */
 html.light .border-white\/10:not(.dark-surface *) { border-color: rgba(0,0,0,0.10) !important; }
 html.light .border-white\/8:not(.dark-surface *)  { border-color: rgba(0,0,0,0.08) !important; }
 html.light .border-white\/20:not(.dark-surface *) { border-color: rgba(0,0,0,0.15) !important; }
