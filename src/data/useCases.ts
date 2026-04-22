@@ -71,6 +71,16 @@ export const useCases: UseCase[] = [
     secondaryTag: "Multilingual",
   },
   {
+    id: "12",
+    slug: "cheating-or-skill",
+    title: "Cheating or Skill Review",
+    description: "Label gameplay clips as skill or cheating, watch AI flag anomalies, then QA-override the call. Human-in-the-loop Gaming Trust & Safety at scale.",
+    icon: "sports_esports",
+    idTag: "GAM-118",
+    categoryTag: "Gaming / T&S",
+    secondaryTag: "GenAI + Human QA",
+  },
+  {
     id: "11",
     slug: "dating-trust-safety",
     title: "Dating Trust & Safety",

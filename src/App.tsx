@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AudioAnnotation from "./pages/AudioAnnotation.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import CatfishDetection from "./pages/CatfishDetection.tsx";
+import CheatingOrSkill from "./pages/CheatingOrSkill.tsx";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           </Route>
           <Route path="/use-cases/audio-annotation" element={<AudioAnnotation />} />
           <Route path="/use-cases/dating-trust-safety" element={<CatfishDetection />} />
+          <Route path="/use-cases/cheating-or-skill" element={<CheatingOrSkill />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />
           <Route path="/qa-report/:useCaseId" element={<QAReport />} />
