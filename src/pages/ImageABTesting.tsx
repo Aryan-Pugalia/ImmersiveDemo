@@ -79,10 +79,10 @@ export default function ImageABTesting() {
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <span
-              className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0"
+              className="cursor-pointer shrink-0"
               onClick={() => navigate("/use-cases")}
             >
-              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
+              <img src="/tp-ai-data-services-logo.png" alt="TP.ai FABStudio" style={{ height: "22px", width: "auto" }} />
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             <span className="text-sm text-foreground/80 font-body whitespace-nowrap">{p.title}</span>

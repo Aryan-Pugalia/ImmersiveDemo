@@ -17,7 +17,7 @@ export const en = {
 
   // ── Use-cases page ────────────────────────────────────────────────────────
   useCasesPage: {
-    heading: "Select Your Pipeline",
+    heading: "Select Your Project",
     role: "Role",
     roleValue: "Data Annotator",
   },

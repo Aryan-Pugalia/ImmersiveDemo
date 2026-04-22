@@ -32,8 +32,8 @@ const UseCaseSelection = () => {
             >
               <span className="material-symbols-outlined text-foreground">arrow_back</span>
             </button>
-            <span className="text-xl font-bold tracking-tight text-white font-headline">
-              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
+            <span className="cursor-pointer">
+              <img src="/tp-ai-data-services-logo.png" alt="TP.ai FABStudio" style={{ height: "22px", width: "auto" }} />
             </span>
           </div>
           <div className="flex items-center gap-3">

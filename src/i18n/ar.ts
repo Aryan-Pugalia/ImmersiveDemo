@@ -14,7 +14,7 @@ export const ar: Translations = {
     capabilitiesHeading: "كل ما تحتاجه لتدريب نماذج الذكاء الاصطناعي المتقدمة",
   },
   useCasesPage: {
-    heading: "اختر خط الأنابيب",
+    heading: "اختر مشروعك",
     role: "الدور",
     roleValue: "مُعلِّق بيانات",
   },

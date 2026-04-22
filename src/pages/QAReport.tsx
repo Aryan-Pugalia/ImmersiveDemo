@@ -177,7 +177,9 @@ export default function QAReport() {
             >
               <ArrowLeft className="h-4 w-4 text-foreground" />
             </button>
-            <span className="text-sm font-bold text-white font-headline">TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio</span>
+            <span className="cursor-pointer shrink-0">
+              <img src="/tp-ai-data-services-logo.png" alt="TP.ai FABStudio" style={{ height: "22px", width: "auto" }} />
+            </span>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-sm text-foreground/80">{data.title}</span>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />

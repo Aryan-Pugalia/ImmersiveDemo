@@ -14,7 +14,7 @@ export const fr: Translations = {
     capabilitiesHeading: "Tout ce qu'il faut pour entraîner des modèles de pointe",
   },
   useCasesPage: {
-    heading: "Choisissez votre pipeline",
+    heading: "Choisissez votre projet",
     role: "Rôle",
     roleValue: "Annotateur de données",
   },

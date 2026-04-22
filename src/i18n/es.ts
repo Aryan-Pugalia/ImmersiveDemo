@@ -14,7 +14,7 @@ export const es: Translations = {
     capabilitiesHeading: "Todo lo que necesitas para entrenar modelos de frontera",
   },
   useCasesPage: {
-    heading: "Selecciona tu pipeline",
+    heading: "Selecciona tu proyecto",
     role: "Rol",
     roleValue: "Anotador de datos",
   },

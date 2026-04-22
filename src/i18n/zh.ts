@@ -14,7 +14,7 @@ export const zh: Translations = {
     capabilitiesHeading: "训练前沿AI模型所需的一切",
   },
   useCasesPage: {
-    heading: "选择您的流水线",
+    heading: "选择您的项目",
     role: "角色",
     roleValue: "数据标注员",
   },

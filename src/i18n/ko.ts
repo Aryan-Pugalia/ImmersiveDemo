@@ -14,7 +14,7 @@ export const ko: Translations = {
     capabilitiesHeading: "프론티어 모델 학습에 필요한 모든 것",
   },
   useCasesPage: {
-    heading: "파이프라인 선택",
+    heading: "프로젝트 선택",
     role: "역할",
     roleValue: "데이터 어노테이터",
   },
