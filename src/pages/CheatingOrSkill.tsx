@@ -21,6 +21,7 @@ import {
   Check, Play, Pause, Target, Activity, Gamepad2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -438,7 +439,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
   const timeStr = `0:${elapsed.toString().padStart(2, "0")} / 0:${clip.duration.toString().padStart(2, "0")}`;
 
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden flex flex-col" style={{ background: "hsl(0,0%,7%)" }}>
+    <div className="rounded-2xl border border-white/10 overflow-hidden flex flex-col" style={{ background: "var(--s3)" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8">
         <div>
@@ -596,8 +597,8 @@ function ProgressStepper({ stage }: { stage: Stage }) {
             <div className="flex flex-col items-center">
               <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
                 done    ? "bg-violet-600 border-violet-600 text-white" :
-                current ? "bg-[hsl(0,0%,10%)] border-violet-500 text-violet-400 ring-4 ring-violet-900/40" :
-                          "bg-[hsl(0,0%,8%)] border-white/10 text-white/30"
+                current ? "bg-[var(--s6)] border-violet-500 text-violet-400 ring-4 ring-violet-900/40" :
+                          "bg-[var(--s4)] border-white/10 text-white/30"
               }`}>
                 {done ? <Check size={15} /> : step.n}
               </div>
@@ -664,7 +665,7 @@ function Stage1({
         </div>
 
         {/* Q1 · Classification */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3 font-headline">1 · Is this skill, cheating, or unsure?</p>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -682,7 +683,7 @@ function Stage1({
 
         {/* Q2 · Cheat type (conditional) */}
         {(label === "cheat" || label === "unsure") && (
-          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
             <p className="text-sm font-semibold text-foreground mb-3 font-headline">2 · Suspected cheat type</p>
             <div className="space-y-1.5">
               {CHEAT_TYPES.map(ct => (
@@ -704,7 +705,7 @@ function Stage1({
         )}
 
         {/* Q3 · Evidence flags */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3 font-headline">
             {(label === "cheat" || label === "unsure") ? "3" : "2"} · Evidence flags
           </p>
@@ -729,7 +730,7 @@ function Stage1({
         </div>
 
         {/* Q4 · Confidence slider */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-semibold text-foreground font-headline">
               {(label === "cheat" || label === "unsure") ? "4" : "3"} · Confidence
@@ -751,7 +752,7 @@ function Stage1({
         </div>
 
         {/* Q5 · Note (optional) */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-2 font-headline">
             {(label === "cheat" || label === "unsure") ? "5" : "4"} · Annotator note <span className="text-foreground/30 font-normal">(optional)</span>
           </p>
@@ -761,7 +762,7 @@ function Stage1({
             placeholder="Brief observation…"
             rows={2}
             className="w-full rounded-xl px-3 py-2 text-sm text-foreground/80 placeholder:text-foreground/25 border border-white/10 resize-none focus:outline-none focus:border-violet-500/50 transition-colors font-body"
-            style={{ background: "hsl(0,0%,6%)" }}
+            style={{ background: "var(--s2)" }}
           />
           <div className="text-right text-[10px] text-foreground/30 mt-1">{note.length}/140</div>
         </div>
@@ -828,7 +829,7 @@ function Stage2({
         <ReplayViewer clip={clip} />
         {/* Human annotation pill */}
         {done && (
-          <div className="mt-3 rounded-xl border border-white/10 px-4 py-3 flex items-center gap-3" style={{ background: "hsl(0,0%,8%)" }}>
+          <div className="mt-3 rounded-xl border border-white/10 px-4 py-3 flex items-center gap-3" style={{ background: "var(--s4)" }}>
             <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">Your annotation:</span>
             <span className="text-sm font-bold" style={{ color: humanColor }}>{humanLbl}</span>
             <span className="text-xs text-foreground/40">·</span>
@@ -849,7 +850,7 @@ function Stage2({
         </div>
 
         {/* Score bars */}
-        <div className="rounded-2xl border border-white/10 p-4 space-y-3.5" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4 space-y-3.5" style={{ background: "var(--s4)" }}>
           <ScoreBar label="Aim Anomaly Score"        score={scores.aim}       active={phase >= 2} idx={0}/>
           <ScoreBar label="Occlusion Awareness Score" score={scores.occlusion} active={phase >= 3} idx={1}/>
           <ScoreBar label="Input Pattern Score"      score={scores.input}     active={phase >= 4} idx={2}/>
@@ -874,7 +875,7 @@ function Stage2({
 
         {/* Explanation */}
         {done && (
-          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
             <p className="text-sm font-semibold text-foreground mb-2.5 font-headline">Signals detected:</p>
             <div className="space-y-2">
               {ai.explanationBullets.map((b, i) => (
@@ -958,7 +959,7 @@ function Stage3({
       {/* Three-column compare */}
       <div className="grid grid-cols-3 gap-4">
         {/* Human annotation */}
-        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3">👤 Human Annotation</p>
           <div className="text-xl font-black mb-2" style={{ color: humanColor }}>{humanLbl}</div>
           <div className="text-xs text-foreground/50 space-y-1.5 font-body">
@@ -977,7 +978,7 @@ function Stage3({
 
         {/* Centre — clip stats + TP Insight */}
         <div className="space-y-3">
-          <div className="rounded-2xl border border-white/10 p-3" style={{ background: "hsl(0,0%,8%)" }}>
+          <div className="rounded-2xl border border-white/10 p-3" style={{ background: "var(--s4)" }}>
             <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-2">📊 Clip Stats</p>
             {[
               { label: "React time",  value: `${clip.stats.avgReactionMs}ms` },
@@ -992,7 +993,7 @@ function Stage3({
             ))}
           </div>
           {/* Quality metrics */}
-          <div className="rounded-xl p-3 border border-white/8" style={{ background: "hsl(0,0%,7%)" }}>
+          <div className="rounded-xl p-3 border border-white/8" style={{ background: "var(--s3)" }}>
             <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-2">📋 Quality Indicators</p>
             {[
               { label: "False positive risk", value: ai.riskScore < 50 ? "Low" : ai.riskScore < 75 ? "Medium" : "High", color: ai.riskScore < 50 ? "#10b981" : ai.riskScore < 75 ? "#f59e0b" : "#ef4444" },
@@ -1008,7 +1009,7 @@ function Stage3({
         </div>
 
         {/* AI result */}
-        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3">🤖 AI Model Decision</p>
           <div className="text-xl font-black mb-1" style={{ color: riskHue(ai.riskScore) }}>{ai.riskScore}/100</div>
           <div className="text-xs font-bold mb-3 font-headline" style={{ color: riskHue(ai.riskScore) }}>{ai.recommendation}</div>
@@ -1019,7 +1020,7 @@ function Stage3({
       </div>
 
       {/* QA action card */}
-      <div className="rounded-2xl border border-white/10 p-5" style={{ background: "hsl(0,0%,8%)" }}>
+      <div className="rounded-2xl border border-white/10 p-5" style={{ background: "var(--s4)" }}>
         <p className="text-sm font-bold text-foreground mb-4 font-headline">QA Decision — Select your action:</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
@@ -1116,7 +1117,7 @@ function Stage4({
   return (
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
       {/* Delivery badge */}
-      <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "hsl(0,0%,13%)" }}>
+      <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "var(--s7)" }}>
         <span>📦</span> Step 4: Decision Packet Delivered to Client Platform
       </div>
 
@@ -1134,8 +1135,8 @@ function Stage4({
       </div>
 
       {/* Decision Packet */}
-      <div className="w-full rounded-2xl border border-white/10 overflow-hidden" style={{ background: "hsl(0,0%,7%)" }}>
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/8" style={{ background: "hsl(0,0%,9%)" }}>
+      <div className="w-full rounded-2xl border border-white/10 overflow-hidden" style={{ background: "var(--s3)" }}>
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/8" style={{ background: "var(--s5)" }}>
           <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">📄 Decision Packet</span>
           <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-700/30 px-2 py-0.5 rounded font-mono ml-auto">JSON</span>
         </div>
@@ -1147,7 +1148,7 @@ function Stage4({
         <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3 text-center">Simulated Impact Metrics</p>
         <div className="grid grid-cols-2 gap-3">
           {metrics.map((m, i) => (
-            <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+            <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
               <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-2" style={{ background: m.iconBg }}>
                 <m.Icon size={17} className={m.color}/>
               </div>
@@ -1160,7 +1161,7 @@ function Stage4({
       </div>
 
       {/* TP at Scale */}
-      <div className="w-full rounded-2xl p-5" style={{ background: "hsl(0,0%,10%)" }}>
+      <div className="w-full rounded-2xl p-5" style={{ background: "var(--s6)" }}>
         <p className="text-sm font-bold text-foreground mb-4 font-headline">How TP Operationalises This at Scale</p>
         <div className="grid grid-cols-3 gap-3 text-center">
           {[
@@ -1222,9 +1223,9 @@ export default function CheatingOrSkill() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "hsl(0,0%,4%)" }}>
+    <div className="min-h-screen" style={{ background: "var(--s0)" }}>
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={() => navigate("/use-cases")}
@@ -1239,6 +1240,7 @@ export default function CheatingOrSkill() {
             <span className="text-sm text-white/70 whitespace-nowrap font-body">Gaming Trust &amp; Safety</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle />
             <Gamepad2 size={14} className="text-violet-400"/>
             <span className="text-xs bg-violet-600/20 text-violet-300 border border-violet-600/30 px-3 py-1 rounded-full font-semibold">
               Anti‑Cheat · Live Demo
@@ -1275,7 +1277,7 @@ export default function CheatingOrSkill() {
                       ? "border-violet-500 bg-violet-600 text-white"
                       : "border-white/10 text-foreground/65 hover:border-violet-500/40 hover:bg-violet-900/20"
                   }`}
-                  style={!active ? { background: "hsl(0,0%,8%)" } : {}}>
+                  style={!active ? { background: "var(--s4)" } : {}}>
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${active ? "bg-violet-200" : gtDot}`}/>
                     <span className="text-xs font-bold truncate">{c.title.split("—")[0].trim()}</span>

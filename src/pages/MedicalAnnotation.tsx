@@ -19,6 +19,7 @@ import type { Annotation, DrawingTool, AnnotationCategory, TumorType, TumorStage
 import { ArrowLeft, Brain, Scan, Activity, PenTool, ChevronRight, BarChart2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type ViewMode = "ai" | "annotate";
 
@@ -170,22 +171,25 @@ export default function MedicalAnnotation() {
     return (
       <div className="min-h-screen bg-background">
         {/* FABStudio Header */}
-        <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
-          <div className="flex items-center px-6 py-3 h-16 gap-3">
-            <button
-              onClick={() => navigate("/use-cases")}
-              className="flex items-center justify-center p-2 hover:bg-muted rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 text-foreground" />
-            </button>
-            <span
-              className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0"
-              onClick={() => navigate("/use-cases")}
-            >
-              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
-            </span>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-foreground/80 font-body">{p.title}</span>
+        <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+          <div className="flex items-center justify-between px-6 py-3 h-16">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/use-cases")}
+                className="flex items-center justify-center p-2 hover:bg-muted rounded-full transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 text-foreground" />
+              </button>
+              <span
+                className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0"
+                onClick={() => navigate("/use-cases")}
+              >
+                TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-sm text-foreground/80 font-body">{p.title}</span>
+            </div>
+            <ThemeToggle />
           </div>
           <div className="absolute bottom-0 left-0 h-[2px] w-full progress-bar-gradient" />
         </header>
@@ -225,7 +229,7 @@ export default function MedicalAnnotation() {
   return (
     <div className="min-h-screen bg-background">
       {/* FABStudio Header */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex items-center justify-between px-6 py-3 h-16">
           <div className="flex items-center gap-3">
             <button
@@ -245,6 +249,7 @@ export default function MedicalAnnotation() {
             <span className="text-sm text-foreground/80 font-body">{p.title}</span>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Badge variant="outline" className="text-sm border-primary/50 text-primary">
               {annotations.length} {annotations.length !== 1 ? t.tools.annotations_plural : t.tools.annotations}
             </Badge>

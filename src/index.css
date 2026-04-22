@@ -61,6 +61,41 @@
     --sidebar-accent-foreground: 30 5% 89%;
     --sidebar-border: 0 0% 13%;
     --sidebar-ring: 255 81% 69%;
+
+    /* ── Surface tokens (dark defaults) ── */
+    --s0: hsl(0,0%,4%);   /* page background */
+    --s1: hsl(0,0%,5%);   /* header / near-black surface */
+    --s2: hsl(0,0%,6%);   /* slightly elevated surface */
+    --s3: hsl(0,0%,7%);   /* content area background */
+    --s4: hsl(0,0%,8%);   /* cards / primary panels */
+    --s5: hsl(0,0%,9%);   /* slightly raised card */
+    --s6: hsl(0,0%,10%);  /* inner / nested panels */
+    --s7: hsl(0,0%,13%);  /* decorative dark bg / badge */
+    --s8: hsl(0,0%,14%);  /* slightly lighter badge / pill */
+  }
+
+  /* ── Light mode overrides ── */
+  html.light {
+    --background: 0 0% 96%;
+    --foreground: 220 15% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 12%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 220 10% 45%;
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+
+    --s0: hsl(0,0%,94%);
+    --s1: hsl(0,0%,96%);
+    --s2: hsl(0,0%,91%);
+    --s3: hsl(0,0%,95%);
+    --s4: hsl(0,0%,100%);
+    --s5: hsl(0,0%,92%);
+    --s6: hsl(0,0%,88%);
+    --s7: hsl(0,0%,85%);
+    --s8: hsl(0,0%,90%);
   }
 }
 
@@ -75,6 +110,30 @@
     overflow-x: hidden;
   }
 }
+
+/* ── Light mode: adapt white text/borders for content areas ── */
+/* Elements inside .dark-surface (headers) are excluded — they stay white-on-dark */
+html.light .text-white:not(.dark-surface *) { color: hsl(220 15% 12%) !important; }
+html.light .text-white\/80:not(.dark-surface *) { color: rgba(17,20,30,0.80) !important; }
+html.light .text-white\/70:not(.dark-surface *) { color: rgba(17,20,30,0.70) !important; }
+html.light .text-white\/60:not(.dark-surface *) { color: rgba(17,20,30,0.60) !important; }
+html.light .text-white\/50:not(.dark-surface *) { color: rgba(17,20,30,0.50) !important; }
+html.light .text-white\/40:not(.dark-surface *) { color: rgba(17,20,30,0.40) !important; }
+html.light .text-white\/30:not(.dark-surface *) { color: rgba(17,20,30,0.30) !important; }
+html.light .text-white\/20:not(.dark-surface *) { color: rgba(17,20,30,0.20) !important; }
+html.light .text-white\/10:not(.dark-surface *) { color: rgba(17,20,30,0.10) !important; }
+/* Buttons with colored bg keep white text */
+html.light .bg-emerald-500 .text-white,
+html.light .bg-red-500 .text-white,
+html.light .bg-amber-500 .text-white,
+html.light .bg-violet-600 .text-white,
+html.light [class*="bg-emerald-5"] .text-white,
+html.light [class*="bg-red-5"] .text-white,
+html.light [class*="bg-amber-5"] .text-white { color: white !important; }
+/* Adapt white/XX borders in content */
+html.light .border-white\/10:not(.dark-surface *) { border-color: rgba(0,0,0,0.10) !important; }
+html.light .border-white\/8:not(.dark-surface *)  { border-color: rgba(0,0,0,0.08) !important; }
+html.light .border-white\/20:not(.dark-surface *) { border-color: rgba(0,0,0,0.15) !important; }
 
 /* Material Symbols */
 .material-symbols-outlined {
@@ -131,7 +190,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #000000;
+  background: var(--s0);
 }
 
 /* ── Header ── */
@@ -141,7 +200,7 @@
   top: 0;
   z-index: 200;
   width: 100%;
-  background: #000000;
+  background: hsl(0,0%,5%); /* intentionally stays dark — brand header */
 }
 
 .header-inner {
@@ -401,12 +460,12 @@
 
 .marquee-fade-left {
   left: 0;
-  background: linear-gradient(to right, #000000, transparent);
+  background: linear-gradient(to right, var(--s0), transparent);
 }
 
 .marquee-fade-right {
   right: 0;
-  background: linear-gradient(to left, #000000, transparent);
+  background: linear-gradient(to left, var(--s0), transparent);
 }
 
 /* Animated track */

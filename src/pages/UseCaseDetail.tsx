@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUseCaseBySlug } from "@/data/useCases";
 import { useLanguage } from "@/context/LanguageContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const UseCaseDetail = () => {
   const { useCaseId } = useParams<{ useCaseId: string }>();
@@ -37,7 +38,7 @@ const UseCaseDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex justify-between items-center px-6 py-3 h-16">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate("/use-cases")} className="flex items-center justify-center p-2 hover:bg-muted rounded-full transition-colors">
@@ -47,12 +48,13 @@ const UseCaseDetail = () => {
               TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
           </div>
+          <ThemeToggle />
           <div className="relative" ref={profileRef}>
             <button onClick={() => setProfileOpen(!profileOpen)} className="w-9 h-9 rounded-full overflow-hidden border-2 border-primary/30 hover:border-primary transition-colors bg-muted flex items-center justify-center">
               <span className="material-symbols-outlined text-foreground/70 text-xl">person</span>
             </button>
             {profileOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border/30 bg-[hsl(0,0%,8%)] shadow-xl p-4 z-50">
+              <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border/30 bg-[var(--s4)] shadow-xl p-4 z-50">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                     <span className="material-symbols-outlined text-foreground/70 text-2xl">person</span>

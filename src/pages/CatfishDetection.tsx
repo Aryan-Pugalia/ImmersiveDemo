@@ -22,6 +22,7 @@ import {
   Check, ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -219,8 +220,8 @@ function ProgressStepper({ stage }: { stage: Stage }) {
             <div className="flex flex-col items-center">
               <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
                 done    ? "bg-violet-600 border-violet-600 text-white" :
-                current ? "bg-[hsl(0,0%,10%)] border-violet-500 text-violet-400 ring-4 ring-violet-900/40" :
-                          "bg-[hsl(0,0%,8%)] border-white/10 text-white/30"
+                current ? "bg-[var(--s6)] border-violet-500 text-violet-400 ring-4 ring-violet-900/40" :
+                          "bg-[var(--s4)] border-white/10 text-white/30"
               }`}>
                 {done ? <Check size={15} /> : step.n}
               </div>
@@ -247,7 +248,7 @@ function ProgressStepper({ stage }: { stage: Stage }) {
 function ProfileCard({ profile, compact = false }: { profile: Profile; compact?: boolean }) {
   if (compact) {
     return (
-      <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "hsl(0,0%,8%)" }}>
+      <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "var(--s4)" }}>
         <div className="flex items-center gap-3 p-4">
           <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
             <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover object-center" />
@@ -263,7 +264,7 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "hsl(0,0%,8%)" }}>
+    <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "var(--s4)" }}>
       {/* Photo — full bleed, face-forward */}
       <div className="relative w-full overflow-hidden" style={{ height: 320 }}>
         <img
@@ -298,7 +299,7 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
 
         <div className="space-y-3">
           {profile.prompts.map((p, i) => (
-            <div key={i} className="rounded-xl p-3 border border-white/8" style={{ background: "hsl(0,0%,6%)" }}>
+            <div key={i} className="rounded-xl p-3 border border-white/8" style={{ background: "var(--s2)" }}>
               <div className="text-xs font-bold text-violet-400 uppercase tracking-wider mb-1">{p.q}</div>
               <div className="text-sm text-foreground/75">{p.a}</div>
             </div>
@@ -342,7 +343,7 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
         </div>
 
         {/* Q1 · Verdict */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3">1 · Is this profile real, fake, or unsure?</p>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -359,7 +360,7 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
         </div>
 
         {/* Q2 · Risk signals */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3">2 · Flag any risk signals (select all that apply)</p>
           <div className="space-y-2">
             {RISK_SIGNALS.map(sig => (
@@ -382,7 +383,7 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
         </div>
 
         {/* Q3 · Confidence */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3">3 · Your confidence level</p>
           <div className="grid grid-cols-3 gap-2 mb-3">
             {(["low","medium","high"] as Confidence[]).map(c => (
@@ -480,7 +481,7 @@ function Stage2({ profile, annotation, onComplete }: {
         </div>
 
         {/* Animated score bars */}
-        <div className="rounded-2xl border border-white/10 p-5 space-y-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border border-white/10 p-5 space-y-4" style={{ background: "var(--s4)" }}>
           <ScoreBar label="Image Authenticity"  score={scores.image}    active={phase >= 2} />
           <ScoreBar label="Text Consistency"    score={scores.text}     active={phase >= 3} />
           <ScoreBar label="Behavioral Risk"     score={scores.behavior} active={phase >= 4} />
@@ -508,7 +509,7 @@ function Stage2({ profile, annotation, onComplete }: {
 
         {/* AI reasoning */}
         {phase >= 4 && scores.overall > 0 && (
-          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
             <p className="text-sm font-semibold text-foreground mb-3">Why the AI flagged this profile:</p>
             <div className="space-y-2.5">
               {profile.aiResult.reasons.map((r, i) => (
@@ -523,7 +524,7 @@ function Stage2({ profile, annotation, onComplete }: {
 
         {/* Human vs AI comparison chip */}
         {phase >= 4 && scores.overall > 0 && (
-          <div className="rounded-xl border border-white/10 p-3" style={{ background: "hsl(0,0%,6%)" }}>
+          <div className="rounded-xl border border-white/10 p-3" style={{ background: "var(--s2)" }}>
             <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Your annotation vs AI</p>
             <div className="flex gap-2">
               <div className={`flex-1 text-center py-2 rounded-xl border text-sm font-bold ${humanCls}`}>
@@ -593,7 +594,7 @@ function Stage3({ profile, annotation, onSubmit }: {
       {/* Three-column comparison */}
       <div className="grid grid-cols-3 gap-4">
         {/* Human annotation summary */}
-        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">👤 Human Annotation</p>
           <div className="text-lg font-black mb-2" style={{ color: humanColor }}>{humanLbl}</div>
           <div className="text-xs text-foreground/50 space-y-1">
@@ -616,7 +617,7 @@ function Stage3({ profile, annotation, onSubmit }: {
         </div>
 
         {/* AI decision summary */}
-        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Model Decision</p>
           <div className="text-lg font-black mb-1" style={{ color: riskHue(ai.overallRisk) }}>
             {ai.overallRisk}/100 Risk
@@ -629,7 +630,7 @@ function Stage3({ profile, annotation, onSubmit }: {
       </div>
 
       {/* QA actions */}
-      <div className="rounded-2xl border border-white/10 p-5" style={{ background: "hsl(0,0%,8%)" }}>
+      <div className="rounded-2xl border border-white/10 p-5" style={{ background: "var(--s4)" }}>
         <p className="text-sm font-bold text-foreground mb-4">QA Decision — Select your action:</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
@@ -701,7 +702,7 @@ function Stage4({ profile, qaAction, onReset }: {
   return (
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
       {/* Delivery label */}
-      <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "hsl(0,0%,14%)" }}>
+      <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "var(--s8)" }}>
         <span>📬</span> Step 4: Final Decision Delivered to Client Platform
       </div>
 
@@ -729,7 +730,7 @@ function Stage4({ profile, qaAction, onReset }: {
         <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3 text-center">Simulated Impact Metrics</p>
         <div className="grid grid-cols-2 gap-3">
           {metrics.map((m, i) => (
-            <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+            <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
               <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-2" style={{ background: m.iconBg }}>
                 <m.Icon size={18} className={m.color} />
               </div>
@@ -742,7 +743,7 @@ function Stage4({ profile, qaAction, onReset }: {
       </div>
 
       {/* TP scale proof points */}
-      <div className="w-full rounded-2xl p-5" style={{ background: "hsl(0,0%,10%)" }}>
+      <div className="w-full rounded-2xl p-5" style={{ background: "var(--s6)" }}>
         <p className="text-sm font-bold text-foreground mb-4">How TP Operationalises This at Scale</p>
         <div className="grid grid-cols-3 gap-3 text-center">
           {[
@@ -791,9 +792,9 @@ export default function CatfishDetection() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "hsl(0,0%,4%)" }}>
+    <div className="min-h-screen" style={{ background: "var(--s0)" }}>
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-white/10">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-white/10">
         <div className="flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={() => navigate("/use-cases")}
@@ -808,6 +809,7 @@ export default function CatfishDetection() {
             <span className="text-sm text-white/70 whitespace-nowrap">Dating Trust &amp; Safety</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle />
             <ShieldAlert size={14} className="text-violet-400" />
             <span className="text-xs bg-violet-600/20 text-violet-300 border border-violet-600/30 px-3 py-1 rounded-full font-semibold">
               Trust &amp; Safety · Live Demo
@@ -840,7 +842,7 @@ export default function CatfishDetection() {
                     ? "border-violet-500 bg-violet-600 text-white shadow-sm"
                     : "border-white/10 text-foreground/70 hover:border-violet-500/40 hover:bg-violet-900/20"
                 }`}
-                style={profileIdx !== i ? { background: "hsl(0,0%,8%)" } : {}}>
+                style={profileIdx !== i ? { background: "var(--s4)" } : {}}>
                 Profile {i + 1}: {p.name.split(" ")[0]}
                 <span className={`ml-1.5 text-xs font-normal ${
                   profileIdx === i ? "text-violet-200" :

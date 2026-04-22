@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -168,7 +169,7 @@ export default function QAReport() {
     <div className="min-h-screen bg-background print:bg-white print:text-black">
 
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20 print:hidden">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20 print:hidden">
         <div className="flex items-center justify-between px-6 py-3 h-16">
           <div className="flex items-center gap-2">
             <button
@@ -185,6 +186,7 @@ export default function QAReport() {
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-sm text-foreground/60">{q.breadcrumb}</span>
           </div>
+          <ThemeToggle />
           <Button variant="outline" size="sm" onClick={() => window.print()} className="gap-2">
             <Printer className="h-4 w-4" /> {q.exportPdf}
           </Button>

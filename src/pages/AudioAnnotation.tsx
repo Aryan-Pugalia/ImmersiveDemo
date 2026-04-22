@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Play, Pause, Download, Save, Send,
@@ -451,7 +452,7 @@ function TaskQueue({ onSelect }: { onSelect:(t:Task)=>void }) {
   };
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -469,6 +470,7 @@ function TaskQueue({ onSelect }: { onSelect:(t:Task)=>void }) {
             <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             <span className="text-sm text-foreground/80 font-body whitespace-nowrap">{pa.breadcrumb}</span>
           </div>
+          <ThemeToggle />
         </div>
         <div className="absolute bottom-0 left-0 h-[2px] w-full progress-bar-gradient" />
       </header>

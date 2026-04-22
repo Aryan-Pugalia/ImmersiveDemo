@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguagePicker } from "@/components/LanguagePicker";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ProjStatus = "on_track" | "at_risk" | "delayed" | "completed";
@@ -131,7 +132,7 @@ function WorldMap({ cities, activeUsers, labels }: { cities: CityNode[]; activeU
   const totalOnline = activeUsers.reduce((a, b) => a + b, 0);
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden" style={{ background: "hsl(0,0%,5%)", border: "1px solid hsl(var(--border)/0.2)" }}>
+    <div className="relative w-full rounded-xl overflow-hidden" style={{ background: "var(--s1)", border: "1px solid hsl(var(--border)/0.2)" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/20">
         <div className="flex items-center gap-2">
@@ -145,7 +146,7 @@ function WorldMap({ cities, activeUsers, labels }: { cities: CityNode[]; activeU
       </div>
 
       {/* Map body */}
-      <div style={{ background:"hsl(0,0%,6%)" }}>
+      <div style={{ background:"var(--s2)" }}>
         {!RSM ? (
           /* Fallback while loading */
           <div className="flex items-center justify-center h-64 text-muted-foreground text-sm font-body">
@@ -430,7 +431,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex items-center justify-between px-6 py-3 h-16">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate("/use-cases")}
@@ -447,6 +448,7 @@ export default function Dashboard() {
             <span className="text-sm text-foreground/80 font-body">{d.title}</span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <LanguagePicker />
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-body">
               <RefreshCw size={11} className="text-green-400"/>

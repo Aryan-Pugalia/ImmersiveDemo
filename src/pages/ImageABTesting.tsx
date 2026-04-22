@@ -15,6 +15,7 @@ import {
   EMPTY_RATINGS,
 } from "@/components/imagetesting/abData";
 import { useLanguage } from "@/context/LanguageContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -64,10 +65,10 @@ export default function ImageABTesting() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: "hsl(0,0%,4%)" }}
+      style={{ background: "var(--s0)" }}
     >
       {/* ── FABStudio Header ── */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex items-center justify-between px-6 h-16 gap-3">
           {/* Left: brand + breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
@@ -148,6 +149,7 @@ export default function ImageABTesting() {
             >
               <BarChart2 className="h-3.5 w-3.5" /> {t.nav.qaReport}
             </Button>
+            <ThemeToggle />
             <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-surface-raised">
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                 <span className="text-sm font-bold text-primary">A</span>
@@ -283,7 +285,7 @@ function PromptCard({
   return (
     <div
       className="rounded-xl border border-border/40 p-4 flex gap-3 items-start"
-      style={{ background: "hsl(0,0%,7%)" }}
+      style={{ background: "var(--s3)" }}
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-2">

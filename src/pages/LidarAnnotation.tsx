@@ -32,6 +32,7 @@ import { LidarPointCloud, getScenePointCloud } from "@/components/lidar/LidarPoi
 import { AI_BOXES } from "@/components/lidar/aiVerification";
 import { AIWorkflowPanel, WorkflowStage } from "@/components/lidar/AIWorkflowPanel";
 import { buildEgoVehicle } from "@/components/lidar/sceneBuilder";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // Ego vehicle (at origin) — built once and shared across view modes
 function EgoVehicle({ wireframe = false }: { wireframe?: boolean }) {
@@ -447,6 +448,7 @@ export default function LidarAnnotation() {
               />
             </div>
 
+            <ThemeToggle />
             <button
               onClick={restartTutorial}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
