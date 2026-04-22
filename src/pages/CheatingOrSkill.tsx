@@ -200,6 +200,133 @@ const CLIPS: Clip[] = [
       needs_followup: { status:"followup", correct:true,  heading:"Escalated — Telemetry Requested",   body:"Correct escalation. Senior reviewer requests 30 days of match history and peripheral telemetry before any enforcement action." },
     },
   },
+
+  // ── Clip D: "Through the Wall" — Wallhack / ESP ──────────────────────────
+  {
+    id: "clip_d",
+    title: "Clip D — Through the Wall",
+    subtitle: "Competitive ladder · Pre-fire anomaly",
+    scenario: "Player consistently pre-fires at exact corner positions before opponents peek. Crosshair tracks moving targets through solid cover with no visual information available.",
+    duration: 9,
+    groundTruth: "cheat",
+    trajectoryPaths: [
+      { d: "M 195 148 L 82 88",   color: "#ef4444" },
+      { d: "M 82 88  L 312 192",  color: "#ef4444" },
+      { d: "M 312 192 L 200 212", color: "#f97316" },
+      { d: "M 200 212 L 295 82",  color: "#f97316" },
+    ],
+    killEvents: [
+      { x: 82,  y: 88,  t: 0.22, label: "K1 · pre-fire" },
+      { x: 312, y: 192, t: 0.42, label: "K2 · wall-track" },
+      { x: 200, y: 212, t: 0.60, label: "K3 · no LoS" },
+      { x: 295, y: 82,  t: 0.78, label: "K4 · pre-fire" },
+    ],
+    suspiciousZones: [
+      { x: 28,  y: 38,  w: 132, h: 124, label: "Pre-fire through cover A" },
+      { x: 308, y: 158, w: 72,  h: 82,  label: "Wall-track cover B" },
+    ],
+    stats: { avgReactionMs: 6, aimSmoothness: 98, inputAPM: 388, suspiciousEvents: 4 },
+    aiResult: {
+      riskScore: 91,
+      recommendation: "Likely Cheating",
+      aimAnomalyScore: 88, occlusionScore: 97, inputPatternScore: 84, networkArtifactScore: 9,
+      explanationBullets: [
+        "Crosshair positioned at target locations 280–420ms before any visual indicator was available to the player",
+        "Occlusion tracking score 97/100 — target positions tracked continuously through solid map geometry",
+        "Pre-fire pattern consistent across 4 independent engagements, ruling out coincidence (p < 0.001)",
+        "No network artifacts detected — lag-based false positives eliminated as explanation",
+      ],
+    },
+    finalDecision: {
+      approve_skill:  { status:"skill",    correct:false, heading:"False Negative Generated",           body:"A wallhack user cleared. They retain full access, continue gaining unfair advantage, and player reports will keep escalating." },
+      confirm_cheat:  { status:"cheat",    correct:true,  heading:"Enforcement Action Queued",          body:"Wallhack detection confirmed. Pre-fire patterns across 4 engagements constitute strong multi-signal evidence. Fast, appeal-ready decision." },
+      needs_followup: { status:"followup", correct:true,  heading:"Escalated for Cross-Match Analysis", body:"Escalation triggers a cross-match review to confirm the pre-fire pattern is consistent across additional sessions." },
+    },
+  },
+
+  // ── Clip E: "The Reload God" — Skill misread as cheat ────────────────────
+  {
+    id: "clip_e",
+    title: "Clip E — The Reload God",
+    subtitle: "Pro scrimmage · Technique vs. macro flag",
+    scenario: "Elite player executes a documented 'reload cancel + flick' technique at peak speed. AI flags input regularity — but this is a known high-skill pattern, not macro automation.",
+    duration: 13,
+    groundTruth: "skill",
+    trajectoryPaths: [
+      { d: "M 195 148 C 218 138 242 126 258 118", color: "#10b981" },
+      { d: "M 258 118 C 238 130 212 146 188 160", color: "#10b981" },
+      { d: "M 188 160 C 205 155 226 148 248 142", color: "#34d399" },
+      { d: "M 248 142 C 228 152 205 164 182 174", color: "#34d399" },
+      { d: "M 182 174 C 202 165 228 154 252 146", color: "#6ee7b7" },
+      { d: "M 252 146 C 232 157 208 168 185 178", color: "#6ee7b7" },
+    ],
+    killEvents: [
+      { x: 258, y: 118, t: 0.18, label: "K1 · 162ms" },
+      { x: 188, y: 160, t: 0.33, label: "K2 · 178ms" },
+      { x: 248, y: 142, t: 0.48, label: "K3 · 155ms" },
+      { x: 182, y: 174, t: 0.62, label: "K4 · 169ms" },
+      { x: 252, y: 146, t: 0.76, label: "K5 · 172ms" },
+      { x: 185, y: 178, t: 0.90, label: "K6 · 180ms" },
+    ],
+    suspiciousZones: [],
+    stats: { avgReactionMs: 169, aimSmoothness: 91, inputAPM: 445, suspiciousEvents: 1 },
+    aiResult: {
+      riskScore: 36,
+      recommendation: "Likely Skill",
+      aimAnomalyScore: 28, occlusionScore: 5, inputPatternScore: 68, networkArtifactScore: 14,
+      explanationBullets: [
+        "Input APM (445) is high but consistent with documented 'reload cancel' technique used by verified pro players",
+        "Aim arcs show natural overshoot and micro-correction — absent in macro-generated inputs",
+        "Reaction times range 155–180ms with ±18ms natural jitter — inconsistent with scripted timing",
+        "No occlusion tracking or pre-aim detected — risk isolated to input cadence, not spatial awareness",
+      ],
+    },
+    finalDecision: {
+      approve_skill:  { status:"skill",    correct:true,  heading:"Approved — Technique Verified",     body:"The 'reload cancel + flick' technique is documented in this game's competitive community. High APM alone is not a cheat signal. Correct call." },
+      confirm_cheat:  { status:"cheat",    correct:false, heading:"False Positive — Pro Player Banned", body:"A legitimate elite player was wrongfully banned. Appeals will overturn this, but the damage to trust and competitive integrity is already done." },
+      needs_followup: { status:"followup", correct:true,  heading:"Escalated — Technique Library Check", body:"Escalation triggers a check against the known-technique library. Senior reviewer confirms reload cancel pattern and closes with approval." },
+    },
+  },
+
+  // ── Clip F: "Perfect Vision" — Suspicious map awareness ─────────────────
+  {
+    id: "clip_f",
+    title: "Clip F — Perfect Vision",
+    subtitle: "Battle royale · Map awareness anomaly",
+    scenario: "Player rotates to exact ambush positions seconds before opponents arrive — repeatedly. Could reflect outstanding game sense or a third-party ESP overlay providing real-time enemy positions.",
+    duration: 16,
+    groundTruth: "borderline",
+    trajectoryPaths: [
+      { d: "M 195 148 C 225 140 252 130 268 122", color: "#f59e0b" },
+      { d: "M 268 122 C 245 132 215 148 188 160", color: "#f59e0b" },
+      { d: "M 188 160 C 165 172 145 182 130 188", color: "#d97706" },
+      { d: "M 130 188 C 158 178 198 160 228 148", color: "#d97706" },
+    ],
+    killEvents: [
+      { x: 268, y: 122, t: 0.25, label: "K1 · rotation+" },
+      { x: 130, y: 188, t: 0.58, label: "K2 · rotation+" },
+    ],
+    suspiciousZones: [
+      { x: 155, y: 100, w: 145, h: 108, label: "Predictive rotation zone" },
+    ],
+    stats: { avgReactionMs: 142, aimSmoothness: 88, inputAPM: 312, suspiciousEvents: 3 },
+    aiResult: {
+      riskScore: 53,
+      recommendation: "Uncertain: Escalate",
+      aimAnomalyScore: 22, occlusionScore: 62, inputPatternScore: 38, networkArtifactScore: 28,
+      explanationBullets: [
+        "Positional rotations pre-empt opponent movements by 600–900ms in 3 of 4 observed engagements",
+        "Occlusion score 62 — player routes toward areas with hidden enemies, but no through-wall crosshair tracking detected",
+        "Aim and input patterns are consistent with human play — risk is purely positional / game-sense based",
+        "Insufficient signal strength for automated action; match history context required to differentiate ESP from elite game sense",
+      ],
+    },
+    finalDecision: {
+      approve_skill:  { status:"skill",    correct:true,  heading:"Approved — Pattern Monitoring Active", body:"Positional game sense alone is insufficient for enforcement. Account placed on passive monitoring. If ESP pattern persists across matches, signals will compound." },
+      confirm_cheat:  { status:"cheat",    correct:false, heading:"Risk: Weak Evidence Base",            body:"Enforcing on positional intuition alone is extremely difficult to defend on appeal. No through-wall crosshair data or input anomalies corroborate this decision." },
+      needs_followup: { status:"followup", correct:true,  heading:"Escalated — Match History Review",   body:"15-match positional heatmap analysis requested. If pre-emptive rotations persist at statistical significance, a stronger case can be built." },
+    },
+  },
 ];
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -1057,7 +1184,7 @@ function Stage4({
         </Button>
         {hasMore ? (
           <Button onClick={onNext} className="flex-[2] bg-violet-600 hover:bg-violet-700 gap-2 h-11">
-            <RotateCcw size={13}/> Review Clip {clipIdx + 2} ({CLIPS[clipIdx + 1].title.split("—")[0].trim()})
+            <RotateCcw size={13}/> Next: {CLIPS[clipIdx + 1].title.split("—")[0].trim()} →
           </Button>
         ) : (
           <Button onClick={onNext} className="flex-[2] bg-violet-600 hover:bg-violet-700 gap-2 h-11">
@@ -1135,25 +1262,30 @@ export default function CheatingOrSkill() {
 
         {/* Clip selector — Stage 1 only */}
         {stage === 1 && (
-          <div className="flex justify-center gap-2 mb-2 flex-wrap">
-            {CLIPS.map((c, i) => (
-              <button key={c.id} onClick={() => reset(i)}
-                className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-all ${
-                  clipIdx === i
-                    ? "border-violet-500 bg-violet-600 text-white"
-                    : "border-white/10 text-foreground/65 hover:border-violet-500/40 hover:bg-violet-900/20"
-                }`}
-                style={clipIdx !== i ? { background: "hsl(0,0%,8%)" } : {}}>
-                {c.title.split("—")[0].trim()}
-                <span className={`ml-1.5 text-xs font-normal ${
-                  clipIdx === i ? "text-violet-200" :
-                  c.groundTruth === "skill" ? "text-emerald-400" :
-                  c.groundTruth === "cheat" ? "text-red-400" : "text-amber-400"
-                }`}>
-                  ({c.groundTruth === "skill" ? "Skill" : c.groundTruth === "cheat" ? "Cheat" : "Tricky"})
-                </span>
-              </button>
-            ))}
+          <div className="grid grid-cols-3 gap-2 mb-3 max-w-2xl mx-auto">
+            {CLIPS.map((c, i) => {
+              const gtColor = c.groundTruth === "skill" ? "text-emerald-400" : c.groundTruth === "cheat" ? "text-red-400" : "text-amber-400";
+              const gtDot   = c.groundTruth === "skill" ? "bg-emerald-500"   : c.groundTruth === "cheat" ? "bg-red-500"   : "bg-amber-500";
+              const gtLabel = c.groundTruth === "skill" ? "Skill"            : c.groundTruth === "cheat" ? "Cheat"        : "Tricky";
+              const active  = clipIdx === i;
+              return (
+                <button key={c.id} onClick={() => reset(i)}
+                  className={`px-3 py-2.5 rounded-xl border text-left transition-all ${
+                    active
+                      ? "border-violet-500 bg-violet-600 text-white"
+                      : "border-white/10 text-foreground/65 hover:border-violet-500/40 hover:bg-violet-900/20"
+                  }`}
+                  style={!active ? { background: "hsl(0,0%,8%)" } : {}}>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${active ? "bg-violet-200" : gtDot}`}/>
+                    <span className="text-xs font-bold truncate">{c.title.split("—")[0].trim()}</span>
+                  </div>
+                  <div className={`text-[10px] truncate font-body ${active ? "text-violet-200" : gtColor}`}>
+                    {gtLabel} · {c.subtitle.split("·")[0].trim()}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
 
