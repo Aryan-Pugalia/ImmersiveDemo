@@ -113,6 +113,28 @@
     --md-outline: 220 15% 55%;
     --md-outline-variant: 220 15% 80%;
   }
+
+  /* ── Restore dark-mode CSS variables inside always-dark headers ──
+     .dark-surface elements (all page headers) keep a near-black
+     background regardless of theme. Without this block, Tailwind
+     classes like text-foreground / text-primary / bg-muted inside
+     the header would resolve to the light-mode variable values and
+     become invisible against the dark background.
+  ── */
+  html.light .dark-surface {
+    --foreground:         30 5% 89%;
+    --card:               0 0% 10%;
+    --card-foreground:    30 5% 89%;
+    --popover:            0 0% 10%;
+    --popover-foreground: 30 5% 89%;
+    --primary:            255 81% 69%;
+    --primary-foreground: 0 0% 100%;
+    --muted:              0 0% 12%;
+    --muted-foreground:   350 20% 80%;
+    --border:             0 0% 20%;
+    --input:              0 0% 13%;
+    --ring:               255 81% 69%;
+  }
 }
 
 @layer base {
