@@ -50,8 +50,9 @@ export const VideoPairPanel = forwardRef<
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  // Read real duration from the video element itself
-  const [duration, setDuration] = useState(0);
+  // Track each video's real duration separately so we can handle mismatched lengths
+  const [leftDur, setLeftDur] = useState(0);
+  const [rightDur, setRightDur] = useState(0);
   const [rate, setRate] = useState(1);
   const [leftReady, setLeftReady] = useState(false);
   const [rightReady, setRightReady] = useState(false);
@@ -75,39 +76,59 @@ export const VideoPairPanel = forwardRef<
     isPlayingRef.current = false;
     setIsPlaying(false);
     setCurrentTime(0);
-    setDuration(0);
+    setLeftDur(0);
+    setRightDur(0);
     setLeftReady(false);
     setRightReady(false);
     cancelAnimationFrame(rafRef.current);
   }, [leftUrl, rightUrl]);
 
-  // ── RAF sync loop — only updates time display and corrects drift ─────────
-  // No manual end-detection. Browser fires onEnded naturally.
+  // ── RAF sync loop ────────────────────────────────────────────────────────
+  // Each video plays to its own end independently. Drift is only corrected
+  // while BOTH videos are still active, so a shorter video ending does not
+  // force the longer one to stop (the original bug with mismatched lengths).
   const syncLoop = useCallback(() => {
     const l = leftRef.current;
     const r = rightRef.current;
     if (!l || !r || !isPlayingRef.current) return;
 
-    // Correct drift between the two videos
-    const drift = Math.abs(l.currentTime - r.currentTime);
-    if (drift > DRIFT_THRESHOLD) {
-      r.currentTime = l.currentTime;
+    const lAlive = !l.ended;
+    const rAlive = !r.ended;
+
+    // Only correct drift while both sides are still playing.
+    if (lAlive && rAlive) {
+      const drift = Math.abs(l.currentTime - r.currentTime);
+      if (drift > DRIFT_THRESHOLD) {
+        // Sync to whichever is furthest behind (prevents unnecessary
+        // backward snaps and audio glitches on the faster video).
+        if (l.currentTime < r.currentTime) r.currentTime = l.currentTime;
+        else l.currentTime = r.currentTime;
+      }
     }
 
-    setCurrentTime(l.currentTime);
+    // Display whichever video has advanced further.
+    setCurrentTime(Math.max(l.currentTime, r.currentTime));
+
+    if (!lAlive && !rAlive) {
+      // Both videos have ended — stop the loop and clear playing state.
+      isPlayingRef.current = false;
+      setIsPlaying(false);
+      return;
+    }
     rafRef.current = requestAnimationFrame(syncLoop);
   }, []);
 
-  // ── Natural video end handler ─────────────────────────────────────────────
-  const handleEnded = useCallback(() => {
-    isPlayingRef.current = false;
-    setIsPlaying(false);
-    cancelAnimationFrame(rafRef.current);
-    // Pause the right video too in case it's slightly behind
-    rightRef.current?.pause();
-    // Show final time
+  // ── Per-video end handlers ────────────────────────────────────────────────
+  // Do NOT pause the other side here — that was the bug where a shorter
+  // video ending would kill the longer one. The sync loop detects when
+  // both have ended on its own.
+  const handleLeftEnded = useCallback(() => {
     const l = leftRef.current;
-    if (l) setCurrentTime(l.duration || l.currentTime);
+    if (l) setCurrentTime((t) => Math.max(t, l.duration || l.currentTime));
+  }, []);
+  const handleRightEnded = useCallback(() => {
+    const r = rightRef.current;
+    if (r) setCurrentTime((t) => Math.max(t, r.duration || r.currentTime));
   }, []);
 
   // ── Playback controls ──────────────────────────────────────────────────────
@@ -116,23 +137,35 @@ export const VideoPairPanel = forwardRef<
     const r = rightRef.current;
     if (!l || !r) return;
 
-    // If at end, restart from beginning
-    if (l.ended || (l.duration > 0 && l.currentTime >= l.duration - 0.1)) {
+    // If BOTH videos have ended (or are effectively at their own end),
+    // restart from the beginning. Otherwise resume from the current position.
+    const lAtEnd = l.ended || (l.duration > 0 && l.currentTime >= l.duration - 0.1);
+    const rAtEnd = r.ended || (r.duration > 0 && r.currentTime >= r.duration - 0.1);
+    if (lAtEnd && rAtEnd) {
       l.currentTime = 0;
       r.currentTime = 0;
-    } else {
-      r.currentTime = l.currentTime;
     }
 
     isPlayingRef.current = true;
     setIsPlaying(true);
     rafRef.current = requestAnimationFrame(syncLoop);
 
-    Promise.all([l.play(), r.play()]).catch(() => {
-      // Fallback: retry muted if browser blocks audio autoplay
+    // Only try to play sides that haven't already ended — avoids an
+    // "already ended" NotAllowedError when the shorter video is finished
+    // but the longer one still has content to play.
+    const playables = [
+      l.ended ? null : l.play(),
+      r.ended ? null : r.play(),
+    ].filter(Boolean) as Promise<void>[];
+
+    Promise.all(playables).catch(() => {
+      // Fallback: retry muted if browser blocks audio autoplay.
       l.muted = true;
       r.muted = true;
-      Promise.all([l.play(), r.play()]).catch(() => {
+      Promise.all([
+        l.ended ? null : l.play(),
+        r.ended ? null : r.play(),
+      ].filter(Boolean) as Promise<void>[]).catch(() => {
         isPlayingRef.current = false;
         setIsPlaying(false);
         cancelAnimationFrame(rafRef.current);
@@ -152,12 +185,14 @@ export const VideoPairPanel = forwardRef<
     const l = leftRef.current;
     const r = rightRef.current;
     if (!l || !r) return;
-    const dur = l.duration || duration;
-    const clamped = Math.max(0, Math.min(dur, t));
-    l.currentTime = clamped;
-    r.currentTime = clamped;
+    // Clamp each video independently to its own duration so seeking past
+    // a shorter video's end doesn't throw — it just parks that video at
+    // its final frame while the longer one seeks normally.
+    const clamped = Math.max(0, t);
+    l.currentTime = Math.min(l.duration || clamped, clamped);
+    r.currentTime = Math.min(r.duration || clamped, clamped);
     setCurrentTime(clamped);
-  }, [duration]);
+  }, []);
 
   const stepFrame = useCallback(
     (dir: 1 | -1) => {
@@ -178,7 +213,8 @@ export const VideoPairPanel = forwardRef<
   useImperativeHandle(ref, () => ({ play, pause, seek }), [play, pause, seek]);
 
   const bothReady = leftReady && rightReady;
-  const displayDuration = duration || 0;
+  // Seek bar spans the longer video so the full tail of a mismatched pair is reachable.
+  const displayDuration = Math.max(leftDur, rightDur);
 
   return (
     <div className="flex flex-col gap-2 h-full">
@@ -193,10 +229,10 @@ export const VideoPairPanel = forwardRef<
           soloed={soloSide === "A"}
           onReady={(dur) => {
             setLeftReady(true);
-            if (dur > 0) setDuration(dur);
+            if (dur > 0) setLeftDur(dur);
           }}
           onError={() => setLeftReady(false)}
-          onEnded={handleEnded}
+          onEnded={handleLeftEnded}
           onSolo={() => setSoloSide((s) => (s === "A" ? null : "A"))}
           onFullscreen={() => setFullscreenSide("A")}
         />
@@ -207,9 +243,12 @@ export const VideoPairPanel = forwardRef<
           accent="#7c3aed"
           ready={rightReady}
           soloed={soloSide === "B"}
-          onReady={(dur) => setRightReady(true)}
+          onReady={(dur) => {
+            setRightReady(true);
+            if (dur > 0) setRightDur(dur);
+          }}
           onError={() => setRightReady(false)}
-          onEnded={() => {/* left video drives end handling */}}
+          onEnded={handleRightEnded}
           onSolo={() => setSoloSide((s) => (s === "B" ? null : "B"))}
           onFullscreen={() => setFullscreenSide("B")}
         />

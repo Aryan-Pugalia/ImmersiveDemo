@@ -532,9 +532,25 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
   const rafRef       = useRef<number|null>(null);
   const startRef     = useRef<{ts:number;base:number}|null>(null);
   const isPlayingRef = useRef(false);
+  // TTS voice list (populated async by the browser) + pending-timeout ref +
+  // an epoch counter to invalidate stale speak callbacks after pause/seek.
+  const voicesRef    = useRef<SpeechSynthesisVoice[]>([]);
+  const ttsTimeoutRef = useRef<number|null>(null);
+  const playEpochRef = useRef(0);
   const totalMs      = task.durationSec * 1000;
   const rtl          = !!LANG_META[task.language]?.rtl;
   const currentMs    = Math.round(playhead * totalMs);
+
+  // ── Preload voices — getVoices() returns [] on first call until the
+  // browser fires `voiceschanged`. Without this, early clicks on Play
+  // fall back to an English voice regardless of the task's language.
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    const load = () => { voicesRef.current = window.speechSynthesis.getVoices(); };
+    load();
+    window.speechSynthesis.addEventListener("voiceschanged", load);
+    return () => window.speechSynthesis.removeEventListener("voiceschanged", load);
+  }, []);
 
   // Show tutorial automatically on first open
   useEffect(() => {
@@ -567,49 +583,86 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
   // Clean up on unmount
   useEffect(()=>()=>{
     if("speechSynthesis" in window) window.speechSynthesis.cancel();
+    if (ttsTimeoutRef.current) clearTimeout(ttsTimeoutRef.current);
   },[]);
 
   const seekToMs = useCallback((ms:number)=>{
     setPlayhead(ms/totalMs);
     startRef.current=null;
+    // Invalidate any in-flight speak callbacks so they don't resume
+    // from the old position after the user seeks.
+    playEpochRef.current++;
     if("speechSynthesis" in window) window.speechSynthesis.cancel();
+    if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; }
   },[totalMs]);
 
   // ── PLAY button handler — Web Speech API (direct user gesture required) ──────
   const handleTogglePlay = () => {
     if (isPlaying) {
       setIsPlaying(false);
+      playEpochRef.current++; // cancel any pending speakNext
       if("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (ttsTimeoutRef.current) { clearTimeout(ttsTimeoutRef.current); ttsTimeoutRef.current = null; }
       return;
     }
 
     setIsPlaying(true);
-    startRef.current = { ts:performance.now(), base:playhead };
+    const myEpoch = ++playEpochRef.current;
+    startRef.current = { ts: performance.now(), base: playhead };
 
-    // Speech synthesis speaks each segment's source text in the correct language
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const voices    = window.speechSynthesis.getVoices();
-      const remaining = segs.filter(s=>s.endMs>currentMs).sort((a,b)=>a.startMs-b.startMs);
-      let idx = 0;
-      const speakNext = () => {
-        if (idx>=remaining.length || !isPlayingRef.current) return;
-        const seg  = remaining[idx++];
-        const text = seg.sourceText.trim() || seg.englishText.trim();
-        if (!text) { speakNext(); return; }
-        const utt  = new SpeechSynthesisUtterance(text);
-        utt.lang   = LANG_BCP47[task.language] ?? "en-US";
-        utt.rate   = seg.speaker==="S2" ? 0.88 : 0.92;
-        utt.pitch  = seg.speaker==="S2" ? 1.2  : 0.95;
-        utt.volume = 1;
-        const match = voices.find(v=>v.lang.startsWith((LANG_BCP47[task.language]??"en").slice(0,2)));
-        if (match) utt.voice = match;
-        utt.onend = speakNext;
-        window.speechSynthesis.speak(utt);
-      };
-      // Chrome sometimes needs a slight delay before the first utterance
-      setTimeout(speakNext, 80);
-    }
+    if (!("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+
+    // Pick two distinct voices for S1 and S2 so the two speakers actually
+    // sound like two different people, not just the same voice at a
+    // different pitch. Prefer voices that match the task language.
+    const langTag    = (LANG_BCP47[task.language] ?? "en").toLowerCase();
+    const langPrefix = langTag.slice(0, 2);
+    const all        = voicesRef.current.length ? voicesRef.current
+                       : window.speechSynthesis.getVoices();
+    const langVoices = all.filter(v => v.lang.toLowerCase().startsWith(langPrefix));
+    const voiceS1    = langVoices[0] ?? all[0];
+    const voiceS2    = langVoices[1] ?? langVoices[0] ?? all[1] ?? all[0];
+
+    const remaining = segs
+      .filter(s => s.endMs > currentMs)
+      .sort((a, b) => a.startMs - b.startMs);
+
+    let idx = 0;
+    const speakNext = () => {
+      // Stale-callback guard: another play/pause/seek happened, bail out.
+      if (playEpochRef.current !== myEpoch || !isPlayingRef.current) return;
+      if (idx >= remaining.length) {
+        setIsPlaying(false);
+        setPlayhead(1);
+        return;
+      }
+      const seg  = remaining[idx++];
+      const text = seg.sourceText.trim() || seg.englishText.trim();
+      if (!text) { speakNext(); return; }
+
+      // Snap the playhead to this segment's start as it begins speaking,
+      // so the visual indicator tracks the actual audio rather than
+      // drifting ahead of it on wall-clock time.
+      const base = Math.min(1, seg.startMs / totalMs);
+      setPlayhead(base);
+      startRef.current = { ts: performance.now(), base };
+
+      const utt   = new SpeechSynthesisUtterance(text);
+      utt.lang    = LANG_BCP47[task.language] ?? "en-US";
+      utt.voice   = seg.speaker === "S2" ? voiceS2 : voiceS1;
+      utt.rate    = 0.95;
+      utt.pitch   = seg.speaker === "S2" ? 1.15 : 0.95;
+      utt.volume  = 1;
+      utt.onend   = () => { if (playEpochRef.current === myEpoch) speakNext(); };
+      utt.onerror = () => { if (playEpochRef.current === myEpoch) speakNext(); };
+      window.speechSynthesis.speak(utt);
+    };
+
+    // If voices still haven't loaded, give the browser a longer moment
+    // before the first utterance so it has time to populate the list.
+    const delay = voicesRef.current.length === 0 ? 250 : 80;
+    ttsTimeoutRef.current = window.setTimeout(speakNext, delay);
   };
 
   // Segment CRUD
