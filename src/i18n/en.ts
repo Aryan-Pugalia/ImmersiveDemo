@@ -331,6 +331,42 @@ export const en = {
       colTime: "Time",
       colIssue: "Issue",
     },
+    lidar: {
+      // workflow stepper stages
+      stageAnnotate: "Annotate",
+      stageAIVerify: "AI Verify",
+      stageQAReview: "QA Review",
+      stageDelivered: "Delivered",
+      // annotating panel
+      annotateIntro: "Draw bounding boxes over all visible objects (cars, pedestrians, cyclists, vegetation). When finished, submit for AI verification.",
+      annotationsPlaced: "Annotations placed",
+      submitForAI: "Submit for AI Verification",
+      // AI verify panel
+      aiIntro: "The AI model will generate reference bounding boxes from the point cloud and compare them against your annotations.",
+      runAIVerify: "Run AI Verification",
+      // metric tiles
+      avgIoU: "Avg IoU",
+      avgConfidence: "Avg Confidence",
+      matches: "Matches",
+      needsQA: "Needs QA",
+      showAIBoxes: "Show AI boxes",
+      // buttons
+      routeToQA: (n: number) => `Route to QA (${n})`,
+      markDelivered: "Mark Delivered",
+      // QA review panel
+      qaIntro: (n: number) => `${n} annotation${n !== 1 ? "s" : ""} flagged for QA review. A senior reviewer inspects these before the batch is delivered.`,
+      qaReport: "QA Report",
+      approveDeliver: "Approve & Deliver",
+      // delivered panel
+      batchDelivered: "Batch delivered",
+      batchDeliveredSub: "Annotations signed off and exported to dataset.",
+      newScene: "New Scene",
+      // comparison row status labels
+      statusMatch: "Match",
+      statusLowIoU: "Low IoU",
+      statusLowConf: "Low conf.",
+      statusMissed: "Missed",
+    },
   },
 } as const;
 

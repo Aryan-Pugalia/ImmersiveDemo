@@ -20,18 +20,18 @@ import {
   compareAnnotations,
   HumanBoxLite,
 } from "./aiVerification";
+import { useLanguage } from "@/context/LanguageContext";
 
 export type WorkflowStage = "annotating" | "ai_verify" | "qa_review" | "delivered";
 
 const STAGES: {
   id: WorkflowStage;
-  label: string;
   Icon: React.ComponentType<{ size?: number; className?: string }>;
 }[] = [
-  { id: "annotating",  label: "Annotate",    Icon: FileEdit },
-  { id: "ai_verify",   label: "AI Verify",   Icon: Sparkles },
-  { id: "qa_review",   label: "QA Review",   Icon: ClipboardCheck },
-  { id: "delivered",   label: "Delivered",   Icon: PackageCheck },
+  { id: "annotating",  Icon: FileEdit },
+  { id: "ai_verify",   Icon: Sparkles },
+  { id: "qa_review",   Icon: ClipboardCheck },
+  { id: "delivered",   Icon: PackageCheck },
 ];
 
 interface Props {
@@ -55,6 +55,16 @@ export function AIWorkflowPanel({
   onToggleAIBoxes,
   onOpenQAReport,
 }: Props) {
+  const { t } = useLanguage();
+  const p = t.pages.lidar;
+
+  const stageLabels: Record<WorkflowStage, string> = {
+    annotating: p.stageAnnotate,
+    ai_verify:  p.stageAIVerify,
+    qa_review:  p.stageQAReview,
+    delivered:  p.stageDelivered,
+  };
+
   const comparison: ComparisonRow[] = useMemo(
     () => (aiRan ? compareAnnotations(humanBoxes) : []),
     [humanBoxes, aiRan]
@@ -112,7 +122,7 @@ export function AIWorkflowPanel({
                         isDone    ? "hsl(0,0%,85%)" : "hsl(0,0%,55%)",
                     }}
                   >
-                    {s.label}
+                    {stageLabels[s.id]}
                   </span>
                 </div>
                 {i < STAGES.length - 1 && (
@@ -136,12 +146,11 @@ export function AIWorkflowPanel({
       {stage === "annotating" && (
         <div className="px-3 pb-3 flex flex-col gap-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Draw bounding boxes over all visible objects (cars, pedestrians,
-            cyclists, vegetation). When finished, submit for AI verification.
+            {p.annotateIntro}
           </p>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Annotations placed</span>
+              <span className="text-muted-foreground">{p.annotationsPlaced}</span>
               <span className="font-mono text-foreground">{humanBoxes.length}</span>
             </div>
             <Button
@@ -150,7 +159,7 @@ export function AIWorkflowPanel({
               disabled={humanBoxes.length === 0}
               onClick={() => onStageChange("ai_verify")}
             >
-              Submit for AI Verification
+              {p.submitForAI}
             </Button>
           </div>
         </div>
@@ -161,27 +170,26 @@ export function AIWorkflowPanel({
           {!aiRan ? (
             <>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                The AI model will generate reference bounding boxes from the
-                point cloud and compare them against your annotations.
+                {p.aiIntro}
               </p>
               <Button size="sm" className="w-full gap-2" onClick={onRunAI}>
-                <Play size={14} /> Run AI Verification
+                <Play size={14} /> {p.runAIVerify}
               </Button>
             </>
           ) : stats ? (
             <>
               {/* Metric tiles */}
               <div className="grid grid-cols-2 gap-2">
-                <MetricTile label="Avg IoU"        value={(stats.avgIoU * 100).toFixed(1) + "%"} tone="primary" />
-                <MetricTile label="Avg Confidence" value={(stats.avgConf * 100).toFixed(1) + "%"} tone="primary" />
-                <MetricTile label="Matches"         value={stats.match + "/" + stats.total}       tone="good" />
-                <MetricTile label="Needs QA"        value={String(stats.needsQA)}                  tone={stats.needsQA > 0 ? "warn" : "good"} />
+                <MetricTile label={p.avgIoU}        value={(stats.avgIoU * 100).toFixed(1) + "%"} tone="primary" />
+                <MetricTile label={p.avgConfidence} value={(stats.avgConf * 100).toFixed(1) + "%"} tone="primary" />
+                <MetricTile label={p.matches}        value={stats.match + "/" + stats.total}       tone="good" />
+                <MetricTile label={p.needsQA}        value={String(stats.needsQA)}                  tone={stats.needsQA > 0 ? "warn" : "good"} />
               </div>
 
               {/* AI overlay toggle */}
               <label className="flex items-center justify-between text-sm px-2 py-2 rounded border border-border">
                 <span className="flex items-center gap-2 text-muted-foreground">
-                  <Eye size={13} /> Show AI boxes
+                  <Eye size={13} /> {p.showAIBoxes}
                 </span>
                 <input
                   type="checkbox"
@@ -205,7 +213,7 @@ export function AIWorkflowPanel({
                     variant="secondary"
                     onClick={() => onStageChange("qa_review")}
                   >
-                    Route to QA ({stats.needsQA})
+                    {p.routeToQA(stats.needsQA)}
                   </Button>
                 ) : (
                   <Button
@@ -213,7 +221,7 @@ export function AIWorkflowPanel({
                     className="flex-1"
                     onClick={() => onStageChange("delivered")}
                   >
-                    Mark Delivered
+                    {p.markDelivered}
                   </Button>
                 )}
               </div>
@@ -225,9 +233,7 @@ export function AIWorkflowPanel({
       {stage === "qa_review" && stats && (
         <div className="px-3 pb-3 flex flex-col gap-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {stats.needsQA} annotation{stats.needsQA !== 1 ? "s" : ""} flagged
-            for QA review. A senior reviewer inspects these before the batch
-            is delivered.
+            {p.qaIntro(stats.needsQA)}
           </p>
 
           <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto">
@@ -245,14 +251,14 @@ export function AIWorkflowPanel({
               className="flex-1 gap-2"
               onClick={onOpenQAReport}
             >
-              <BarChart2 size={14} /> QA Report
+              <BarChart2 size={14} /> {p.qaReport}
             </Button>
             <Button
               size="sm"
               className="flex-1"
               onClick={() => onStageChange("delivered")}
             >
-              Approve &amp; Deliver
+              {p.approveDeliver}
             </Button>
           </div>
         </div>
@@ -263,9 +269,9 @@ export function AIWorkflowPanel({
           <div className="flex items-center gap-2 p-3 rounded-lg border border-green-500/30 bg-green-500/5">
             <CheckCircle2 className="text-green-500" size={18} />
             <div className="text-sm leading-tight">
-              <div className="font-semibold text-foreground">Batch delivered</div>
+              <div className="font-semibold text-foreground">{p.batchDelivered}</div>
               <div className="text-muted-foreground">
-                Annotations signed off and exported to dataset.
+                {p.batchDeliveredSub}
               </div>
             </div>
           </div>
@@ -276,7 +282,7 @@ export function AIWorkflowPanel({
               className="flex-1 gap-2"
               onClick={onOpenQAReport}
             >
-              <BarChart2 size={14} /> QA Report
+              <BarChart2 size={14} /> {p.qaReport}
             </Button>
             <Button
               size="sm"
@@ -284,7 +290,7 @@ export function AIWorkflowPanel({
               className="flex-1"
               onClick={() => onStageChange("annotating")}
             >
-              New Scene
+              {p.newScene}
             </Button>
           </div>
         </div>
@@ -315,14 +321,16 @@ function MetricTile({
 }
 
 function ComparisonRowView({ row }: { row: ComparisonRow }) {
+  const { t } = useLanguage();
+  const p = t.pages.lidar;
   const { Icon, color, text } =
     row.status === "match"
-      ? { Icon: CheckCircle2, color: "#22c55e", text: "Match" }
+      ? { Icon: CheckCircle2, color: "#22c55e", text: p.statusMatch }
       : row.status === "low_iou"
-      ? { Icon: AlertTriangle, color: "#f59e0b", text: "Low IoU" }
+      ? { Icon: AlertTriangle, color: "#f59e0b", text: p.statusLowIoU }
       : row.status === "low_conf"
-      ? { Icon: AlertTriangle, color: "#f59e0b", text: "Low conf." }
-      : { Icon: XCircle, color: "#ef4444", text: "Missed" };
+      ? { Icon: AlertTriangle, color: "#f59e0b", text: p.statusLowConf }
+      : { Icon: XCircle, color: "#ef4444", text: p.statusMissed };
 
   return (
     <div className="flex items-center justify-between text-sm px-2 py-1.5 rounded border border-border">
