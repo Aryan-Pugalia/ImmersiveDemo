@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ChevronRight, Brain, Shield, AlertTriangle,
   CheckCircle2, XCircle, Zap, TrendingUp, Users, RotateCcw,
-  Check, AlertOctagon, ShieldAlert,
+  Check, ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -289,20 +289,20 @@ function ProgressStepper({ stage }: { stage: Stage }) {
             <div className="flex flex-col items-center">
               <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
                 done    ? "bg-violet-600 border-violet-600 text-white" :
-                current ? "bg-white border-violet-600 text-violet-600 ring-4 ring-violet-100" :
-                          "bg-white border-slate-200 text-slate-400"
+                current ? "bg-[hsl(0,0%,10%)] border-violet-500 text-violet-400 ring-4 ring-violet-900/40" :
+                          "bg-[hsl(0,0%,8%)] border-white/10 text-white/30"
               }`}>
                 {done ? <Check size={15} /> : step.n}
               </div>
               <span className={`mt-1 text-xs font-semibold whitespace-nowrap transition-colors ${
-                current ? "text-violet-600" : done ? "text-slate-600" : "text-slate-400"
+                current ? "text-violet-400" : done ? "text-foreground/60" : "text-foreground/30"
               }`}>
                 {step.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
               <div className={`w-14 h-0.5 mx-1 mb-5 transition-all duration-500 ${
-                stage > step.n ? "bg-violet-600" : "bg-slate-200"
+                stage > step.n ? "bg-violet-600" : "bg-white/10"
               }`} />
             )}
           </div>
@@ -319,15 +319,15 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
 
   if (compact) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "hsl(0,0%,8%)" }}>
         <div className="flex items-center gap-3 p-4">
-          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100">
+          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0" style={{ background: "hsl(0,0%,12%)" }}>
             <Avatar />
           </div>
           <div>
-            <div className="font-bold text-slate-900 text-sm">{profile.name}, {profile.age}</div>
-            <div className="text-xs text-slate-500">{profile.location}</div>
-            <div className="text-xs text-slate-400">{profile.occupation}</div>
+            <div className="font-bold text-foreground text-sm">{profile.name}, {profile.age}</div>
+            <div className="text-xs text-foreground/50">{profile.location}</div>
+            <div className="text-xs text-foreground/40">{profile.occupation}</div>
           </div>
         </div>
       </div>
@@ -335,9 +335,9 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1">
+    <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "hsl(0,0%,8%)" }}>
       {/* Avatar */}
-      <div className="relative w-full" style={{ aspectRatio: "4/3", background: "linear-gradient(135deg,#f0f4f8,#e8eef5)", display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
+      <div className="relative w-full" style={{ aspectRatio: "4/3", background: "linear-gradient(135deg,hsl(0,0%,10%),hsl(0,0%,13%))", display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
         <div style={{ width: 190, height: 220 }}>
           <Avatar />
         </div>
@@ -346,8 +346,8 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
           {profile.tags.map(tag => (
             <span key={tag.label} className={`text-xs px-2 py-0.5 rounded-full font-medium border ${
               tag.warn
-                ? "bg-red-50 text-red-700 border-red-200"
-                : "bg-white/90 text-slate-700 border-slate-200"
+                ? "bg-red-950/60 text-red-400 border-red-700/50"
+                : "bg-black/50 text-white/80 border-white/20"
             }`}>
               {tag.label}
             </span>
@@ -358,17 +358,17 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
       {/* Info */}
       <div className="p-5">
         <div className="flex items-baseline gap-2 mb-0.5">
-          <h2 className="text-xl font-bold text-slate-900">{profile.name}</h2>
-          <span className="text-slate-400 text-lg">{profile.age}</span>
+          <h2 className="text-xl font-bold text-foreground">{profile.name}</h2>
+          <span className="text-foreground/40 text-lg">{profile.age}</span>
         </div>
-        <p className="text-xs text-slate-500 mb-3">📍 {profile.location} · {profile.occupation}</p>
-        <p className="text-sm text-slate-700 leading-relaxed mb-4">{profile.bio}</p>
+        <p className="text-xs text-foreground/50 mb-3">📍 {profile.location} · {profile.occupation}</p>
+        <p className="text-sm text-foreground/80 leading-relaxed mb-4">{profile.bio}</p>
 
         <div className="space-y-3">
           {profile.prompts.map((p, i) => (
-            <div key={i} className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-              <div className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-1">{p.q}</div>
-              <div className="text-sm text-slate-700">{p.a}</div>
+            <div key={i} className="rounded-xl p-3 border border-white/8" style={{ background: "hsl(0,0%,6%)" }}>
+              <div className="text-xs font-bold text-violet-400 uppercase tracking-wider mb-1">{p.q}</div>
+              <div className="text-sm text-foreground/75">{p.a}</div>
             </div>
           ))}
         </div>
@@ -401,22 +401,22 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
 
       <div className="w-[380px] flex-shrink-0 space-y-4">
         {/* Role badge */}
-        <div className="bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 flex items-center gap-3">
+        <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-violet-600/30" style={{ background: "rgba(109,40,217,0.12)" }}>
           <span className="text-2xl">✏️</span>
           <div>
-            <div className="text-sm font-bold text-violet-900">You are the Human Annotator</div>
-            <div className="text-xs text-violet-600">Review this profile and submit your assessment</div>
+            <div className="text-sm font-bold text-violet-300">You are the Human Annotator</div>
+            <div className="text-xs text-violet-400/80">Review this profile and submit your assessment</div>
           </div>
         </div>
 
         {/* Q1 · Verdict */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm font-semibold text-slate-800 mb-3">1 · Is this profile real, fake, or unsure?</p>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <p className="text-sm font-semibold text-foreground mb-3">1 · Is this profile real, fake, or unsure?</p>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { val: "real"   as Verdict, label: "Real",  activeClass: "bg-emerald-500 border-emerald-500 text-white", idleClass: "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100" },
-              { val: "fake"   as Verdict, label: "Fake",  activeClass: "bg-red-500 border-red-500 text-white",         idleClass: "bg-red-50 border-red-300 text-red-800 hover:bg-red-100" },
-              { val: "unsure" as Verdict, label: "Unsure",activeClass: "bg-amber-500 border-amber-500 text-white",     idleClass: "bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100" },
+              { val: "real"   as Verdict, label: "Real",  activeClass: "bg-emerald-500 border-emerald-500 text-white", idleClass: "bg-emerald-950/40 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/50" },
+              { val: "fake"   as Verdict, label: "Fake",  activeClass: "bg-red-500 border-red-500 text-white",         idleClass: "bg-red-950/40 border-red-700/50 text-red-400 hover:bg-red-900/50" },
+              { val: "unsure" as Verdict, label: "Unsure",activeClass: "bg-amber-500 border-amber-500 text-white",     idleClass: "bg-amber-950/40 border-amber-700/50 text-amber-400 hover:bg-amber-900/50" },
             ].map(opt => (
               <button key={opt.val} onClick={() => setVerdict(opt.val)}
                 className={`py-2.5 rounded-xl border-2 text-sm font-bold transition-all ${verdict === opt.val ? opt.activeClass : opt.idleClass}`}>
@@ -427,18 +427,19 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
         </div>
 
         {/* Q2 · Risk signals */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm font-semibold text-slate-800 mb-3">2 · Flag any risk signals (select all that apply)</p>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <p className="text-sm font-semibold text-foreground mb-3">2 · Flag any risk signals (select all that apply)</p>
           <div className="space-y-2">
             {RISK_SIGNALS.map(sig => (
               <button key={sig.id} onClick={() => toggleSignal(sig.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm text-left transition-all ${
                   signals.includes(sig.id)
-                    ? "bg-violet-50 border-violet-400 text-violet-800 font-medium"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                }`}>
+                    ? "border-violet-500/60 text-violet-300 font-medium"
+                    : "border-white/10 text-foreground/70 hover:bg-white/5"
+                }`}
+                style={signals.includes(sig.id) ? { background: "rgba(109,40,217,0.18)" } : {}}>
                 <div className={`w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                  signals.includes(sig.id) ? "bg-violet-600 border-violet-600" : "border-slate-300"
+                  signals.includes(sig.id) ? "bg-violet-600 border-violet-600" : "border-white/20"
                 }`}>
                   {signals.includes(sig.id) && <Check size={10} className="text-white" />}
                 </div>
@@ -449,26 +450,26 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
         </div>
 
         {/* Q3 · Confidence */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-          <p className="text-sm font-semibold text-slate-800 mb-3">3 · Your confidence level</p>
+        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <p className="text-sm font-semibold text-foreground mb-3">3 · Your confidence level</p>
           <div className="grid grid-cols-3 gap-2 mb-3">
             {(["low","medium","high"] as Confidence[]).map(c => (
               <button key={c} onClick={() => setConfidence(c)}
                 className={`py-2 rounded-xl border-2 text-sm font-bold capitalize transition-all ${
-                  confidence === c ? "bg-slate-800 border-slate-800 text-white" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                  confidence === c ? "bg-violet-600 border-violet-600 text-white" : "border-white/10 text-foreground/60 hover:bg-white/5"
                 }`}>
                 {c}
               </button>
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Human confidence:</span>
+            <span className="text-xs text-foreground/50">Human confidence:</span>
             <div className="flex gap-1">
               {[1,2,3].map(i => (
-                <div key={i} className={`h-2 w-8 rounded-full transition-all duration-300 ${i <= confLevel ? "bg-violet-500" : "bg-slate-200"}`} />
+                <div key={i} className={`h-2 w-8 rounded-full transition-all duration-300 ${i <= confLevel ? "bg-violet-500" : "bg-white/10"}`} />
               ))}
             </div>
-            {confidence && <span className="text-xs font-semibold text-violet-600 capitalize ml-1">{confidence}</span>}
+            {confidence && <span className="text-xs font-semibold text-violet-400 capitalize ml-1">{confidence}</span>}
           </div>
         </div>
 
@@ -476,7 +477,7 @@ function Stage1({ profile, onSubmit }: { profile: Profile; onSubmit: (a: Annotat
           className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
           Submit Annotation →
         </Button>
-        {!canSubmit && <p className="text-xs text-slate-400 text-center">Complete all three fields to continue</p>}
+        {!canSubmit && <p className="text-xs text-foreground/40 text-center">Complete all three fields to continue</p>}
       </div>
     </div>
   );
@@ -504,24 +505,25 @@ function Stage2({ profile, annotation, onComplete }: {
     return () => t.forEach(clearTimeout);
   }, [profile]);
 
-  const riskHue   = (n: number) => n >= 90 ? "#dc2626" : n >= 70 ? "#ea580c" : n >= 50 ? "#d97706" : "#059669";
-  const riskBg    = (n: number) => n >= 90 ? "#fef2f2" : n >= 70 ? "#fff7ed" : n >= 50 ? "#fffbeb" : "#f0fdf4";
-  const humanLbl  = annotation.verdict === "real" ? "✓ Real" : annotation.verdict === "fake" ? "✗ Fake" : "? Unsure";
-  const humanCls  = annotation.verdict === "real"
-    ? "bg-emerald-50 border-emerald-300 text-emerald-700"
+  const riskHue = (n: number) => n >= 90 ? "#ef4444" : n >= 70 ? "#f97316" : n >= 50 ? "#f59e0b" : "#10b981";
+  const riskBg  = (n: number) => n >= 90 ? "rgba(220,38,38,0.18)" : n >= 70 ? "rgba(234,88,12,0.18)" : n >= 50 ? "rgba(217,119,6,0.18)" : "rgba(5,150,105,0.18)";
+
+  const humanLbl = annotation.verdict === "real" ? "✓ Real" : annotation.verdict === "fake" ? "✗ Fake" : "? Unsure";
+  const humanCls = annotation.verdict === "real"
+    ? "bg-emerald-950/40 border-emerald-700/50 text-emerald-400"
     : annotation.verdict === "fake"
-    ? "bg-red-50 border-red-300 text-red-700"
-    : "bg-amber-50 border-amber-300 text-amber-700";
+    ? "bg-red-950/40 border-red-700/50 text-red-400"
+    : "bg-amber-950/40 border-amber-700/50 text-amber-400";
 
   const ScoreBar = ({ label, score, active }: { label: string; score: number; active: boolean }) => (
     <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-slate-700">{label}</span>
-        <span className="text-sm font-bold tabular-nums" style={{ color: active ? riskHue(score) : "#94a3b8" }}>
+        <span className="text-sm font-medium text-foreground/80">{label}</span>
+        <span className="text-sm font-bold tabular-nums" style={{ color: active ? riskHue(score) : "rgba(255,255,255,0.25)" }}>
           {active ? `${score}/100` : "—"}
         </span>
       </div>
-      <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+      <div className="h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
         <div className="h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: active ? `${score}%` : "0%", background: riskHue(score) }} />
       </div>
@@ -534,26 +536,26 @@ function Stage2({ profile, annotation, onComplete }: {
 
       <div className="w-[380px] flex-shrink-0 space-y-4">
         {/* Role badge */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center gap-3">
-          <Brain size={22} className="text-blue-600 flex-shrink-0" />
+        <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30" style={{ background: "rgba(37,99,235,0.12)" }}>
+          <Brain size={22} className="text-blue-400 flex-shrink-0" />
           <div className="flex-1">
-            <div className="text-sm font-bold text-blue-900">AI Detection Model Review</div>
-            <div className="text-xs text-blue-600">AI-assisted · not a final decision</div>
+            <div className="text-sm font-bold text-blue-300">AI Detection Model Review</div>
+            <div className="text-xs text-blue-400/80">AI-assisted · not a final decision</div>
           </div>
           {phase >= 4 && scores.overall > 0 && (
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">Complete</span>
+            <span className="text-xs px-2 py-0.5 rounded-full font-semibold border border-blue-600/40 text-blue-300" style={{ background: "rgba(37,99,235,0.25)" }}>Complete</span>
           )}
         </div>
 
         {/* Animated score bars */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div className="rounded-2xl border border-white/10 p-5 space-y-4" style={{ background: "hsl(0,0%,8%)" }}>
           <ScoreBar label="Image Authenticity"  score={scores.image}    active={phase >= 2} />
           <ScoreBar label="Text Consistency"    score={scores.text}     active={phase >= 3} />
           <ScoreBar label="Behavioral Risk"     score={scores.behavior} active={phase >= 4} />
 
           {phase >= 4 && scores.overall > 0 && (
-            <div className="border-t border-slate-100 pt-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Overall AI Risk Score</p>
+            <div className="border-t border-white/8 pt-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-foreground/35 mb-3">Overall AI Risk Score</p>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
                   style={{ background: riskBg(scores.overall) }}>
@@ -565,7 +567,7 @@ function Stage2({ profile, annotation, onComplete }: {
                   <div className="text-sm font-bold" style={{ color: riskHue(scores.overall) }}>
                     {profile.aiResult.verdictLabel}
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">AI confidence: High</div>
+                  <div className="text-xs text-foreground/40 mt-0.5">AI confidence: High</div>
                 </div>
               </div>
             </div>
@@ -574,13 +576,13 @@ function Stage2({ profile, annotation, onComplete }: {
 
         {/* AI reasoning */}
         {phase >= 4 && scores.overall > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <p className="text-sm font-semibold text-slate-800 mb-3">Why the AI flagged this profile:</p>
+          <div className="rounded-2xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+            <p className="text-sm font-semibold text-foreground mb-3">Why the AI flagged this profile:</p>
             <div className="space-y-2.5">
               {profile.aiResult.reasons.map((r, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   <AlertTriangle size={13} className="text-amber-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-xs text-slate-600 leading-relaxed">{r}</span>
+                  <span className="text-xs text-foreground/65 leading-relaxed">{r}</span>
                 </div>
               ))}
             </div>
@@ -589,8 +591,8 @@ function Stage2({ profile, annotation, onComplete }: {
 
         {/* Human vs AI comparison chip */}
         {phase >= 4 && scores.overall > 0 && (
-          <div className="bg-slate-50 rounded-xl border border-slate-200 p-3">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Your annotation vs AI</p>
+          <div className="rounded-xl border border-white/10 p-3" style={{ background: "hsl(0,0%,6%)" }}>
+            <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Your annotation vs AI</p>
             <div className="flex gap-2">
               <div className={`flex-1 text-center py-2 rounded-xl border text-sm font-bold ${humanCls}`}>
                 You: {humanLbl}
@@ -625,10 +627,9 @@ function Stage3({ profile, annotation, onSubmit }: {
 
   const ai = profile.aiResult;
   const humanLbl   = annotation.verdict === "real" ? "✓ Real" : annotation.verdict === "fake" ? "✗ Fake" : "? Unsure";
-  const humanColor = annotation.verdict === "real" ? "#059669" : annotation.verdict === "fake" ? "#dc2626" : "#d97706";
+  const humanColor = annotation.verdict === "real" ? "#10b981" : annotation.verdict === "fake" ? "#ef4444" : "#f59e0b";
 
-  const riskHue = (n: number) => n >= 90 ? "#dc2626" : n >= 70 ? "#ea580c" : n >= 50 ? "#d97706" : "#059669";
-  const riskBg  = (n: number) => n >= 90 ? "#fef2f2" : n >= 70 ? "#fff7ed" : n >= 50 ? "#fffbeb" : "#f0fdf4";
+  const riskHue = (n: number) => n >= 90 ? "#ef4444" : n >= 70 ? "#f97316" : n >= 50 ? "#f59e0b" : "#10b981";
 
   const conflict =
     (annotation.verdict === "real"  && ai.overallRisk >= 70) ||
@@ -638,21 +639,21 @@ function Stage3({ profile, annotation, onSubmit }: {
   return (
     <div className="space-y-4">
       {/* Role badge */}
-      <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 flex items-center gap-3">
-        <Shield size={22} className="text-indigo-600 flex-shrink-0" />
+      <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30" style={{ background: "rgba(79,70,229,0.12)" }}>
+        <Shield size={22} className="text-indigo-400 flex-shrink-0" />
         <div>
-          <div className="text-sm font-bold text-indigo-900">Human QA Review — Teleperformance</div>
-          <div className="text-xs text-indigo-600">You are a senior QA reviewer. Review both decisions and make the final call.</div>
+          <div className="text-sm font-bold text-indigo-300">Human QA Review — Teleperformance</div>
+          <div className="text-xs text-indigo-400/80">You are a senior QA reviewer. Review both decisions and make the final call.</div>
         </div>
       </div>
 
       {/* Conflict banner */}
       {conflict && (
-        <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 flex items-start gap-3">
-          <AlertTriangle size={17} className="text-amber-600 mt-0.5 flex-shrink-0" />
+        <div className="rounded-xl px-4 py-3 flex items-start gap-3 border border-amber-600/40" style={{ background: "rgba(217,119,6,0.12)" }}>
+          <AlertTriangle size={17} className="text-amber-500 mt-0.5 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-amber-800">Human–AI Conflict Detected</div>
-            <div className="text-xs text-amber-700 mt-0.5">Your annotation and the AI model disagree. Human QA must make the final determination.</div>
+            <div className="text-sm font-bold text-amber-300">Human–AI Conflict Detected</div>
+            <div className="text-xs text-amber-400/80 mt-0.5">Your annotation and the AI model disagree. Human QA must make the final determination.</div>
           </div>
         </div>
       )}
@@ -660,15 +661,15 @@ function Stage3({ profile, annotation, onSubmit }: {
       {/* Three-column comparison */}
       <div className="grid grid-cols-3 gap-4">
         {/* Human annotation summary */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 p-4 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">👤 Human Annotation</p>
+        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">👤 Human Annotation</p>
           <div className="text-lg font-black mb-2" style={{ color: humanColor }}>{humanLbl}</div>
-          <div className="text-xs text-slate-500 space-y-1">
+          <div className="text-xs text-foreground/50 space-y-1">
             <div><span className="font-semibold">Confidence:</span> {annotation.confidence}</div>
             <div className="font-semibold mt-2 mb-1">Signals flagged:</div>
             {annotation.signals.map(s => {
               const sig = RISK_SIGNALS.find(r => r.id === s);
-              return sig ? <div key={s} className="text-slate-600">· {sig.label}</div> : null;
+              return sig ? <div key={s} className="text-foreground/60">· {sig.label}</div> : null;
             })}
           </div>
         </div>
@@ -676,37 +677,38 @@ function Stage3({ profile, annotation, onSubmit }: {
         {/* Centre — compact profile + insight */}
         <div className="space-y-3">
           <ProfileCard profile={profile} compact />
-          <div className="bg-violet-50 border border-violet-200 rounded-xl p-3">
-            <p className="text-xs font-bold text-violet-700 mb-1">💡 TP Insight</p>
-            <p className="text-xs text-violet-800 leading-relaxed">{profile.insight}</p>
+          <div className="rounded-xl p-3 border border-violet-600/25" style={{ background: "rgba(109,40,217,0.12)" }}>
+            <p className="text-xs font-bold text-violet-400 mb-1">💡 TP Insight</p>
+            <p className="text-xs text-violet-300/80 leading-relaxed">{profile.insight}</p>
           </div>
         </div>
 
         {/* AI decision summary */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 p-4 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">🤖 AI Model Decision</p>
+        <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Model Decision</p>
           <div className="text-lg font-black mb-1" style={{ color: riskHue(ai.overallRisk) }}>
             {ai.overallRisk}/100 Risk
           </div>
           <div className="text-xs font-bold mb-2" style={{ color: riskHue(ai.overallRisk) }}>{ai.verdictLabel}</div>
-          <div className="text-xs text-slate-500 space-y-1">
+          <div className="text-xs text-foreground/50 space-y-1">
             {ai.reasons.map((r, i) => <div key={i}>· {r.split("(")[0].trim()}</div>)}
           </div>
         </div>
       </div>
 
       {/* QA actions */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <p className="text-sm font-bold text-slate-800 mb-4">QA Decision — Select your action:</p>
+      <div className="rounded-2xl border border-white/10 p-5" style={{ background: "hsl(0,0%,8%)" }}>
+        <p className="text-sm font-bold text-foreground mb-4">QA Decision — Select your action:</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { action:"validate" as QAAction, icon:"✓", label:"Validate AI",           sub:"Accept AI decision",      idle:"border-emerald-300 bg-emerald-50 text-emerald-800",    active:"border-emerald-500 bg-emerald-500 text-white" },
-            { action:"override" as QAAction, icon:"↩", label:"Override AI",           sub:"Human judgment prevails", idle:"border-violet-300 bg-violet-50 text-violet-800",       active:"border-violet-600 bg-violet-600 text-white" },
-            { action:"escalate" as QAAction, icon:"🔍",label:"Request More Evidence", sub:"Escalate for senior review",idle:"border-amber-300 bg-amber-50 text-amber-800",        active:"border-amber-500 bg-amber-500 text-white" },
+            { action:"validate" as QAAction, icon:"✓", label:"Validate AI",           sub:"Accept AI decision",       idle:"border-emerald-700/50 text-emerald-400",  idleBg:"rgba(5,150,105,0.12)",  active:"border-emerald-500 bg-emerald-500 text-white" },
+            { action:"override" as QAAction, icon:"↩", label:"Override AI",           sub:"Human judgment prevails",  idle:"border-violet-600/40 text-violet-400",    idleBg:"rgba(109,40,217,0.12)", active:"border-violet-600 bg-violet-600 text-white" },
+            { action:"escalate" as QAAction, icon:"🔍",label:"Request More Evidence", sub:"Escalate for senior review",idle:"border-amber-700/50 text-amber-400",     idleBg:"rgba(217,119,6,0.12)", active:"border-amber-500 bg-amber-500 text-white" },
           ].map(opt => (
             <button key={opt.action}
               onClick={() => { setSelected(opt.action); if (opt.action === "override") setOverrideExpanded(true); else setOverrideExpanded(false); }}
-              className={`p-3 rounded-xl border-2 text-left transition-all ${selected === opt.action ? opt.active : opt.idle}`}>
+              className={`p-3 rounded-xl border-2 text-left transition-all ${selected === opt.action ? opt.active : `${opt.idle}`}`}
+              style={selected !== opt.action ? { background: opt.idleBg } : {}}>
               <div className="text-xl mb-1">{opt.icon}</div>
               <div className="text-sm font-bold">{opt.label}</div>
               <div className={`text-xs mt-0.5 ${selected === opt.action ? "opacity-80" : "opacity-70"}`}>{opt.sub}</div>
@@ -716,14 +718,14 @@ function Stage3({ profile, annotation, onSubmit }: {
 
         {/* Override rationale panel */}
         {overrideExpanded && selected === "override" && (
-          <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-4">
-            <p className="text-sm font-bold text-violet-900 mb-2">⚠️ Why Human Override Matters</p>
-            <div className="text-xs text-violet-800 space-y-1.5 leading-relaxed">
+          <div className="rounded-xl p-4 mb-4 border border-violet-600/25" style={{ background: "rgba(109,40,217,0.15)" }}>
+            <p className="text-sm font-bold text-violet-200 mb-2">⚠️ Why Human Override Matters</p>
+            <div className="text-xs text-violet-300/80 space-y-1.5 leading-relaxed">
               <p>· AI models generate <strong>false positives</strong> — flagging real users incorrectly. Human review prevents wrongful removal.</p>
               <p>· AI models generate <strong>false negatives</strong> — missing sophisticated fraud that mimics authentic behaviour. Human intuition catches edge cases.</p>
               <p>· Human QA is the <strong>accountability layer</strong> that makes AI-assisted moderation defensible to regulators, platforms, and users.</p>
             </div>
-            <p className="mt-3 text-xs font-bold text-violet-700">
+            <p className="mt-3 text-xs font-bold text-violet-400">
               TP operates human-in-the-loop QA at scale across 100+ Trust &amp; Safety programs globally.
             </p>
           </div>
@@ -748,68 +750,68 @@ function Stage4({ profile, qaAction, onReset }: {
   const decision = profile.finalDecision[qaAction];
 
   const statusCfg = {
-    approved:  { icon: "✅", label: "Profile Approved",       ring: "border-emerald-300 bg-emerald-50", heading: "text-emerald-700" },
-    rejected:  { icon: "🚫", label: "Profile Removed",        ring: "border-red-300 bg-red-50",         heading: "text-red-700" },
-    escalated: { icon: "⚠️", label: "Needs Follow-up",        ring: "border-amber-300 bg-amber-50",     heading: "text-amber-700" },
+    approved:  { icon: "✅", label: "Profile Approved",  ring: "border-emerald-700/50",  heading: "text-emerald-400", bg: "rgba(5,150,105,0.10)" },
+    rejected:  { icon: "🚫", label: "Profile Removed",   ring: "border-red-700/50",       heading: "text-red-400",     bg: "rgba(220,38,38,0.10)" },
+    escalated: { icon: "⚠️", label: "Needs Follow-up",   ring: "border-amber-700/50",     heading: "text-amber-400",   bg: "rgba(217,119,6,0.10)" },
   }[decision.status];
 
   const correctBanner = decision.correct
-    ? { bg: "bg-emerald-50 border-emerald-200", icon: <CheckCircle2 size={16} className="text-emerald-600" />, text: "text-emerald-800", msg: "Correct decision — this matches the ground truth outcome." }
-    : { bg: "bg-red-50 border-red-200",         icon: <XCircle      size={16} className="text-red-600"     />, text: "text-red-800",     msg: "Suboptimal decision — see the insight above for the preferred outcome." };
+    ? { bg: "rgba(5,150,105,0.12)",  border: "border-emerald-700/40", icon: <CheckCircle2 size={16} className="text-emerald-500" />, text: "text-emerald-300", msg: "Correct decision — this matches the ground truth outcome." }
+    : { bg: "rgba(220,38,38,0.12)", border: "border-red-700/40",      icon: <XCircle      size={16} className="text-red-500"     />, text: "text-red-300",     msg: "Suboptimal decision — see the insight above for the preferred outcome." };
 
   const metrics = [
-    { Icon: Shield,     label: "Users Protected",       value: decision.status === "rejected" ? "2,840" : "1",     sub: decision.status === "rejected" ? "potential victims in region" : "real user outcome resolved", color: "text-violet-600 bg-violet-50" },
-    { Icon: TrendingUp, label: "Platform Trust Score",  value: "+0.3%",                                            sub: "projected improvement from this decision",                                                   color: "text-emerald-600 bg-emerald-50" },
-    { Icon: Zap,        label: "Decision Latency",      value: "<4 min",                                           sub: "annotation → AI → QA → delivery",                                                           color: "text-blue-600 bg-blue-50" },
-    { Icon: Users,      label: "TP Specialists Involved", value: "3",                                              sub: "annotator + AI reviewer + QA approver",                                                      color: "text-indigo-600 bg-indigo-50" },
+    { Icon: Shield,     label: "Users Protected",         value: decision.status === "rejected" ? "2,840" : "1",     sub: decision.status === "rejected" ? "potential victims in region" : "real user outcome resolved", color: "text-violet-400", iconBg: "rgba(109,40,217,0.20)" },
+    { Icon: TrendingUp, label: "Platform Trust Score",    value: "+0.3%",  sub: "projected improvement from this decision",          color: "text-emerald-400", iconBg: "rgba(5,150,105,0.20)" },
+    { Icon: Zap,        label: "Decision Latency",        value: "<4 min", sub: "annotation → AI → QA → delivery",                  color: "text-blue-400",    iconBg: "rgba(37,99,235,0.20)" },
+    { Icon: Users,      label: "TP Specialists Involved", value: "3",      sub: "annotator + AI reviewer + QA approver",             color: "text-indigo-400",  iconBg: "rgba(79,70,229,0.20)" },
   ];
 
   return (
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
       {/* Delivery label */}
-      <div className="inline-flex items-center gap-2 bg-slate-800 text-white text-xs font-bold px-4 py-1.5 rounded-full">
+      <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "hsl(0,0%,14%)" }}>
         <span>📬</span> Step 4: Final Decision Delivered to Client Platform
       </div>
 
       {/* Status card */}
-      <div className={`w-full rounded-2xl border-2 p-6 text-center ${statusCfg.ring}`}>
+      <div className={`w-full rounded-2xl border-2 p-6 text-center ${statusCfg.ring}`} style={{ background: statusCfg.bg }}>
         <div className="text-5xl mb-3">{statusCfg.icon}</div>
         <div className={`text-2xl font-black mb-2 ${statusCfg.heading}`}>{decision.heading}</div>
-        <p className="text-sm text-slate-600 leading-relaxed max-w-sm mx-auto">{decision.body}</p>
+        <p className="text-sm text-foreground/65 leading-relaxed max-w-sm mx-auto">{decision.body}</p>
       </div>
 
       {/* Correct/incorrect banner */}
-      <div className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 ${correctBanner.bg}`}>
+      <div className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 ${correctBanner.border}`} style={{ background: correctBanner.bg }}>
         {correctBanner.icon}
         <p className={`text-xs font-semibold ${correctBanner.text}`}>{correctBanner.msg}</p>
       </div>
 
       {/* TP Insight */}
-      <div className="w-full bg-violet-50 border border-violet-200 rounded-xl p-4">
-        <p className="text-sm font-bold text-violet-900 mb-1">💡 Why This Case Matters</p>
-        <p className="text-xs text-violet-800 leading-relaxed">{profile.insight}</p>
+      <div className="w-full rounded-xl p-4 border border-violet-600/25" style={{ background: "rgba(109,40,217,0.12)" }}>
+        <p className="text-sm font-bold text-violet-300 mb-1">💡 Why This Case Matters</p>
+        <p className="text-xs text-violet-300/75 leading-relaxed">{profile.insight}</p>
       </div>
 
       {/* Impact metrics */}
       <div className="w-full">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Simulated Impact Metrics</p>
+        <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3 text-center">Simulated Impact Metrics</p>
         <div className="grid grid-cols-2 gap-3">
           {metrics.map((m, i) => (
-            <div key={i} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-              <div className={`inline-flex items-center justify-center w-9 h-9 rounded-xl mb-2 ${m.color}`}>
-                <m.Icon size={18} />
+            <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "hsl(0,0%,8%)" }}>
+              <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-2" style={{ background: m.iconBg }}>
+                <m.Icon size={18} className={m.color} />
               </div>
-              <div className="text-xl font-black text-slate-900">{m.value}</div>
-              <div className="text-xs font-semibold text-slate-700">{m.label}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{m.sub}</div>
+              <div className={`text-xl font-black ${m.color}`}>{m.value}</div>
+              <div className="text-xs font-semibold text-foreground/75">{m.label}</div>
+              <div className="text-xs text-foreground/40 mt-0.5">{m.sub}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* TP scale proof points */}
-      <div className="w-full bg-slate-900 text-white rounded-2xl p-5">
-        <p className="text-sm font-bold mb-4">How TP Operationalises This at Scale</p>
+      <div className="w-full rounded-2xl p-5" style={{ background: "hsl(0,0%,10%)" }}>
+        <p className="text-sm font-bold text-foreground mb-4">How TP Operationalises This at Scale</p>
         <div className="grid grid-cols-3 gap-3 text-center">
           {[
             { val: "500K+", sub: "Daily T&S decisions" },
@@ -818,7 +820,7 @@ function Stage4({ profile, qaAction, onReset }: {
           ].map(kpi => (
             <div key={kpi.val}>
               <div className="text-2xl font-black text-violet-400">{kpi.val}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{kpi.sub}</div>
+              <div className="text-xs text-foreground/40 mt-0.5">{kpi.sub}</div>
             </div>
           ))}
         </div>
@@ -826,7 +828,7 @@ function Stage4({ profile, qaAction, onReset }: {
 
       {/* Nav */}
       <div className="flex gap-3 w-full">
-        <Button variant="outline" onClick={onReset} className="flex-1 gap-2 h-12">
+        <Button variant="outline" onClick={onReset} className="flex-1 gap-2 h-12 border-white/15 text-foreground/80 hover:bg-white/5">
           <RotateCcw size={14} /> Try Another Profile
         </Button>
         <Button onClick={() => window.history.back()} className="flex-1 bg-violet-600 hover:bg-violet-700 gap-2 h-12">
@@ -857,7 +859,7 @@ export default function CatfishDetection() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
+    <div className="min-h-screen" style={{ background: "hsl(0,0%,4%)" }}>
       {/* ── Header ── */}
       <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-white/10">
         <div className="flex items-center justify-between px-6 h-16">
@@ -887,10 +889,10 @@ export default function CatfishDetection() {
       <div className="max-w-5xl mx-auto px-4 py-6">
         {/* Hero title */}
         <div className="text-center mb-4">
-          <h1 className="text-2xl font-black text-slate-900">
-            Real or Fake? <span className="text-violet-600">Catfish Detection</span>
+          <h1 className="text-2xl font-black text-white">
+            Real or Fake? <span className="text-violet-400">Catfish Detection</span>
           </h1>
-          <p className="text-sm text-slate-500 mt-1 max-w-xl mx-auto">
+          <p className="text-sm text-foreground/50 mt-1 max-w-xl mx-auto">
             Experience how Teleperformance annotators, AI models, and QA reviewers work together
             to protect dating platform users from fraud and impersonation.
           </p>
@@ -904,14 +906,15 @@ export default function CatfishDetection() {
                 className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-all ${
                   profileIdx === i
                     ? "border-violet-500 bg-violet-600 text-white shadow-sm"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-violet-300 hover:bg-violet-50"
-                }`}>
+                    : "border-white/10 text-foreground/70 hover:border-violet-500/40 hover:bg-violet-900/20"
+                }`}
+                style={profileIdx !== i ? { background: "hsl(0,0%,8%)" } : {}}>
                 Profile {i + 1}: {p.name.split(" ")[0]}
                 <span className={`ml-1.5 text-xs font-normal ${
                   profileIdx === i ? "text-violet-200" :
-                  p.groundTruth === "REAL"      ? "text-emerald-500" :
-                  p.groundTruth === "FAKE"      ? "text-red-500" :
-                                                  "text-amber-500"
+                  p.groundTruth === "REAL"      ? "text-emerald-400" :
+                  p.groundTruth === "FAKE"      ? "text-red-400" :
+                                                  "text-amber-400"
                 }`}>
                   ({p.groundTruth === "REAL" ? "Real" : p.groundTruth === "FAKE" ? "Fake" : "Tricky"})
                 </span>
