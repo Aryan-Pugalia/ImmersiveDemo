@@ -62,7 +62,7 @@ export function SampleGallery({ onSampleSelected }: SampleGalleryProps) {
                 loading="lazy"
               />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-3">
+            <div className="dark-surface absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-3">
               <p className="text-sm font-semibold text-white">{sample.name}</p>
               <p className="text-sm text-white/70">{sample.description}</p>
             </div>
