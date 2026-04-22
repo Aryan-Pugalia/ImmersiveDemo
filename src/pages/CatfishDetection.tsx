@@ -88,7 +88,7 @@ const PROFILES: Profile[] = [
     age: 28,
     location: "Austin, TX",
     occupation: "UX Designer",
-    photo: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&h=720&fit=crop&crop=top",
+    photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=720&fit=crop&crop=faces",
     bio: "Coffee addict ☕ hiking enthusiast. Looking for someone to explore farmers markets and local trails with. I'm a bit nerdy about fonts and design but I promise I'm fun at parties. Dog mom to a golden named Pretzel 🐾",
     prompts: [
       { q: "My ideal Sunday",  a: "Farmers market in the morning, a long hike, then cooking something new for dinner — wine included 🍷" },
@@ -127,7 +127,7 @@ const PROFILES: Profile[] = [
     age: 34,
     location: "Lagos, Nigeria · 'offshore'",
     occupation: "Petroleum Engineer (offshore)",
-    photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=720&fit=crop&crop=top",
+    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=720&fit=crop&crop=faces",
     bio: "Successful engineer currently working offshore but dreaming of settling down with the right woman. God-fearing, honest, faithful. Looking for my forever person 💍  WhatsApp: +1-234-555-0198",
     prompts: [
       { q: "My love language",   a: "Gift-giving and quality time. I love spoiling the people I care about. I'll show you how a real man loves his queen." },
@@ -166,7 +166,7 @@ const PROFILES: Profile[] = [
     age: 31,
     location: "London, UK",
     occupation: "Marketing Consultant",
-    photo: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&h=720&fit=crop&crop=top",
+    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=720&fit=crop&crop=faces",
     bio: "Londoner by choice, Mumbai by heart 🌍 I love cooking for friends, impromptu weekend trips, and finding hole-in-the-wall restaurants before they get Instagrammed. Probably too competitive at board games.",
     prompts: [
       { q: "Typical Tuesday",    a: "Client calls, strong tea, and a long walk along the Southbank if the weather is kind." },
@@ -250,7 +250,7 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
       <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "hsl(0,0%,8%)" }}>
         <div className="flex items-center gap-3 p-4">
           <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-            <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover object-top" />
+            <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover object-center" />
           </div>
           <div>
             <div className="font-bold text-foreground text-sm">{profile.name}, {profile.age}</div>
@@ -269,7 +269,7 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
         <img
           src={profile.photo}
           alt={profile.name}
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full object-cover object-center"
         />
         {/* gradient scrim so tags are readable */}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
