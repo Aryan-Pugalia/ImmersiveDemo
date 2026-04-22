@@ -54,7 +54,7 @@ interface Profile {
   bio:         string;
   prompts:     { q: string; a: string }[];
   tags:        { label: string; warn?: boolean }[];
-  Avatar:      () => JSX.Element;
+  photo:       string;
   aiResult: {
     imageScore:    number;
     textScore:     number;
@@ -67,76 +67,6 @@ interface Profile {
   insight:     string;
   finalDecision: Record<QAAction, FinalDecision>;
 }
-
-// ─── SVG Avatars (self-contained, no external assets) ────────────────────────
-
-/** Sarah Chen — genuine user, warm natural look */
-const SarahAvatar = () => (
-  <svg viewBox="0 0 120 140" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="60" cy="70" r="65" fill="#fde8dc" />
-    {/* hair */}
-    <ellipse cx="60" cy="50" rx="35" ry="31" fill="#2c1810" />
-    {/* face */}
-    <ellipse cx="60" cy="86" rx="29" ry="35" fill="#f5c6a8" />
-    {/* eyes */}
-    <circle cx="49" cy="79" r="5.5" fill="#2c1810" />
-    <circle cx="71" cy="79" r="5.5" fill="#2c1810" />
-    <circle cx="50.5" cy="77.5" r="2" fill="white" />
-    <circle cx="72.5" cy="77.5" r="2" fill="white" />
-    {/* nose */}
-    <ellipse cx="60" cy="90" rx="3.5" ry="2.5" fill="#e8a882" />
-    {/* smile */}
-    <path d="M 51 100 Q 60 109 69 100" stroke="#c47350" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-    {/* blush */}
-    <ellipse cx="44" cy="93" rx="6" ry="3.5" fill="#f0b0a0" opacity="0.5" />
-    <ellipse cx="76" cy="93" rx="6" ry="3.5" fill="#f0b0a0" opacity="0.5" />
-  </svg>
-);
-
-/** Marcus King — too-perfect "model" look, romance-scam archetype */
-const MarcusAvatar = () => (
-  <svg viewBox="0 0 120 140" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="60" cy="70" r="65" fill="#e8f0f8" />
-    {/* styled hair */}
-    <path d="M 26 65 Q 28 22 60 18 Q 92 22 94 65 Q 87 54 60 52 Q 33 54 26 65" fill="#1a0a00" />
-    {/* neck */}
-    <rect x="49" y="114" width="22" height="20" rx="5" fill="#c8845a" />
-    {/* face */}
-    <path d="M 32 67 Q 30 90 33 105 Q 46 122 60 124 Q 74 122 87 105 Q 90 90 88 67 Q 86 54 60 52 Q 34 54 32 67" fill="#c8845a" />
-    {/* eyes */}
-    <ellipse cx="48" cy="79" rx="6" ry="5.5" fill="#1a0a00" />
-    <ellipse cx="72" cy="79" rx="6" ry="5.5" fill="#1a0a00" />
-    <circle cx="50" cy="77.5" r="2.2" fill="white" />
-    <circle cx="74" cy="77.5" r="2.2" fill="white" />
-    {/* perfect smile */}
-    <path d="M 48 99 Q 60 111 72 99 Q 60 115 48 99" fill="white" opacity="0.65" />
-    <path d="M 48 99 Q 60 110 72 99" stroke="#a0614a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-  </svg>
-);
-
-/** Priya Sharma — ambiguous, could be real or AI-generated */
-const PriyaAvatar = () => (
-  <svg viewBox="0 0 120 140" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="60" cy="70" r="65" fill="#f5ede8" />
-    {/* long dark hair */}
-    <ellipse cx="60" cy="52" rx="33" ry="30" fill="#1a0a00" />
-    <path d="M 28 74 Q 24 100 28 124" stroke="#1a0a00" strokeWidth="12" strokeLinecap="round" fill="none" />
-    <path d="M 92 74 Q 96 100 92 124" stroke="#1a0a00" strokeWidth="9" strokeLinecap="round" fill="none" />
-    {/* face */}
-    <ellipse cx="60" cy="88" rx="28" ry="33" fill="#d4956a" />
-    {/* eyes */}
-    <ellipse cx="49" cy="81" rx="5" ry="4.5" fill="#1a0a00" />
-    <ellipse cx="71" cy="81" rx="5" ry="4.5" fill="#1a0a00" />
-    <circle cx="50.5" cy="79.5" r="1.8" fill="white" />
-    <circle cx="72.5" cy="79.5" r="1.8" fill="white" />
-    {/* bindi */}
-    <circle cx="60" cy="65" r="3" fill="#dc2626" />
-    {/* nose */}
-    <ellipse cx="60" cy="92" rx="3" ry="2" fill="#c47850" />
-    {/* neutral mouth */}
-    <path d="M 53 102 Q 60 107 67 102" stroke="#b87050" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-  </svg>
-);
 
 // ─── Risk signal options ──────────────────────────────────────────────────────
 
@@ -158,7 +88,7 @@ const PROFILES: Profile[] = [
     age: 28,
     location: "Austin, TX",
     occupation: "UX Designer",
-    Avatar: SarahAvatar,
+    photo: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&h=720&fit=crop&crop=top",
     bio: "Coffee addict ☕ hiking enthusiast. Looking for someone to explore farmers markets and local trails with. I'm a bit nerdy about fonts and design but I promise I'm fun at parties. Dog mom to a golden named Pretzel 🐾",
     prompts: [
       { q: "My ideal Sunday",  a: "Farmers market in the morning, a long hike, then cooking something new for dinner — wine included 🍷" },
@@ -197,7 +127,7 @@ const PROFILES: Profile[] = [
     age: 34,
     location: "Lagos, Nigeria · 'offshore'",
     occupation: "Petroleum Engineer (offshore)",
-    Avatar: MarcusAvatar,
+    photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=720&fit=crop&crop=top",
     bio: "Successful engineer currently working offshore but dreaming of settling down with the right woman. God-fearing, honest, faithful. Looking for my forever person 💍  WhatsApp: +1-234-555-0198",
     prompts: [
       { q: "My love language",   a: "Gift-giving and quality time. I love spoiling the people I care about. I'll show you how a real man loves his queen." },
@@ -236,7 +166,7 @@ const PROFILES: Profile[] = [
     age: 31,
     location: "London, UK",
     occupation: "Marketing Consultant",
-    Avatar: PriyaAvatar,
+    photo: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&h=720&fit=crop&crop=top",
     bio: "Londoner by choice, Mumbai by heart 🌍 I love cooking for friends, impromptu weekend trips, and finding hole-in-the-wall restaurants before they get Instagrammed. Probably too competitive at board games.",
     prompts: [
       { q: "Typical Tuesday",    a: "Client calls, strong tea, and a long walk along the Southbank if the weather is kind." },
@@ -315,14 +245,12 @@ function ProgressStepper({ stage }: { stage: Stage }) {
 // ─── Profile Card ─────────────────────────────────────────────────────────────
 
 function ProfileCard({ profile, compact = false }: { profile: Profile; compact?: boolean }) {
-  const { Avatar } = profile;
-
   if (compact) {
     return (
       <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "hsl(0,0%,8%)" }}>
         <div className="flex items-center gap-3 p-4">
-          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0" style={{ background: "hsl(0,0%,12%)" }}>
-            <Avatar />
+          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+            <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover object-top" />
           </div>
           <div>
             <div className="font-bold text-foreground text-sm">{profile.name}, {profile.age}</div>
@@ -336,18 +264,22 @@ function ProfileCard({ profile, compact = false }: { profile: Profile; compact?:
 
   return (
     <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "hsl(0,0%,8%)" }}>
-      {/* Avatar */}
-      <div className="relative w-full" style={{ aspectRatio: "4/3", background: "linear-gradient(135deg,hsl(0,0%,10%),hsl(0,0%,13%))", display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
-        <div style={{ width: 190, height: 220 }}>
-          <Avatar />
-        </div>
+      {/* Photo — full bleed, face-forward */}
+      <div className="relative w-full overflow-hidden" style={{ height: 320 }}>
+        <img
+          src={profile.photo}
+          alt={profile.name}
+          className="w-full h-full object-cover object-top"
+        />
+        {/* gradient scrim so tags are readable */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
         {/* Tags */}
         <div className="absolute bottom-3 left-3 flex gap-1.5 flex-wrap">
           {profile.tags.map(tag => (
             <span key={tag.label} className={`text-xs px-2 py-0.5 rounded-full font-medium border ${
               tag.warn
-                ? "bg-red-950/60 text-red-400 border-red-700/50"
-                : "bg-black/50 text-white/80 border-white/20"
+                ? "bg-red-950/70 text-red-300 border-red-600/50"
+                : "bg-black/60 text-white/90 border-white/25"
             }`}>
               {tag.label}
             </span>
