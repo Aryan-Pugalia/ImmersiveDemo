@@ -574,7 +574,7 @@ function Stage3({ profile, annotation, onSubmit }: {
       <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30" style={{ background: "rgba(79,70,229,0.12)" }}>
         <Shield size={22} className="text-indigo-400 flex-shrink-0" />
         <div>
-          <div className="text-sm font-bold text-indigo-300">Human QA Review — Teleperformance</div>
+          <div className="text-sm font-bold text-indigo-300">Human QA Review — TP</div>
           <div className="text-xs text-indigo-400/80">You are a senior QA reviewer. Review both decisions and make the final call.</div>
         </div>
       </div>
@@ -825,7 +825,7 @@ export default function CatfishDetection() {
             Real or Fake? <span className="text-violet-400">Catfish Detection</span>
           </h1>
           <p className="text-sm text-foreground/50 mt-1 max-w-xl mx-auto">
-            Experience how Teleperformance annotators, AI models, and QA reviewers work together
+            Experience how TP annotators, AI models, and QA reviewers work together
             to protect dating platform users from fraud and impersonation.
           </p>
         </div>
