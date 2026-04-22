@@ -414,10 +414,10 @@ export default function LidarAnnotation() {
         <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 border-b border-border bg-card/90 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <span
-              className="cursor-pointer shrink-0"
+              className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0"
               onClick={() => navigate("/use-cases")}
             >
-              <img src="/tp-ai-data-services-logo.png" alt="TP.ai FABStudio" style={{ height: "22px", width: "auto" }} />
+              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
             </span>
             <ChevronRight size={14} className="text-muted-foreground" />
             <span className="text-foreground/80 text-sm">{t.useCases["lidar-annotation"]?.title ?? "LiDAR 3D Annotation"}</span>

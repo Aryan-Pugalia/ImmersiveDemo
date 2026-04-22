@@ -451,16 +451,27 @@ function TaskQueue({ onSelect }: { onSelect:(t:Task)=>void }) {
   };
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center justify-between px-6 h-14">
-          <button onClick={()=>navigate("/use-cases")} className="flex items-center gap-2 text-foreground/60 hover:text-foreground text-sm">
-            <ArrowLeft size={16}/> Use Cases
-          </button>
-          <span className="font-headline font-bold text-foreground text-sm tracking-wide uppercase">{pa.breadcrumb}</span>
-          <div className="w-24"/>
+      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
+        <div className="flex items-center justify-between px-6 h-16">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => navigate("/use-cases")}
+              className="flex items-center justify-center p-2 hover:bg-muted rounded-full transition-colors shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4 text-foreground" />
+            </button>
+            <span
+              className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0"
+              onClick={() => navigate("/use-cases")}
+            >
+              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <span className="text-sm text-foreground/80 font-body whitespace-nowrap">{pa.breadcrumb}</span>
+          </div>
         </div>
-        <div className="h-0.5 bg-gradient-to-r from-[#5b21b6] to-[#9071f0]"/>
-      </div>
+        <div className="absolute bottom-0 left-0 h-[2px] w-full progress-bar-gradient" />
+      </header>
       <div className="max-w-5xl mx-auto w-full px-6 py-10">
         <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}}>
           <h1 className="font-headline font-black text-4xl text-foreground text-center mb-2">{pa.selectTask}</h1>
