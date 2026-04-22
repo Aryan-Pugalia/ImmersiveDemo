@@ -101,6 +101,17 @@
     --s6: hsl(0,0%,88%);
     --s7: hsl(0,0%,85%);
     --s8: hsl(0,0%,90%);
+
+    /* MD3 surface tokens — these power .industrial-card on use-cases page */
+    --md-surface: 0 0% 97%;
+    --md-surface-container: 0 0% 100%;
+    --md-surface-container-low: 0 0% 98%;
+    --md-surface-container-high: 0 0% 95%;
+    --md-surface-container-highest: 0 0% 92%;
+    --md-on-surface: 220 15% 12%;
+    --md-on-surface-variant: 220 15% 35%;
+    --md-outline: 220 15% 55%;
+    --md-outline-variant: 220 15% 80%;
   }
 }
 
@@ -188,6 +199,55 @@ html.light [class*="bg-blue-5"] .text-white    { color: white !important; }
 html.light .border-white\/10:not(.dark-surface *) { border-color: rgba(0,0,0,0.10) !important; }
 html.light .border-white\/8:not(.dark-surface *)  { border-color: rgba(0,0,0,0.08) !important; }
 html.light .border-white\/20:not(.dark-surface *) { border-color: rgba(0,0,0,0.15) !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   LIGHT MODE — Index page (landing) component overrides
+   These CSS classes have hardcoded dark-bg colors in them.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Capabilities section heading — was hsl(30,5%,89%) (near-white) */
+html.light .capabilities-heading {
+  color: hsl(220 15% 12%);
+}
+
+/* Capability card: swap dark purple-black bg to pale violet tint */
+html.light .capability-card {
+  background: rgba(243, 240, 255, 0.95);
+  border-color: rgba(109, 40, 217, 0.18);
+}
+html.light .capability-card:hover {
+  border-color: rgba(109, 40, 217, 0.55);
+  box-shadow: 0 0 16px rgba(109, 40, 217, 0.10);
+}
+
+/* Capability card text — was hardcoded near-white */
+html.light .capability-category  { color: hsl(263 70% 40%); }
+html.light .capability-title     { color: hsl(220 15% 10%); }
+html.light .capability-desc      { color: hsl(220 15% 28%); }
+html.light .capability-sub-item  { color: hsl(220 15% 28%); }
+html.light .capability-check     { color: hsl(263 70% 45%); }
+
+/* Bullet dots keep their glow but use visible colors */
+html.light .bullet-purple { background: hsl(263 70% 45%); }
+html.light .bullet-violet { background: hsl(263 55% 52%); }
+
+/* CTA "LET'S GO" button — was white text on transparent */
+html.light .cta-btn {
+  color: hsl(220 15% 12%);
+  border-color: rgba(109, 40, 217, 0.70);
+}
+html.light .cta-btn:hover {
+  color: #ffffff;
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+
+/* Circular brand image — mix-blend-mode: screen is invisible on light bg.
+   Switch to multiply so the image composites correctly on light surfaces. */
+html.light .circular-img {
+  mix-blend-mode: multiply;
+  opacity: 0.75;
+}
 
 /* Material Symbols */
 .material-symbols-outlined {
