@@ -20,21 +20,6 @@ const SAMPLES = [
     description: "Contrast-enhanced CT with hepatic lesion",
     url: "/samples/liver-tumor-ct.jpg",
   },
-  {
-    name: "Chest X-Ray",
-    description: "Posteroanterior chest radiograph",
-    url: "/samples/chest-xray.jpg",
-  },
-  {
-    name: "Brain MRI",
-    description: "T1-weighted axial brain scan",
-    url: "/samples/brain-mri.jpg",
-  },
-  {
-    name: "Retinal Scan",
-    description: "Fundus photograph of the eye",
-    url: "/samples/retinal-scan.jpg",
-  },
 ];
 
 export function SampleGallery({ onSampleSelected }: SampleGalleryProps) {
@@ -44,9 +29,6 @@ export function SampleGallery({ onSampleSelected }: SampleGalleryProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
     >
-      <p className="text-sm font-medium text-muted-foreground mb-3">
-        Or try a sample image
-      </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {SAMPLES.map((sample) => (
           <button

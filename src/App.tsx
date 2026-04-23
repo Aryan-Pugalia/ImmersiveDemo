@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import UseCaseSelection from "./pages/UseCaseSelection.tsx";
 import UseCaseDetail from "./pages/UseCaseDetail.tsx";
-import LidarAnnotation from "./pages/LidarAnnotation.tsx";
+import LidarAnnotationTest from "./pages/LidarAnnotationTest.tsx";
 import MedicalAnnotation from "./pages/MedicalAnnotation.tsx";
 import ImageABTesting from "./pages/ImageABTesting.tsx";
 import VideoABTesting from "./pages/VideoABTesting.tsx";
@@ -36,7 +36,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/use-cases" element={<UseCaseSelection />} />
-          <Route path="/use-cases/lidar-annotation" element={<LidarAnnotation />} />
+          <Route path="/use-cases/lidar-annotation" element={<LidarAnnotationTest />} />
           <Route path="/use-cases/medical-annotation" element={<MedicalAnnotation />} />
           <Route path="/use-cases/image-ab-testing" element={<ImageABTesting />} />
           <Route path="/use-cases/video-ab-testing" element={<VideoABTesting />} />
@@ -46,6 +46,7 @@ const App = () => (
             <Route path="review" element={<InvoiceReviewExport />} />
           </Route>
           <Route path="/use-cases/audio-annotation" element={<AudioAnnotation />} />
+          <Route path="/use-cases/audio-annotation-test" element={<AudioAnnotation />} />
           <Route path="/use-cases/dating-trust-safety" element={<CatfishDetection />} />
           <Route path="/use-cases/cheating-or-skill" element={<CheatingOrSkill />} />
           <Route path="/dashboard" element={<Dashboard />} />

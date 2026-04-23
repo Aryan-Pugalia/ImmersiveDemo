@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ImageUpload } from "@/components/ImageUpload";
 import { SampleGallery } from "@/components/SampleGallery";
 import { SegmentationCanvas } from "@/components/SegmentationCanvas";
 import { ControlsPanel } from "@/components/ControlsPanel";
@@ -11,12 +10,12 @@ import { AnnotationToolbar } from "@/components/AnnotationToolbar";
 import { AnnotationList } from "@/components/AnnotationList";
 import { TumorClassificationDialog } from "@/components/TumorClassificationDialog";
 import { useSegmentation } from "@/hooks/useSegmentation";
+import { SAMPLE_ANALYSIS_RESULTS } from "@/data/sampleAnalysisResults";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import type { SegmentedRegion } from "@/types/segmentation";
 import type { Annotation, DrawingTool, AnnotationCategory, TumorType, TumorStage } from "@/types/annotation";
-import { ArrowLeft, Brain, Scan, Activity, PenTool, ChevronRight, BarChart2 } from "lucide-react";
+import { ArrowLeft, Brain, Activity, PenTool, ChevronRight, BarChart2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -29,9 +28,9 @@ export default function MedicalAnnotation() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const p = t.pages.medical;
-  const { result, loading, error, analyze, setResult } = useSegmentation();
+  const { result, setResult } = useSegmentation();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selectedSampleUrl, setSelectedSampleUrl] = useState<string | null>(null);
   const [overlayVisible, setOverlayVisible] = useState(true);
   const [opacity, setOpacity] = useState(60);
   const [selectedRegion, setSelectedRegion] = useState<SegmentedRegion | null>(null);
@@ -45,31 +44,13 @@ export default function MedicalAnnotation() {
   const [pendingShape, setPendingShape] = useState<"rect" | "ellipse">("rect");
   const [classifyOpen, setClassifyOpen] = useState(false);
 
-  const handleImageSelected = useCallback(
-    (file: File, previewUrl: string) => {
-      setImageUrl(previewUrl);
-      setImageFile(file);
-      setResult(null);
-      setSelectedRegion(null);
-      setMode("annotate");
-    },
-    [setResult]
-  );
-
   const handleSampleSelected = useCallback(
-    async (url: string) => {
+    (url: string) => {
       setImageUrl(url);
+      setSelectedSampleUrl(url);
       setResult(null);
       setSelectedRegion(null);
       setMode("annotate");
-      try {
-        const resp = await fetch(url);
-        const blob = await resp.blob();
-        const file = new File([blob], "sample.jpg", { type: blob.type || "image/jpeg" });
-        setImageFile(file);
-      } catch {
-        setImageFile(null);
-      }
     },
     [setResult]
   );
@@ -84,7 +65,7 @@ export default function MedicalAnnotation() {
 
   const reset = () => {
     setImageUrl(null);
-    setImageFile(null);
+    setSelectedSampleUrl(null);
     setResult(null);
     setSelectedRegion(null);
     setAnnotations([]);
@@ -216,7 +197,6 @@ export default function MedicalAnnotation() {
           </motion.div>
 
           <div className="space-y-8">
-            <ImageUpload onImageSelected={handleImageSelected} />
             <SampleGallery onSampleSelected={handleSampleSelected} />
           </div>
 
@@ -291,8 +271,9 @@ export default function MedicalAnnotation() {
               className="h-7 text-sm gap-1 rounded-sm"
               onClick={() => {
                 setMode("ai");
-                if (!result && !loading && imageFile) {
-                  analyze(imageFile);
+                if (!result && selectedSampleUrl) {
+                  const staticResult = SAMPLE_ANALYSIS_RESULTS[selectedSampleUrl];
+                  if (staticResult) setResult(staticResult);
                 }
               }}
             >
@@ -311,20 +292,12 @@ export default function MedicalAnnotation() {
             />
           )}
 
-          {mode === "ai" && loading && (
-            <span className="text-sm text-muted-foreground animate-pulse font-body">{p.analyzing}</span>
-          )}
-          {mode === "ai" && error && (
-            <span className="text-sm text-destructive font-body">{error}</span>
-          )}
         </div>
 
         {/* Canvas + side panel */}
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 min-w-0">
-            {mode === "ai" && loading ? (
-              <Skeleton className="w-full aspect-[4/3] rounded-sm" />
-            ) : mode === "annotate" ? (
+            {mode === "annotate" ? (
               <AnnotationCanvas
                 imageUrl={imageUrl}
                 annotations={annotations}

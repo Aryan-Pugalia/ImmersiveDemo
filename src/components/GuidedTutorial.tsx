@@ -6,7 +6,7 @@ export interface TutorialStep {
   target: string;
   title: string;
   description: string;
-  position: "top" | "bottom" | "left" | "right";
+  position: "top" | "bottom" | "left" | "right" | "center";
   action: string;
   waitForInteraction: boolean;
 }
@@ -48,8 +48,8 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: "Place a Bounding Box",
     description:
       "With the Box tool active and a label selected, click anywhere on the 3D ground plane to create an annotation. The box will appear at the click position with the default size for that label.",
-    position: "top",
-    action: "Click on the ground in the 3D view to place a box",
+    position: "center",
+    action: "Click on the ground in the 3D view to place a box — or click Next to continue",
     waitForInteraction: true,
   },
   {
@@ -129,8 +129,17 @@ export default function GuidedTutorial({
   if (!step) return null;
 
   const getTooltipStyle = (): React.CSSProperties => {
-    if (!spotlightRect) return {};
     const gap = 16;
+    if (step.position === "center" || !spotlightRect) {
+      return {
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        maxWidth: 380,
+        width: "90vw",
+      };
+    }
     switch (step.position) {
       case "right":
         return {
