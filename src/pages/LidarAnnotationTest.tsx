@@ -13,7 +13,7 @@
  *     a 0–100 composite score with a letter grade
  */
 
-import React, { useCallback, useEffect, useMemo, useState, Component } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Html, PerspectiveCamera } from "@react-three/drei";
@@ -67,9 +67,10 @@ import {
   scoreAnnotations,
 } from "@/components/lidar-test/advancedScoring";
 import GuidedTutorial, { TUTORIAL_STEPS } from "@/components/GuidedTutorial";
+import { CanvasErrorBoundary } from "@/components/CanvasErrorBoundary";
 
 // ────────────────────────────────────────────────────────────────────────────
-//  WebGL detection + ErrorBoundary
+//  WebGL detection helper
 // ────────────────────────────────────────────────────────────────────────────
 
 function isWebGLSupported(): boolean {
@@ -81,39 +82,6 @@ function isWebGLSupported(): boolean {
     );
   } catch {
     return false;
-  }
-}
-
-interface EBState { hasError: boolean; message: string }
-class CanvasErrorBoundary extends Component<
-  { children: React.ReactNode },
-  EBState
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, message: "" };
-  }
-  static getDerivedStateFromError(err: unknown): EBState {
-    const message =
-      err instanceof Error ? err.message : "Unknown rendering error";
-    return { hasError: true, message };
-  }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background gap-4 z-30">
-          <div className="text-4xl">⚠️</div>
-          <p className="text-foreground font-semibold text-base">3D view unavailable</p>
-          <p className="text-muted-foreground text-sm max-w-xs text-center leading-relaxed">
-            Your browser blocked the WebGL renderer required for this page.
-            Try opening it in Chrome, Edge, or Firefox with hardware
-            acceleration enabled.
-          </p>
-          <p className="text-muted-foreground/50 text-xs font-mono">{this.state.message}</p>
-        </div>
-      );
-    }
-    return this.props.children;
   }
 }
 

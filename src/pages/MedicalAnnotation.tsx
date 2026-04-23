@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { CanvasErrorBoundary } from "@/components/CanvasErrorBoundary";
 import { SampleGallery } from "@/components/SampleGallery";
 import { SegmentationCanvas } from "@/components/SegmentationCanvas";
 import { ControlsPanel } from "@/components/ControlsPanel";
@@ -197,7 +198,9 @@ export default function MedicalAnnotation() {
           </motion.div>
 
           <div className="space-y-8">
-            <SampleGallery onSampleSelected={handleSampleSelected} />
+            <CanvasErrorBoundary label="image gallery">
+              <SampleGallery onSampleSelected={handleSampleSelected} />
+            </CanvasErrorBoundary>
           </div>
 
         </div>
@@ -297,26 +300,28 @@ export default function MedicalAnnotation() {
         {/* Canvas + side panel */}
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 min-w-0">
-            {mode === "annotate" ? (
-              <AnnotationCanvas
-                imageUrl={imageUrl}
-                annotations={annotations}
-                activeTool={activeTool}
-                selectedId={selectedAnnotation}
-                opacity={annotationOpacity}
-                onAnnotationDrawn={handleAnnotationDrawn}
-                onAnnotationSelected={setSelectedAnnotation}
-                onAnnotationUpdated={handleBoundsUpdated}
-              />
-            ) : (
-              <SegmentationCanvas
-                imageUrl={imageUrl}
-                regions={result?.regions ?? []}
-                overlayVisible={overlayVisible}
-                opacity={opacity}
-                onRegionClick={handleRegionClick}
-              />
-            )}
+            <CanvasErrorBoundary label="annotation canvas">
+              {mode === "annotate" ? (
+                <AnnotationCanvas
+                  imageUrl={imageUrl}
+                  annotations={annotations}
+                  activeTool={activeTool}
+                  selectedId={selectedAnnotation}
+                  opacity={annotationOpacity}
+                  onAnnotationDrawn={handleAnnotationDrawn}
+                  onAnnotationSelected={setSelectedAnnotation}
+                  onAnnotationUpdated={handleBoundsUpdated}
+                />
+              ) : (
+                <SegmentationCanvas
+                  imageUrl={imageUrl}
+                  regions={result?.regions ?? []}
+                  overlayVisible={overlayVisible}
+                  opacity={opacity}
+                  onRegionClick={handleRegionClick}
+                />
+              )}
+            </CanvasErrorBoundary>
           </div>
 
           {mode === "ai" && result && (
