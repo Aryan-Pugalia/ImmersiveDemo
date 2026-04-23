@@ -106,10 +106,8 @@ export const STATUS_LABELS: Record<string, string> = {
 }
 
 export const LANG_FLAGS: Record<string, string> = {
-  zh: '🇨🇳',
-  ar: '🇸🇦',
-  hi: '🇮🇳',
-  ko: '🇰🇷',
+  es: '🇪🇸',
+  en: '🇺🇸',
   fr: '🇫🇷',
-  ja: '🇯🇵',
+  pt: '🇧🇷',
 }

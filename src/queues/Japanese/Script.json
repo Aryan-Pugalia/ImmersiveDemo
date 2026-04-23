@@ -1,0 +1,38 @@
+{
+  "title": "In-Car AI - EV Charging Search",
+  "language": "ja",
+  "languageLabel": "Japanese",
+  "audioFile": "Audio.mp3",
+  "durationSec": 22,
+  "domain": "automotive AI",
+  "difficulty": "medium",
+  "segments": [
+    {
+      "id": "seg_001",
+      "speaker": "S1",
+      "role": "Driver",
+      "startMs": 500,
+      "endMs": 6000,
+      "sourceText": "最も近い電気自動車の充電ステーションまで案内して。",
+      "englishText": "Navigate to the nearest electric vehicle charging station."
+    },
+    {
+      "id": "seg_002",
+      "speaker": "S2",
+      "role": "Voice Assistant",
+      "startMs": 6500,
+      "endMs": 14000,
+      "sourceText": "近くに3つのステーションが見つかりました。一番近いものは2キロ先です。ルート案内を開始しますか？",
+      "englishText": "I found three stations nearby. The closest one is two kilometers away. Should I start route guidance?"
+    },
+    {
+      "id": "seg_003",
+      "speaker": "S1",
+      "role": "Driver",
+      "startMs": 14500,
+      "endMs": 21000,
+      "sourceText": "はい、ナビゲーションを開始して、ドライブ用のプレイリストを再生して。",
+      "englishText": "Yes, start the navigation and play my driving playlist."
+    }
+  ]
+}

@@ -1,321 +1,88 @@
 [
   {
-    "id": "zh_01",
-    "language": "zh",
-    "languageLabel": "Chinese",
-    "title": "Coffee Order",
-    "audioPath": "/samples/zh/zh_01.mp3",
-    "durationSec": 18,
+    "id": "es_01",
+    "language": "es",
+    "languageLabel": "Spanish",
+    "title": "Ch.1 — Dashboard Review (The Client)",
+    "audioPath": "/samples/es/es_01.mp3",
+    "durationSec": 14,
     "taskType": "both",
     "difficulty": "easy",
-    "domainTag": "conversational",
+    "domainTag": "business",
     "reference": {
       "transcriptSegments": [
-        { "startMs": 500,  "endMs": 3200,  "speaker": "S1", "text": "你好，我想要一杯拿铁咖啡。" },
-        { "startMs": 3400, "endMs": 6100,  "speaker": "S2", "text": "好的，您要大杯还是小杯？" },
-        { "startMs": 6300, "endMs": 9000,  "speaker": "S1", "text": "大杯，谢谢。还有，能加一份燕麦奶吗？" },
-        { "startMs": 9200, "endMs": 12000, "speaker": "S2", "text": "当然可以。请问您的名字是？" },
-        { "startMs": 12200,"endMs": 14500, "speaker": "S1", "text": "我叫小明。" },
-        { "startMs": 14700,"endMs": 17800, "speaker": "S2", "text": "好的，小明，请稍等。" }
+        {
+          "startMs": 500,
+          "endMs": 13500,
+          "speaker": "S1",
+          "text": "Estoy viendo el nuevo panel de revisión comercial mensual... ¿De verdad extrajo los datos de las treinta cuentas automáticamente?"
+        }
       ],
       "translationSegments": [
-        { "startMs": 500,  "endMs": 3200,  "speaker": "S1", "textEn": "Hello, I'd like a latte, please." },
-        { "startMs": 3400, "endMs": 6100,  "speaker": "S2", "textEn": "Sure, would you like a large or small?" },
-        { "startMs": 6300, "endMs": 9000,  "speaker": "S1", "textEn": "Large, thank you. Also, can you add oat milk?" },
-        { "startMs": 9200, "endMs": 12000, "speaker": "S2", "textEn": "Of course. May I have your name?" },
-        { "startMs": 12200,"endMs": 14500, "speaker": "S1", "textEn": "My name is Xiao Ming." },
-        { "startMs": 14700,"endMs": 17800, "speaker": "S2", "textEn": "Alright, Xiao Ming, please wait a moment." }
+        {
+          "startMs": 500,
+          "endMs": 13500,
+          "speaker": "S1",
+          "textEn": "I'm looking at the new Monthly Business Review dashboard... Did this really pull from all thirty accounts automatically?"
+        }
       ]
     }
   },
   {
-    "id": "zh_02",
-    "language": "zh",
-    "languageLabel": "Chinese",
-    "title": "Taxi Directions",
-    "audioPath": "/samples/zh/zh_02.mp3",
-    "durationSec": 22,
-    "taskType": "both",
-    "difficulty": "medium",
-    "domainTag": "travel",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 600,  "endMs": 4000,  "speaker": "S1", "text": "师傅，请到北京路地铁站。" },
-        { "startMs": 4200, "endMs": 7500,  "speaker": "S2", "text": "好的，现在很堵，可能要二十分钟。" },
-        { "startMs": 7700, "endMs": 11000, "speaker": "S1", "text": "没关系，我不着急。请走高速吧。" },
-        { "startMs": 11200,"endMs": 15000, "speaker": "S2", "text": "好，走高速要加十块钱过路费。" },
-        { "startMs": 15200,"endMs": 21000, "speaker": "S1", "text": "没问题，我用微信支付可以吗？" }
-      ],
-      "translationSegments": [
-        { "startMs": 600,  "endMs": 4000,  "speaker": "S1", "textEn": "Driver, please take me to Beijing Road subway station." },
-        { "startMs": 4200, "endMs": 7500,  "speaker": "S2", "textEn": "Alright, traffic is heavy — it might take around twenty minutes." },
-        { "startMs": 7700, "endMs": 11000, "speaker": "S1", "textEn": "That's fine, I'm not in a hurry. Please take the expressway." },
-        { "startMs": 11200,"endMs": 15000, "speaker": "S2", "textEn": "Okay, taking the expressway will add ten yuan in toll fees." },
-        { "startMs": 15200,"endMs": 21000, "speaker": "S1", "textEn": "No problem. Can I pay with WeChat Pay?" }
-      ]
-    }
-  },
-  {
-    "id": "ar_01",
-    "language": "ar",
-    "languageLabel": "Arabic",
-    "title": "Clinic Appointment",
-    "audioPath": "/samples/ar/ar_01.mp3",
-    "durationSec": 20,
-    "taskType": "both",
-    "difficulty": "medium",
-    "domainTag": "healthcare-lite",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 800,  "endMs": 4500,  "speaker": "S1", "text": "صباح الخير، أريد حجز موعد مع الدكتور." },
-        { "startMs": 4700, "endMs": 8000,  "speaker": "S2", "text": "صباح النور، ما اسمك من فضلك؟" },
-        { "startMs": 8200, "endMs": 11500, "speaker": "S1", "text": "اسمي أحمد حسن، ولدي ألم في الظهر." },
-        { "startMs": 11700,"endMs": 15000, "speaker": "S2", "text": "حسناً، يوجد موعد الثلاثاء الساعة الثالثة." },
-        { "startMs": 15200,"endMs": 19000, "speaker": "S1", "text": "ممتاز، سأكون هناك. شكراً جزيلاً." }
-      ],
-      "translationSegments": [
-        { "startMs": 800,  "endMs": 4500,  "speaker": "S1", "textEn": "Good morning, I'd like to book an appointment with the doctor." },
-        { "startMs": 4700, "endMs": 8000,  "speaker": "S2", "textEn": "Good morning, what is your name, please?" },
-        { "startMs": 8200, "endMs": 11500, "speaker": "S1", "textEn": "My name is Ahmed Hassan, and I have back pain." },
-        { "startMs": 11700,"endMs": 15000, "speaker": "S2", "textEn": "Alright, there is an appointment on Tuesday at three o'clock." },
-        { "startMs": 15200,"endMs": 19000, "speaker": "S1", "textEn": "Excellent, I'll be there. Thank you very much." }
-      ]
-    }
-  },
-  {
-    "id": "ar_02",
-    "language": "ar",
-    "languageLabel": "Arabic",
-    "title": "Market Negotiation",
-    "audioPath": "/samples/ar/ar_02.mp3",
-    "durationSec": 16,
-    "taskType": "transcribe",
-    "difficulty": "easy",
-    "domainTag": "conversational",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 500,  "endMs": 3800,  "speaker": "S1", "text": "بكم هذه التمور؟" },
-        { "startMs": 4000, "endMs": 7200,  "speaker": "S2", "text": "خمسة وعشرون ريالاً للكيلو." },
-        { "startMs": 7400, "endMs": 10500, "speaker": "S1", "text": "غالي شوي، ممكن تخفض؟" },
-        { "startMs": 10700,"endMs": 15500, "speaker": "S2", "text": "طيب، عشرون ريالاً لأنك زبون قديم." }
-      ],
-      "translationSegments": [
-        { "startMs": 500,  "endMs": 3800,  "speaker": "S1", "textEn": "How much are these dates?" },
-        { "startMs": 4000, "endMs": 7200,  "speaker": "S2", "textEn": "Twenty-five riyals per kilogram." },
-        { "startMs": 7400, "endMs": 10500, "speaker": "S1", "textEn": "A bit expensive, can you lower it?" },
-        { "startMs": 10700,"endMs": 15500, "speaker": "S2", "textEn": "Alright, twenty riyals since you're a regular customer." }
-      ]
-    }
-  },
-  {
-    "id": "hi_01",
-    "language": "hi",
-    "languageLabel": "Hindi",
-    "title": "Train Booking",
-    "audioPath": "/samples/hi/hi_01.mp3",
-    "durationSec": 19,
+    "id": "es_02",
+    "language": "es",
+    "languageLabel": "Spanish",
+    "title": "Ch.2 — Pipeline Automation (The Consultant)",
+    "audioPath": "/samples/es/es_02.mp3",
+    "durationSec": 13,
     "taskType": "both",
     "difficulty": "easy",
-    "domainTag": "travel",
+    "domainTag": "business",
     "reference": {
       "transcriptSegments": [
-        { "startMs": 700,  "endMs": 4200,  "speaker": "S1", "text": "नमस्ते, मुझे दिल्ली से मुंबई की ट्रेन टिकट चाहिए।" },
-        { "startMs": 4400, "endMs": 7800,  "speaker": "S2", "text": "कौन सी तारीख को जाना है आपको?" },
-        { "startMs": 8000, "endMs": 11500, "speaker": "S1", "text": "पंद्रह मार्च को, और वापसी अठारह को।" },
-        { "startMs": 11700,"endMs": 15000, "speaker": "S2", "text": "ठीक है, राजधानी एक्सप्रेस में सीट उपलब्ध है।" },
-        { "startMs": 15200,"endMs": 18500, "speaker": "S1", "text": "बढ़िया, AC थर्ड क्लास में बुक कर दीजिए।" }
+        {
+          "startMs": 500,
+          "endMs": 12500,
+          "speaker": "S2",
+          "text": "Sí, todo el flujo está automatizado ahora. Lo que antes nos tomaba semanas de ingreso manual... se actualiza al instante."
+        }
       ],
       "translationSegments": [
-        { "startMs": 700,  "endMs": 4200,  "speaker": "S1", "textEn": "Hello, I need a train ticket from Delhi to Mumbai." },
-        { "startMs": 4400, "endMs": 7800,  "speaker": "S2", "textEn": "Which date are you looking to travel?" },
-        { "startMs": 8000, "endMs": 11500, "speaker": "S1", "textEn": "March fifteenth, and returning on the eighteenth." },
-        { "startMs": 11700,"endMs": 15000, "speaker": "S2", "textEn": "Alright, seats are available on the Rajdhani Express." },
-        { "startMs": 15200,"endMs": 18500, "speaker": "S1", "textEn": "Great, please book it in AC Third Class." }
+        {
+          "startMs": 500,
+          "endMs": 12500,
+          "speaker": "S2",
+          "textEn": "Yeah, the entire pipeline is automated now. What used to take weeks of manual data entry... updates instantly."
+        }
       ]
     }
   },
   {
-    "id": "hi_02",
-    "language": "hi",
-    "languageLabel": "Hindi",
-    "title": "Customer Support — Noisy Line",
-    "audioPath": "/samples/hi/hi_02.mp3",
-    "durationSec": 17,
-    "taskType": "both",
-    "difficulty": "medium",
-    "domainTag": "customer_support",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 500,  "endMs": 3900,  "speaker": "S1", "text": "हेलो, मेरा नेट पैक चार्ज हो गया लेकिन डेटा नहीं मिला।" },
-        { "startMs": 4100, "endMs": 7200,  "speaker": "S2", "text": "[inaudible] कृपया अपना नंबर बताइए।" },
-        { "startMs": 7400, "endMs": 10600, "speaker": "S1", "text": "नंबर है नौ-आठ-सात-छह-पाँच-चार-तीन-दो-एक।" },
-        { "startMs": 10800,"endMs": 16500, "speaker": "S2", "text": "धन्यवाद, हम चौबीस घंटे में समस्या हल करेंगे।" }
-      ],
-      "translationSegments": [
-        { "startMs": 500,  "endMs": 3900,  "speaker": "S1", "textEn": "Hello, my data pack was charged but I didn't receive any data." },
-        { "startMs": 4100, "endMs": 7200,  "speaker": "S2", "textEn": "[inaudible] Please tell me your number." },
-        { "startMs": 7400, "endMs": 10600, "speaker": "S1", "textEn": "The number is nine-eight-seven-six-five-four-three-two-one." },
-        { "startMs": 10800,"endMs": 16500, "speaker": "S2", "textEn": "Thank you, we will resolve the issue within twenty-four hours." }
-      ]
-    }
-  },
-  {
-    "id": "ko_01",
-    "language": "ko",
-    "languageLabel": "Korean",
-    "title": "Restaurant Reservation",
-    "audioPath": "/samples/ko/ko_01.mp3",
-    "durationSec": 20,
+    "id": "es_03",
+    "language": "es",
+    "languageLabel": "Spanish",
+    "title": "Ch.3 — Executive Accessibility (The Client)",
+    "audioPath": "/samples/es/es_03.mp3",
+    "durationSec": 11,
     "taskType": "both",
     "difficulty": "easy",
-    "domainTag": "conversational",
+    "domainTag": "business",
     "reference": {
       "transcriptSegments": [
-        { "startMs": 600,  "endMs": 4000,  "speaker": "S1", "text": "안녕하세요, 오늘 저녁 예약 가능한가요?" },
-        { "startMs": 4200, "endMs": 7500,  "speaker": "S2", "text": "네, 몇 분이서 오시나요?" },
-        { "startMs": 7700, "endMs": 10800, "speaker": "S1", "text": "4명이요. 7시에 창가 자리로 부탁드려요." },
-        { "startMs": 11000,"endMs": 14500, "speaker": "S2", "text": "죄송하지만 창가 자리는 이미 예약이 꽉 찼어요." },
-        { "startMs": 14700,"endMs": 19500, "speaker": "S1", "text": "그럼 안쪽 자리도 괜찮아요. 이름은 김지수예요." }
+        {
+          "startMs": 500,
+          "endMs": 10500,
+          "speaker": "S1",
+          "text": "Eso es increíble. Hace que los datos complejos sean mucho más accesibles para el equipo."
+        }
       ],
       "translationSegments": [
-        { "startMs": 600,  "endMs": 4000,  "speaker": "S1", "textEn": "Hello, is a reservation available for this evening?" },
-        { "startMs": 4200, "endMs": 7500,  "speaker": "S2", "textEn": "Yes, how many people will be dining?" },
-        { "startMs": 7700, "endMs": 10800, "speaker": "S1", "textEn": "Four people. Please book a window seat at seven o'clock." },
-        { "startMs": 11000,"endMs": 14500, "speaker": "S2", "textEn": "I'm sorry, but window seats are fully booked." },
-        { "startMs": 14700,"endMs": 19500, "speaker": "S1", "textEn": "Then an interior seat is fine. The name is Kim Ji-su." }
-      ]
-    }
-  },
-  {
-    "id": "ko_02",
-    "language": "ko",
-    "languageLabel": "Korean",
-    "title": "Online Shopping Support",
-    "audioPath": "/samples/ko/ko_02.mp3",
-    "durationSec": 18,
-    "taskType": "translate",
-    "difficulty": "medium",
-    "domainTag": "customer_support",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 500,  "endMs": 4200,  "speaker": "S1", "text": "주문한 상품이 아직도 안 왔어요. 언제 오나요?" },
-        { "startMs": 4400, "endMs": 8000,  "speaker": "S2", "text": "주문번호를 알려주시겠어요?" },
-        { "startMs": 8200, "endMs": 11500, "speaker": "S1", "text": "AB-1234-5678이에요." },
-        { "startMs": 11700,"endMs": 15200, "speaker": "S2", "text": "확인해보니 내일 오후에 배송될 예정이에요." },
-        { "startMs": 15400,"endMs": 17800, "speaker": "S1", "text": "감사합니다." }
-      ],
-      "translationSegments": [
-        { "startMs": 500,  "endMs": 4200,  "speaker": "S1", "textEn": "My order still hasn't arrived. When is it coming?" },
-        { "startMs": 4400, "endMs": 8000,  "speaker": "S2", "textEn": "Could you give me your order number?" },
-        { "startMs": 8200, "endMs": 11500, "speaker": "S1", "textEn": "It's AB-1234-5678." },
-        { "startMs": 11700,"endMs": 15200, "speaker": "S2", "textEn": "I checked and it's scheduled to be delivered tomorrow afternoon." },
-        { "startMs": 15400,"endMs": 17800, "speaker": "S1", "textEn": "Thank you." }
-      ]
-    }
-  },
-  {
-    "id": "fr_01",
-    "language": "fr",
-    "languageLabel": "French",
-    "title": "Hotel Check-in",
-    "audioPath": "/samples/fr/fr_01.mp3",
-    "durationSec": 21,
-    "taskType": "both",
-    "difficulty": "easy",
-    "domainTag": "travel",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 600,  "endMs": 4100,  "speaker": "S1", "text": "Bonjour, j'ai une réservation au nom de Dupont." },
-        { "startMs": 4300, "endMs": 7800,  "speaker": "S2", "text": "Bonjour monsieur, un instant s'il vous plaît." },
-        { "startMs": 8000, "endMs": 11500, "speaker": "S2", "text": "Oui, chambre deux-cent-douze, vue sur jardin." },
-        { "startMs": 11700,"endMs": 15200, "speaker": "S1", "text": "Parfait. Est-ce que le petit-déjeuner est inclus?" },
-        { "startMs": 15400,"endMs": 20500, "speaker": "S2", "text": "Oui, il est servi de sept heures à dix heures au restaurant." }
-      ],
-      "translationSegments": [
-        { "startMs": 600,  "endMs": 4100,  "speaker": "S1", "textEn": "Good morning, I have a reservation under the name Dupont." },
-        { "startMs": 4300, "endMs": 7800,  "speaker": "S2", "textEn": "Good morning, sir, one moment please." },
-        { "startMs": 8000, "endMs": 11500, "speaker": "S2", "textEn": "Yes, room two-twelve, garden view." },
-        { "startMs": 11700,"endMs": 15200, "speaker": "S1", "textEn": "Perfect. Is breakfast included?" },
-        { "startMs": 15400,"endMs": 20500, "speaker": "S2", "textEn": "Yes, it is served from seven to ten o'clock in the restaurant." }
-      ]
-    }
-  },
-  {
-    "id": "fr_02",
-    "language": "fr",
-    "languageLabel": "French",
-    "title": "Pharmacy Consultation",
-    "audioPath": "/samples/fr/fr_02.mp3",
-    "durationSec": 17,
-    "taskType": "both",
-    "difficulty": "medium",
-    "domainTag": "healthcare-lite",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 500,  "endMs": 3900,  "speaker": "S1", "text": "Bonjour, j'ai mal à la gorge depuis deux jours." },
-        { "startMs": 4100, "endMs": 7600,  "speaker": "S2", "text": "Avez-vous de la fièvre également?" },
-        { "startMs": 7800, "endMs": 10800, "speaker": "S1", "text": "Non, juste la gorge et un peu de fatigue." },
-        { "startMs": 11000,"endMs": 16500, "speaker": "S2", "text": "Je vous conseille ce spray et des pastilles. Si ça ne passe pas, consultez un médecin." }
-      ],
-      "translationSegments": [
-        { "startMs": 500,  "endMs": 3900,  "speaker": "S1", "textEn": "Hello, I have had a sore throat for two days." },
-        { "startMs": 4100, "endMs": 7600,  "speaker": "S2", "textEn": "Do you also have a fever?" },
-        { "startMs": 7800, "endMs": 10800, "speaker": "S1", "textEn": "No, just the throat and a little fatigue." },
-        { "startMs": 11000,"endMs": 16500, "speaker": "S2", "textEn": "I recommend this spray and some lozenges. If it doesn't improve, see a doctor." }
-      ]
-    }
-  },
-  {
-    "id": "ja_01",
-    "language": "ja",
-    "languageLabel": "Japanese",
-    "title": "Convenience Store",
-    "audioPath": "/samples/ja/ja_01.mp3",
-    "durationSec": 16,
-    "taskType": "both",
-    "difficulty": "easy",
-    "domainTag": "conversational",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 500,  "endMs": 3200,  "speaker": "S2", "text": "いらっしゃいませ。" },
-        { "startMs": 3400, "endMs": 6900,  "speaker": "S1", "text": "これとこれをください。あと、レジ袋も一枚。" },
-        { "startMs": 7100, "endMs": 10500, "speaker": "S2", "text": "合計で五百二十円になります。" },
-        { "startMs": 10700,"endMs": 13800, "speaker": "S1", "text": "千円でお願いします。" },
-        { "startMs": 14000,"endMs": 15800, "speaker": "S2", "text": "四百八十円のお返しです。ありがとうございました。" }
-      ],
-      "translationSegments": [
-        { "startMs": 500,  "endMs": 3200,  "speaker": "S2", "textEn": "Welcome." },
-        { "startMs": 3400, "endMs": 6900,  "speaker": "S1", "textEn": "I'd like these two items, please. Also, one plastic bag." },
-        { "startMs": 7100, "endMs": 10500, "speaker": "S2", "textEn": "Your total comes to five hundred and twenty yen." },
-        { "startMs": 10700,"endMs": 13800, "speaker": "S1", "textEn": "Here's one thousand yen." },
-        { "startMs": 14000,"endMs": 15800, "speaker": "S2", "textEn": "Your change is four hundred and eighty yen. Thank you very much." }
-      ]
-    }
-  },
-  {
-    "id": "ja_02",
-    "language": "ja",
-    "languageLabel": "Japanese",
-    "title": "Business Meeting — Crosstalk",
-    "audioPath": "/samples/ja/ja_02.mp3",
-    "durationSec": 23,
-    "taskType": "both",
-    "difficulty": "medium",
-    "domainTag": "customer_support",
-    "reference": {
-      "transcriptSegments": [
-        { "startMs": 700,  "endMs": 4200,  "speaker": "S1", "text": "本日はお時間をいただきありがとうございます。" },
-        { "startMs": 4400, "endMs": 7800,  "speaker": "S2", "text": "こちらこそ、よろしくお願いします。" },
-        { "startMs": 8000, "endMs": 12500, "speaker": "OVERLAP", "text": "[Crosstalk] 新しいプロジェクトについて / はい、資料を—" },
-        { "startMs": 12700,"endMs": 17000, "speaker": "S1", "text": "失礼しました。先に続けてください。" },
-        { "startMs": 17200,"endMs": 22500, "speaker": "S2", "text": "資料をご覧いただけましたか？来月から開始したいと思っています。" }
-      ],
-      "translationSegments": [
-        { "startMs": 700,  "endMs": 4200,  "speaker": "S1", "textEn": "Thank you very much for your time today." },
-        { "startMs": 4400, "endMs": 7800,  "speaker": "S2", "textEn": "Likewise, thank you for having us." },
-        { "startMs": 8000, "endMs": 12500, "speaker": "OVERLAP", "textEn": "[Crosstalk] About the new project / Yes, the documents—" },
-        { "startMs": 12700,"endMs": 17000, "speaker": "S1", "textEn": "I apologize, please go ahead." },
-        { "startMs": 17200,"endMs": 22500, "speaker": "S2", "textEn": "Have you had a chance to review the documents? We'd like to start next month." }
+        {
+          "startMs": 500,
+          "endMs": 10500,
+          "speaker": "S1",
+          "textEn": "That is incredible. It makes the complex data so much more accessible for the executive team."
+        }
       ]
     }
   }

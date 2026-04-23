@@ -11,12 +11,10 @@ const MANIFESTS = manifestData as TaskManifest[]
 
 const LANG_OPTIONS: { value: '' | LanguageCode; label: string }[] = [
   { value: '', label: 'All Languages' },
-  { value: 'zh', label: '🇨🇳 Chinese' },
-  { value: 'ar', label: '🇸🇦 Arabic' },
-  { value: 'hi', label: '🇮🇳 Hindi' },
-  { value: 'ko', label: '🇰🇷 Korean' },
+  { value: 'es', label: '🇪🇸 Spanish' },
+  { value: 'en', label: '🇺🇸 English' },
   { value: 'fr', label: '🇫🇷 French' },
-  { value: 'ja', label: '🇯🇵 Japanese' },
+  { value: 'pt', label: '🇧🇷 Portuguese' },
 ]
 
 const TYPE_OPTIONS: { value: '' | TaskType; label: string }[] = [

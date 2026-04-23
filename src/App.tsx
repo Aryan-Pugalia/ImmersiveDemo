@@ -19,6 +19,7 @@ import InvoiceReviewExport from "./pages/invoice/InvoiceReviewExport.tsx";
 import QAReport from "./pages/QAReport.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AudioAnnotation from "./pages/AudioAnnotation.tsx";
+import AudioAnnotationTest from "./pages/AudioAnnotationTest.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import CatfishDetection from "./pages/CatfishDetection.tsx";
 import CheatingOrSkill from "./pages/CheatingOrSkill.tsx";
@@ -45,8 +46,7 @@ const App = () => (
             <Route path="annotate/:id" element={<InvoiceAnnotateWorkspace />} />
             <Route path="review" element={<InvoiceReviewExport />} />
           </Route>
-          <Route path="/use-cases/audio-annotation" element={<AudioAnnotation />} />
-          <Route path="/use-cases/audio-annotation-test" element={<AudioAnnotation />} />
+          <Route path="/use-cases/audio-annotation" element={<AudioAnnotationTest />} />
           <Route path="/use-cases/dating-trust-safety" element={<CatfishDetection />} />
           <Route path="/use-cases/cheating-or-skill" element={<CheatingOrSkill />} />
           <Route path="/dashboard" element={<Dashboard />} />

@@ -1,0 +1,38 @@
+{
+  "title": "Running Late to Meeting",
+  "language": "hi",
+  "languageLabel": "Hindi",
+  "audioFile": "Audio.mp3",
+  "durationSec": 22,
+  "domain": "business",
+  "difficulty": "easy",
+  "segments": [
+    {
+      "id": "seg_001",
+      "speaker": "S1",
+      "role": "Colleague A",
+      "startMs": 500,
+      "endMs": 7200,
+      "sourceText": "अरे, तुम कहाँ हो? टीम मीटिंग बस पाँच मिनट में शुरू होने वाली है।",
+      "englishText": "Hey, where are you? The team meeting starts in just five minutes."
+    },
+    {
+      "id": "seg_002",
+      "speaker": "S2",
+      "role": "Colleague B",
+      "startMs": 7400,
+      "endMs": 15500,
+      "sourceText": "मैं मेट्रो स्टेशन के पास भारी ट्रैफ़िक में फँसा हुआ हूँ। क्या तुम मुझे कॉल पर जोड़ सकते हो?",
+      "englishText": "I'm stuck in massive traffic near the metro station. Can you dial me in?"
+    },
+    {
+      "id": "seg_003",
+      "speaker": "S1",
+      "role": "Colleague A",
+      "startMs": 15800,
+      "endMs": 21000,
+      "sourceText": "कोई बात नहीं, मैं तुम्हें अभी लिंक भेजता हूँ। आराम से आना।",
+      "englishText": "No problem, I'll send you the link right now. Drive safe."
+    }
+  ]
+}

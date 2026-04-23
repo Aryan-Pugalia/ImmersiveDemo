@@ -1,0 +1,38 @@
+{
+  "title": "MBR Automation",
+  "language": "es",
+  "languageLabel": "Spanish",
+  "audioFile": "Audio.mp3",
+  "durationSec": 37,
+  "domain": "business",
+  "difficulty": "easy",
+  "segments": [
+    {
+      "id": "seg_001",
+      "speaker": "S1",
+      "role": "The Client",
+      "startMs": 500,
+      "endMs": 13500,
+      "sourceText": "Estoy viendo el nuevo panel de revisión comercial mensual... ¿De verdad extrajo los datos de las treinta cuentas automáticamente?",
+      "englishText": "I'm looking at the new Monthly Business Review dashboard... Did this really pull from all thirty accounts automatically?"
+    },
+    {
+      "id": "seg_002",
+      "speaker": "S2",
+      "role": "The Consultant",
+      "startMs": 13800,
+      "endMs": 26300,
+      "sourceText": "Sí, todo el flujo está automatizado ahora. Lo que antes nos tomaba semanas de ingreso manual... se actualiza al instante.",
+      "englishText": "Yeah, the entire pipeline is automated now. What used to take weeks of manual data entry... updates instantly."
+    },
+    {
+      "id": "seg_003",
+      "speaker": "S1",
+      "role": "The Client",
+      "startMs": 26600,
+      "endMs": 36900,
+      "sourceText": "Eso es increíble. Hace que los datos complejos sean mucho más accesibles para el equipo.",
+      "englishText": "That is incredible. It makes the complex data so much more accessible for the executive team."
+    }
+  ]
+}

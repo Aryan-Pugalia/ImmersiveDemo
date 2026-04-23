@@ -1,0 +1,38 @@
+{
+  "title": "Discussing a Webtoon",
+  "language": "ko",
+  "languageLabel": "Korean",
+  "audioFile": "Audio.mp3",
+  "durationSec": 21,
+  "domain": "entertainment",
+  "difficulty": "easy",
+  "segments": [
+    {
+      "id": "seg_001",
+      "speaker": "S1",
+      "role": "Friend A",
+      "startMs": 500,
+      "endMs": 7500,
+      "sourceText": "그 새로운 웹툰 최신화 읽었어? 주인공 진짜 사기캐야.",
+      "englishText": "Did you read the latest chapter of that new webtoon? The main character is so overpowered."
+    },
+    {
+      "id": "seg_002",
+      "speaker": "S2",
+      "role": "Friend B",
+      "startMs": 7800,
+      "endMs": 15000,
+      "sourceText": "응! 단 한 번의 공격으로 보스를 쓰러뜨렸을 때 진짜 믿을 수가 없었어.",
+      "englishText": "Yes! I couldn't believe it when he defeated the boss with just one strike."
+    },
+    {
+      "id": "seg_003",
+      "speaker": "S1",
+      "role": "Friend A",
+      "startMs": 15300,
+      "endMs": 20500,
+      "sourceText": "내 말이! 다음 주 업데이트까지 어떻게 기다리지?",
+      "englishText": "I know, right? I can't wait for the next update next week."
+    }
+  ]
+}

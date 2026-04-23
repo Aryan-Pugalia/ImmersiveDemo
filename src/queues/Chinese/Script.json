@@ -1,0 +1,38 @@
+{
+  "title": "Ordering Coffee",
+  "language": "zh",
+  "languageLabel": "Mandarin Chinese",
+  "audioFile": "Audio.mp3",
+  "durationSec": 20,
+  "domain": "daily life",
+  "difficulty": "easy",
+  "segments": [
+    {
+      "id": "seg_001",
+      "speaker": "S1",
+      "role": "The Customer",
+      "startMs": 500,
+      "endMs": 8500,
+      "sourceText": "你好，我想要一杯冰的燕麦奶拿铁... 哦，能额外加一份浓缩吗？",
+      "englishText": "Hi, I'd like an iced oat milk latte, please... Oh, and can you add an extra shot of espresso?"
+    },
+    {
+      "id": "seg_002",
+      "speaker": "S2",
+      "role": "The Barista",
+      "startMs": 8800,
+      "endMs": 15300,
+      "sourceText": "没问题。大杯冰燕麦拿铁加三份浓缩... 在这儿喝还是带走？",
+      "englishText": "Sure thing. That’s a large iced oat milk latte with a triple shot. For here or to go?"
+    },
+    {
+      "id": "seg_003",
+      "speaker": "S1",
+      "role": "The Customer",
+      "startMs": 15600,
+      "endMs": 19500,
+      "sourceText": "带走，谢谢。我用手机支付。",
+      "englishText": "To go, please. And I'll just pay with my app."
+    }
+  ]
+}

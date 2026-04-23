@@ -1,0 +1,38 @@
+{
+  "title": "Banking - Suspicious Transaction",
+  "language": "fr",
+  "languageLabel": "French",
+  "audioFile": "Audio.mp3",
+  "durationSec": 23,
+  "domain": "finance",
+  "difficulty": "medium",
+  "segments": [
+    {
+      "id": "seg_001",
+      "speaker": "S1",
+      "role": "Bank Agent",
+      "startMs": 500,
+      "endMs": 6500,
+      "sourceText": "Bonjour, service client de la banque. Comment puis-je vous aider aujourd'hui ?",
+      "englishText": "Hello, bank customer service. How can I help you today?"
+    },
+    {
+      "id": "seg_002",
+      "speaker": "S2",
+      "role": "Customer",
+      "startMs": 6800,
+      "endMs": 14000,
+      "sourceText": "J'ai remarqué une transaction suspecte sur ma carte de crédit ce matin. Je ne l'ai pas autorisée.",
+      "englishText": "I noticed a suspicious transaction on my credit card this morning. I did not authorize it."
+    },
+    {
+      "id": "seg_003",
+      "speaker": "S1",
+      "role": "Bank Agent",
+      "startMs": 14500,
+      "endMs": 22000,
+      "sourceText": "Je comprends votre inquiétude. Je vais bloquer la carte immédiatement et lancer une enquête de fraude.",
+      "englishText": "I understand your concern. I will block the card immediately and start a fraud investigation."
+    }
+  ]
+}

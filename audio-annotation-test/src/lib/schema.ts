@@ -1,9 +1,9 @@
 // ── Manifest types ──────────────────────────────────────────────────────────
 
-export type LanguageCode = 'zh' | 'ar' | 'hi' | 'ko' | 'fr' | 'ja'
+export type LanguageCode = 'es' | 'en' | 'fr' | 'pt'
 export type TaskType     = 'transcribe' | 'translate' | 'both'
 export type Difficulty   = 'easy' | 'medium'
-export type DomainTag    = 'conversational' | 'customer_support' | 'travel' | 'healthcare-lite'
+export type DomainTag    = 'business' | 'conversational' | 'customer_support' | 'travel' | 'healthcare-lite'
 
 export interface RefSegment {
   startMs:  number
