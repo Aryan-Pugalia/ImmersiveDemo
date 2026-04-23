@@ -43,6 +43,14 @@ export const ko: Translations = {
       title: "음성 전사 및 번역",
       description: "화자 분리, 구간 타이밍, 오디오 품질 플래그, QC 검토 워크플로우를 통해 다국어 음성을 전사하고 영어로 번역합니다.",
     },
+    "cheating-or-skill": {
+      title: "치팅 또는 실력 검토",
+      description: "게임플레이 클립을 실력 또는 치팅으로 분류하고, AI가 이상을 감지하는 것을 확인한 후 QA로 결정을 재정의하세요. 인간이 참여하는 게임 트러스트 & 세이프티를 대규모로 실현합니다.",
+    },
+    "dating-trust-safety": {
+      title: "데이팅 트러스트 & 세이프티",
+      description: "카피캣 탐지를 처음부터 끝까지 경험하세요 — 프로필에 주석을 달고, AI가 점수를 매기는 것을 확인한 후 QA 검토 및 재정의를 수행하세요. 인간이 참여하는 트러스트 & 세이프티를 대규모로 실현합니다.",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "텍스트 & NLP",        subs: ["개체명 인식", "의도 분류", "요약 QA", "상호참조 해결"] },
@@ -66,7 +74,7 @@ export const ko: Translations = {
     pause: "일시정지",
     annotations: "어노테이션",
     annotations_plural: "어노테이션",
-    uploadPrompt: "의료 스캔을 업로드하여 종양 및 관심 영역을 어노테이션하고 AI로 검증하세요.",
+    uploadPrompt: "샘플 스캔을 선택하여 종양 및 관심 영역을 어노테이션하고 AI로 검증하세요.",
     aiPowered: "AI 보조 의료 영상",
   },
   dashboard: {

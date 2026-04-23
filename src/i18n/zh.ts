@@ -43,6 +43,14 @@ export const zh: Translations = {
       title: "音频转录与翻译",
       description: "转录多语言语音并翻译成英文，支持说话人分离、片段时间轴、音频质量标记和完整QC审核流程。",
     },
+    "cheating-or-skill": {
+      title: "作弊或技术审查",
+      description: "将游戏片段标注为技术或作弊，观察AI标记异常，然后通过质检覆盖判断。实现大规模人工介入的游戏信任与安全。",
+    },
+    "dating-trust-safety": {
+      title: "约会信任与安全",
+      description: "端到端体验网络钓鱼检测——注释用户资料，观察AI评分，然后进行质检审核和覆盖。实现大规模人工介入的信任与安全。",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "文本与自然语言处理", subs: ["命名实体识别", "意图分类", "摘要QA", "指代消解"] },
@@ -66,7 +74,7 @@ export const zh: Translations = {
     pause: "暂停",
     annotations: "标注",
     annotations_plural: "标注",
-    uploadPrompt: "上传医学扫描图像以标注肿瘤和感兴趣区域，然后使用AI分析进行验证。",
+    uploadPrompt: "选择一个样本扫描图像以标注肿瘤和感兴趣区域，然后使用AI分析进行验证。",
     aiPowered: "AI辅助医学影像",
   },
   dashboard: {

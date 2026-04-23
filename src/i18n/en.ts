@@ -32,21 +32,29 @@ export const en = {
       title: "Medical Image Annotation",
       description: "Annotate tumors, lesions, and regions of interest on medical scans — X-Ray, MRI, CT — with AI-assisted verification.",
     },
-    "invoice-labeler": {
-      title: "Invoice Labeler",
-      description: "Label and extract structured fields from invoices and receipts — vendor, totals, line items — with bounding-box annotation and JSON export.",
-    },
-    "image-ab-testing": {
-      title: "Image A/B Testing",
-      description: "Evaluate AI-generated image pairs against text prompts — rate realism, composition, and prompt alignment to build RLHF preference datasets.",
+    "audio-annotation": {
+      title: "Audio Transcription & Translation",
+      description: "Transcribe multilingual speech and translate to English — with speaker diarization, segment timing, audio quality flags, and full QC reviewer workflow.",
     },
     "video-ab-testing": {
       title: "Video A/B Testing",
       description: "Compare AI-generated video pairs with synced playback, frame stepping, and audio solo — flag temporal artifacts and A/V sync issues for preference learning.",
     },
-    "audio-annotation": {
-      title: "Audio Transcription & Translation",
-      description: "Transcribe multilingual speech and translate to English — with speaker diarization, segment timing, audio quality flags, and full QC reviewer workflow.",
+    "image-ab-testing": {
+      title: "Image A/B Testing",
+      description: "Evaluate AI-generated image pairs against text prompts — rate realism, composition, and prompt alignment to build RLHF preference datasets.",
+    },
+    "cheating-or-skill": {
+      title: "Cheating or Skill Review",
+      description: "Label gameplay clips as skill or cheating, watch AI flag anomalies, then QA-override the call. Human-in-the-loop Gaming Trust & Safety at scale.",
+    },
+    "dating-trust-safety": {
+      title: "Dating Trust & Safety",
+      description: "Experience catfish detection end-to-end — annotate a profile, watch AI score it, then QA-review and override. Human-in-the-loop Trust & Safety at scale.",
+    },
+    "invoice-labeler": {
+      title: "Invoice Labeler",
+      description: "Label and extract structured fields from invoices and receipts — vendor, totals, line items — with bounding-box annotation and JSON export.",
     },
   } as Record<string, { title: string; description: string }>,
 
@@ -75,7 +83,7 @@ export const en = {
     pause: "Pause",
     annotations: "annotation",
     annotations_plural: "annotations",
-    uploadPrompt: "Upload a medical scan to annotate tumors and regions of interest, then verify with AI analysis.",
+    uploadPrompt: "Select a sample scan to annotate tumors and regions of interest, then verify with AI analysis.",
     aiPowered: "AI-Powered Medical Imaging",
   },
 

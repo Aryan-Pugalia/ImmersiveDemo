@@ -43,6 +43,14 @@ export const fr: Translations = {
       title: "Transcription et traduction audio",
       description: "Transcrivez la parole multilingue et traduisez en anglais — avec diarisation des locuteurs, temporisation des segments et workflow QC complet.",
     },
+    "cheating-or-skill": {
+      title: "Triche ou Compétence",
+      description: "Étiquetez des clips de jeu comme compétence ou triche, regardez l'IA signaler les anomalies, puis annulez la décision avec un contrôle qualité. Sécurité des jeux à grande échelle avec l'humain dans la boucle.",
+    },
+    "dating-trust-safety": {
+      title: "Confiance et Sécurité dans les Rencontres",
+      description: "Vivez la détection de faux profils de bout en bout — annotez un profil, regardez l'IA le noter, puis effectuez un contrôle qualité et annulez. Confiance et sécurité humain-dans-la-boucle à grande échelle.",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "Texte et TAL",          subs: ["Reconnaissance d'entités", "Classification d'intention", "Résumé QA", "Résolution de coréférence"] },
@@ -66,7 +74,7 @@ export const fr: Translations = {
     pause: "Pause",
     annotations: "annotation",
     annotations_plural: "annotations",
-    uploadPrompt: "Téléchargez une image médicale pour annoter les tumeurs et régions d'intérêt, puis vérifiez avec l'analyse IA.",
+    uploadPrompt: "Sélectionnez une image d'exemple pour annoter les tumeurs et régions d'intérêt, puis vérifiez avec l'analyse IA.",
     aiPowered: "Imagerie médicale assistée par IA",
   },
   dashboard: {

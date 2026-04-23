@@ -43,6 +43,14 @@ export const es: Translations = {
       title: "Transcripción y traducción de audio",
       description: "Transcribe habla multilingüe y traduce al inglés con diarización de hablantes, tiempos de segmento y flujo completo de revisión QC.",
     },
+    "cheating-or-skill": {
+      title: "Revisión: Trampa o Habilidad",
+      description: "Etiqueta clips de juego como habilidad o trampa, observa cómo la IA señala anomalías y anula la decisión con control de calidad. Seguridad en juegos a escala con humanos en el bucle.",
+    },
+    "dating-trust-safety": {
+      title: "Confianza y Seguridad en Citas",
+      description: "Experimenta la detección de catfish de extremo a extremo — anota un perfil, observa cómo la IA lo puntúa, luego revisa y anula. Confianza y seguridad con humanos en el bucle a escala.",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "Texto y PLN",         subs: ["Reconocimiento de entidades", "Clasificación de intención", "QA de resúmenes", "Resolución de correferencia"] },
@@ -66,7 +74,7 @@ export const es: Translations = {
     pause: "Pausar",
     annotations: "anotación",
     annotations_plural: "anotaciones",
-    uploadPrompt: "Sube una imagen médica para anotar tumores y regiones de interés, luego verifica con análisis de IA.",
+    uploadPrompt: "Selecciona una imagen de muestra para anotar tumores y regiones de interés, luego verifica con análisis de IA.",
     aiPowered: "Imagen médica con IA",
   },
   dashboard: {

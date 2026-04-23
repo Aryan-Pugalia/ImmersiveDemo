@@ -183,14 +183,7 @@ export function VideoWorkflowPanel({
 
       {/* EVALUATE */}
       {stage === "evaluate" && (
-        <div className="flex-1 overflow-y-auto px-4 pb-5 pt-4 flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {p.evalIntro}{" "}
-            <span className="text-foreground/70 font-medium">
-              {p.tasksComplete(completedCount, VIDEO_TASKS.length)}
-            </span>
-          </p>
-
+        <div className="flex-1 px-4 pb-5 pt-4 flex flex-col gap-4">
           {/* Progress bar */}
           <div className="flex gap-1.5">
             {VIDEO_TASKS.map((t) => {
