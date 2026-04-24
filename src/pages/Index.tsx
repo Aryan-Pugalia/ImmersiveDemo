@@ -48,7 +48,7 @@ const Index = () => {
         <div className="banner-content">
           <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="label-service-logo" />
           <span className="label-introducing">{t.landing.introducing}</span>
-          <h1 className="banner-title">TP.ai <span className="title-fab">FAB</span>Studio</h1>
+          <h1 className="banner-title">TP.ai <span className="title-fab">Data</span>Studio</h1>
         </div>
       </section>
 

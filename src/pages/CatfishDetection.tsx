@@ -803,7 +803,7 @@ export default function CatfishDetection() {
             </button>
             <span onClick={() => navigate("/use-cases")}
               className="text-sm font-bold tracking-wide text-white cursor-pointer hover:text-white/80 transition-colors font-headline shrink-0">
-              TP.ai <span style={{ color: "#9071f0" }}>FAB</span>Studio
+              TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-white/40 shrink-0" />
             <span className="text-sm text-white/70 whitespace-nowrap">Dating Trust &amp; Safety</span>
