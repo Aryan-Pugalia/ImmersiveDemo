@@ -105,7 +105,7 @@ export const ko: Translations = {
     activeAnnotators: "명 활동 중",
     throughput: "7일 처리량",
     tasksToday: "오늘 작업",
-    footerNote: "모든 데이터는 데모 목적으로 시뮬레이션된 것입니다 · TP.ai FABStudio 플랫폼 대시보드",
+    footerNote: "모든 데이터는 데모 목적으로 시뮬레이션된 것입니다 · TP.ai DataStudio 플랫폼 대시보드",
     status: {
       on_track: "정상",
       at_risk: "위험",
@@ -218,7 +218,7 @@ export const ko: Translations = {
       colAccuracy: "정확도",
       colSamples: "샘플",
       colIssues: "문제",
-      footer: (date: string) => `TP.ai FABStudio 생성 · ${date} · 기밀`,
+      footer: (date: string) => `TP.ai DataStudio 생성 · ${date} · 기밀`,
     },
     medical: {
       title: "의료 이미지 어노테이션",

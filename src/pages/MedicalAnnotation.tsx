@@ -152,7 +152,7 @@ export default function MedicalAnnotation() {
   if (!imageUrl) {
     return (
       <div className="min-h-screen bg-background">
-        {/* FABStudio Header */}
+        {/* DataStudio Header */}
         <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
           <div className="flex items-center justify-between px-6 py-3 h-16">
             <div className="flex items-center gap-3">
@@ -211,7 +211,7 @@ export default function MedicalAnnotation() {
   // ─── Annotation / Viewer ─────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background">
-      {/* FABStudio Header */}
+      {/* DataStudio Header */}
       <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
         <div className="flex items-center justify-between px-6 py-3 h-16">
           <div className="flex items-center gap-3">

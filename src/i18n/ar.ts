@@ -105,7 +105,7 @@ export const ar: Translations = {
     activeAnnotators: "معلِّق نشط",
     throughput: "الإنتاجية خلال 7 أيام",
     tasksToday: "مهام اليوم",
-    footerNote: "جميع البيانات محاكاة لأغراض العرض التوضيحي · لوحة تحكم منصة TP.ai FABStudio",
+    footerNote: "جميع البيانات محاكاة لأغراض العرض التوضيحي · لوحة تحكم منصة TP.ai DataStudio",
     status: {
       on_track: "على المسار",
       at_risk: "في خطر",
@@ -218,7 +218,7 @@ export const ar: Translations = {
       colAccuracy: "الدقة",
       colSamples: "العينات",
       colIssues: "المشكلات",
-      footer: (date: string) => `صادر عن TP.ai FABStudio · ${date} · سري`,
+      footer: (date: string) => `صادر عن TP.ai DataStudio · ${date} · سري`,
     },
     medical: {
       title: "تعليق الصور الطبية",

@@ -105,7 +105,7 @@ export const zh: Translations = {
     activeAnnotators: "名活跃标注员",
     throughput: "7日处理量",
     tasksToday: "今日任务",
-    footerNote: "所有数据均为演示目的模拟生成 · TP.ai FABStudio平台仪表板",
+    footerNote: "所有数据均为演示目的模拟生成 · TP.ai DataStudio平台仪表板",
     status: {
       on_track: "正常",
       at_risk: "风险",
@@ -218,7 +218,7 @@ export const zh: Translations = {
       colAccuracy: "准确率",
       colSamples: "样本数",
       colIssues: "问题数",
-      footer: (date: string) => `由TP.ai FABStudio生成 · ${date} · 保密`,
+      footer: (date: string) => `由TP.ai DataStudio生成 · ${date} · 保密`,
     },
     medical: {
       title: "医学图像标注",

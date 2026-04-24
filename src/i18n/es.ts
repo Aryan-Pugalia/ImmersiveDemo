@@ -105,7 +105,7 @@ export const es: Translations = {
     activeAnnotators: "anotadores activos",
     throughput: "Rendimiento 7 días",
     tasksToday: "tareas hoy",
-    footerNote: "Todos los datos son simulados con fines demostrativos · TP.ai FABStudio Panel",
+    footerNote: "Todos los datos son simulados con fines demostrativos · TP.ai DataStudio Panel",
     status: {
       on_track: "En curso",
       at_risk: "En riesgo",
@@ -218,7 +218,7 @@ export const es: Translations = {
       colAccuracy: "Precisión",
       colSamples: "Muestras",
       colIssues: "Problemas",
-      footer: (date: string) => `Generado por TP.ai FABStudio · ${date} · Confidencial`,
+      footer: (date: string) => `Generado por TP.ai DataStudio · ${date} · Confidencial`,
     },
     medical: {
       title: "Anotación de imágenes médicas",

@@ -26,13 +26,13 @@ const LanguageContext = createContext<LanguageContextValue>({
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLang] = useState<Language>(() => {
-    const stored = localStorage.getItem("fabstudio_lang");
+    const stored = localStorage.getItem("datastudio_lang");
     return VALID.includes(stored as Language) ? (stored as Language) : "en";
   });
 
   const setLanguage = (l: Language) => {
     setLang(l);
-    localStorage.setItem("fabstudio_lang", l);
+    localStorage.setItem("datastudio_lang", l);
   };
 
   // Set HTML dir and lang attributes for RTL/LTR and accessibility

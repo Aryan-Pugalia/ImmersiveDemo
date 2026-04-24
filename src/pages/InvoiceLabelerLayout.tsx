@@ -12,7 +12,7 @@ export default function InvoiceLabelerLayout() {
   return (
     <InvoiceAnnotationProvider>
       <div className="min-h-screen bg-background flex flex-col">
-        {/* FABStudio sticky header */}
+        {/* DataStudio sticky header */}
         <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-border/20">
           <div className="flex items-center justify-between px-6 py-3 h-16">
             <div className="flex items-center gap-3">
