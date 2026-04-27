@@ -1,6 +1,6 @@
 /**
  * ImpersonationRedaction.tsx
- * "Impersonation Review + Policy Redaction" – Dating Trust & Safety Demo
+ * "Impersonation Review + Policy Redaction" – Content Moderation Demo
  * 4-stage pipeline: Annotate → AI Review → Human QA → Delivered
  * All data is mock/deterministic. No external APIs.
  */
@@ -15,50 +15,184 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-// ─── Policy config (configurable array) ──────────────────────────────────────
+// ─── Policy categories (13 categories with definitions) ──────────────────────
 
 const POLICY_CATEGORIES = [
-  { id: "weapons",       label: "Weapons" },
-  { id: "sensitive_pii", label: "Sensitive Personal Info" },
-  { id: "scams_fraud",   label: "Scams/Fraud" },
-  { id: "category_a",    label: "Category_A" },
-  { id: "category_b",    label: "Category_B" },
+  { id: "hate_speech",        label: "Hate Speech & Harassment",              def: "Content targeting individuals/groups based on protected characteristics such as race, nationality, religion, or gender." },
+  { id: "violence",           label: "Violence & Physical Harm",              def: "Threats, glorification of violence, content promoting self-harm, or dangerous activities." },
+  { id: "sexual_content",     label: "Sexual Content & Exploitation",         def: "Explicit sexual content shared without consent, non-consensual imagery, or adult content in non-adult contexts." },
+  { id: "child_safety",       label: "Child Safety",                          def: "Any content that exploits, endangers, grooms, or sexualises minors." },
+  { id: "extremism",          label: "Extremism & Terrorism",                 def: "Promotion of, or recruitment for, extremist ideologies or designated terrorist organisations." },
+  { id: "misinfo",            label: "Misinformation & Disinformation",       def: "Deliberately false or misleading content designed to deceive users or manipulate public discourse." },
+  { id: "scams_fraud",        label: "Fraud, Scams & Deceptive Practices",   def: "Phishing, romance scams, fake giveaways, fraudulent investment schemes, or impersonation for financial gain." },
+  { id: "illegal_goods",      label: "Illegal or Regulated Goods",           def: "Sale or promotion of weapons, drugs, counterfeit items, or other regulated/illegal products." },
+  { id: "ip_copyright",       label: "IP & Copyright",                       def: "Unauthorised use or distribution of copyrighted, trademarked, or proprietary content." },
+  { id: "sensitive_pii",      label: "Privacy & Personal Data",               def: "Exposure of private contact info, location data, financial details, or identity documents." },
+  { id: "platform_integrity", label: "Platform Integrity & Abuse",            def: "Bot activity, fake accounts, coordinated inauthentic behaviour, or ban evasion." },
+  { id: "advertising",        label: "Advertising & Commercial",              def: "Unsolicited promotions, spam, affiliate link abuse, or undisclosed commercial intent." },
+  { id: "community_conduct",  label: "Community Conduct & Rules",             def: "Violations of platform-specific terms of service or community guidelines not covered above." },
 ];
 
-// ─── Mock profile ─────────────────────────────────────────────────────────────
+// ─── Profile interface ────────────────────────────────────────────────────────
 
-const BIO_TEXT =
-  "Freelance photographer & outdoor enthusiast. Reach me at alex.jordan92@gmail.com " +
-  "or call +1 (415) 555-0147. Active on Instagram: @alex_j_photos — portfolio at alexjordan.co. " +
-  "Based near 4th & King St, San Francisco. Selling vintage camera gear and hunting accessories " +
-  "— DM for details, no lowballers \uD83D\uDD2B";
+interface ProfilePhoto {
+  url:     string;
+  caption: string;
+  flag:    string;
+}
 
-const MOCK_PROFILE = {
-  profile_id: "USR-20482",
-  display_name: "Alex Jordan",
-  age: 29,
-  location: "San Francisco, CA",
-  bio_text: BIO_TEXT,
-  // Photo 1: polished headshot — looks stock; Photo 2: outdoor shot — different lighting/background
-  photos: [
-    {
-      url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=520&h=640&fit=crop&crop=faces",
-      caption: "Photo 1 — Primary",
-      flag: "Reverse-image match: 74% similarity to stock portfolio",
+interface AiResult {
+  recommendation:          "Escalate" | "Reject" | "Approve";
+  confidence:              number;
+  signals:                 string[];
+  predictedCategories:     string[];
+  suggestedRedactionTypes: string[];
+}
+
+interface MockProfile {
+  profile_id:   string;
+  display_name: string;
+  age:          number;
+  location:     string;
+  bio_text:     string;
+  photos:       ProfilePhoto[];
+  signals:      string[];
+  ai_result:    AiResult;
+}
+
+// ─── Mock profiles ────────────────────────────────────────────────────────────
+
+const PROFILES: MockProfile[] = [
+  // ── Profile 1: Alex Jordan — PII + Scams/Fraud ───────────────────────────
+  {
+    profile_id:   "USR-20482",
+    display_name: "Alex Jordan",
+    age:          29,
+    location:     "San Francisco, CA",
+    bio_text:
+      "Freelance photographer & outdoor enthusiast. Reach me at alex.jordan92@gmail.com " +
+      "or call +1 (415) 555-0147. Active on Instagram: @alex_j_photos — portfolio at alexjordan.co. " +
+      "Based near 4th & King St, San Francisco. Selling vintage camera gear and hunting accessories " +
+      "— DM for details, no lowballers \uD83D\uDD2B",
+    photos: [
+      {
+        url:     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=520&h=640&fit=crop&crop=faces",
+        caption: "Photo 1 — Primary",
+        flag:    "Reverse-image match: 74% similarity to stock portfolio",
+      },
+      {
+        url:     "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=520&h=640&fit=crop&crop=faces",
+        caption: "Photo 2 — Secondary",
+        flag:    "Metadata mismatch: EXIF location \u2260 stated city",
+      },
+    ],
+    signals: [
+      "Photo 1 reverse-image match: 74% similarity to stock portfolio",
+      "Rapid profile edits (3 edits in 2 hours)",
+      "Reused bio snippet (matched 2 other profiles)",
+      "Location ping mismatch (IP: Chicago, stated: SF)",
+    ],
+    ai_result: {
+      recommendation:          "Escalate",
+      confidence:              84,
+      signals: [
+        "Contact info in bio: email + phone detected (policy violation)",
+        "External handle reference @alex_j_photos (off-platform solicitation risk)",
+        "Portfolio link embedded: alexjordan.co (external redirect risk)",
+        "Weapon-adjacent context: sale listing + ambiguous item description",
+      ],
+      predictedCategories:     ["sensitive_pii", "scams_fraud"],
+      suggestedRedactionTypes: ["email", "phone", "handle", "link"],
     },
-    {
-      url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=520&h=640&fit=crop&crop=faces",
-      caption: "Photo 2 — Secondary",
-      flag: "Metadata mismatch: EXIF location ≠ stated city",
+  },
+
+  // ── Profile 2: Jamie Rivera — Hate Speech + Illegal Goods ────────────────
+  {
+    profile_id:   "USR-38817",
+    display_name: "Jamie Rivera",
+    age:          31,
+    location:     "Las Vegas, NV",
+    bio_text:
+      "Vegas girl, life\u2019s too short for boring dates \uD83C\uDFB2 DM me on Snap @jamie.rv.real or text " +
+      "+1 (702) 555-0219 \u2014 faster than the app. Got some items for trade: AR-15 accessories, " +
+      "tactical attachments \u2014 cash only, no cops. Only interested in certain types \u2014 NO immigrants " +
+      "or foreigners, keeping it 100%. Real deal only \uD83D\uDD25\uD83C\uDDF8",
+    photos: [
+      {
+        url:     "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=520&h=640&fit=crop&crop=faces",
+        caption: "Photo 1 — Primary",
+        flag:    "Reverse-image match: 81% — linked to fitness influencer @fit_by_jamie",
+      },
+      {
+        url:     "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=520&h=640&fit=crop&crop=faces",
+        caption: "Photo 2 — Secondary",
+        flag:    "Stock photo detected: found in 3 commercial image databases",
+      },
+    ],
+    signals: [
+      "Photo 1 reverse-image match: 81% similarity to fitness influencer",
+      "Discriminatory keywords detected in bio (automated scan)",
+      "Off-platform handle found in bio text (Snapchat)",
+      "Regulated item keywords: AR-15, tactical attachments",
+    ],
+    ai_result: {
+      recommendation:          "Reject",
+      confidence:              91,
+      signals: [
+        "Discriminatory exclusion language detected: nationality-based ('NO immigrants / foreigners')",
+        "Off-platform redirect: Snapchat handle @jamie.rv.real (policy: no external solicitation)",
+        "Direct contact info: phone +1 (702) 555-0219 embedded in bio",
+        "Regulated goods signal: AR-15 accessories, tactical attachments — cash sale offer",
+      ],
+      predictedCategories:     ["hate_speech", "illegal_goods"],
+      suggestedRedactionTypes: ["phone", "handle"],
     },
-  ],
-  signals: [
-    "Photo 1 reverse-image match: 74% similarity to stock portfolio",
-    "Rapid profile edits (3 edits in 2 hours)",
-    "Reused bio snippet (matched 2 other profiles)",
-    "Location ping mismatch (IP: Chicago, stated: SF)",
-  ],
-};
+  },
+
+  // ── Profile 3: Sam Chen — Scams/Fraud + Platform Integrity ───────────────
+  {
+    profile_id:   "USR-51293",
+    display_name: "Sam Chen",
+    age:          34,
+    location:     "Los Angeles, CA",
+    bio_text:
+      "Finance coach & crypto investor based in LA \uD83D\uDCBC I\u2019ve helped 200+ clients achieve 30\u201340% " +
+      "monthly returns. Looking for a real connection beyond the app \u2014 reach me on WhatsApp " +
+      "+1 (213) 555-0398 or Telegram @sam_trade_pro. Check my verified track record at samchenpro.com. " +
+      "Serious inquiries only \u2014 free private consultation for matches \uD83D\uDCB0\uD83D\uDE80 " +
+      "Limited spots left, don\u2019t wait!",
+    photos: [
+      {
+        url:     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=520&h=640&fit=crop&crop=faces",
+        caption: "Photo 1 — Primary",
+        flag:    "Reverse-image match: 68% — same photo found on 3 other dating profiles",
+      },
+      {
+        url:     "https://images.unsplash.com/photo-1463453091185-61582044d556?w=520&h=640&fit=crop&crop=faces",
+        caption: "Photo 2 — Secondary",
+        flag:    "AI-generated face probability: 73% (GAN artifact pattern detected)",
+      },
+    ],
+    signals: [
+      "Photo reverse-image match: 68% — linked to 3 separate dating profiles",
+      "Financial promise language: '30–40% monthly returns' (romance scam pattern)",
+      "Multiple off-platform redirects: WhatsApp, Telegram, external website",
+      "Account age: 2 days · 47 messages sent in 6 hours (bot-like velocity)",
+    ],
+    ai_result: {
+      recommendation:          "Reject",
+      confidence:              96,
+      signals: [
+        "Financial solicitation: '30–40% monthly returns' — textbook romance scam trigger",
+        "Multiple off-platform redirects: WhatsApp + Telegram handle + personal website",
+        "Urgency manipulation: 'Limited spots left' — high-pressure solicitation tactic",
+        "Platform integrity flag: 2-day-old account, 47 messages, likely bot/coordinated",
+      ],
+      predictedCategories:     ["scams_fraud", "platform_integrity"],
+      suggestedRedactionTypes: ["phone", "handle", "link"],
+    },
+  },
+];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,10 +224,10 @@ interface AnnotationState {
 }
 
 interface QAState {
-  finalLabel:        FinalLabel | null;
+  finalLabel:         FinalLabel | null;
   activeRedactionIds: Set<string>;
-  qaReason:          QAReason | null;
-  qaNotes:           string;
+  qaReason:           QAReason | null;
+  qaNotes:            string;
 }
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -140,21 +274,6 @@ export function diffDecisions(annotatorLabel: ProfileLabel | null, aiRec: string
       : `You labelled "${annotatorLabel}" but AI recommends "${aiRec}"`,
   };
 }
-
-// ─── AI mock output (deterministic) ──────────────────────────────────────────
-
-const AI_RESULT = {
-  recommendation:          "Escalate" as const,
-  confidence:              84,
-  signals: [
-    "Contact info in bio: email + phone detected (policy violation)",
-    "External handle reference @alex_j_photos (off-platform solicitation risk)",
-    "Portfolio link embedded: alexjordan.co (external redirect risk)",
-    "Weapon-adjacent context: sale listing + ambiguous item description",
-  ],
-  predictedCategories:     ["sensitive_pii", "scams_fraud"],
-  suggestedRedactionTypes: ["email", "phone", "handle", "link"],
-};
 
 // ─── Progress stepper ─────────────────────────────────────────────────────────
 
@@ -236,9 +355,10 @@ function buildSegs(text: string, tokens: PiiToken[], redactedIds: Set<string>, m
 }
 
 function BioEditor({
-  detectedTokens, redactedIds, manualRedactions,
+  bioText, detectedTokens, redactedIds, manualRedactions,
   onToggle, onAddManual, onAutoMark, locked,
 }: {
+  bioText:          string;
   detectedTokens:   PiiToken[];
   redactedIds:      Set<string>;
   manualRedactions: PiiToken[];
@@ -251,8 +371,8 @@ function BioEditor({
   const [pending, setPending] = useState("");
 
   const segs = useMemo(
-    () => buildSegs(BIO_TEXT, detectedTokens, redactedIds, manualRedactions),
-    [detectedTokens, redactedIds, manualRedactions],
+    () => buildSegs(bioText, detectedTokens, redactedIds, manualRedactions),
+    [bioText, detectedTokens, redactedIds, manualRedactions],
   );
 
   function onMouseUp() {
@@ -266,7 +386,7 @@ function BioEditor({
 
   function redactSelection() {
     if (!pending) return;
-    const idx = BIO_TEXT.indexOf(pending);
+    const idx = bioText.indexOf(pending);
     if (idx === -1) return;
     onAddManual({ id: `manual-${Date.now()}`, type: "manual", original: pending, start: idx, end: idx + pending.length });
     setPending("");
@@ -346,21 +466,21 @@ function BioEditor({
 
 // ─── Profile preview card ─────────────────────────────────────────────────────
 
-function ProfileCard({ compact = false }: { compact?: boolean }) {
+function ProfileCard({ profile, compact = false }: { profile: MockProfile; compact?: boolean }) {
   const [activePhoto, setActivePhoto] = useState(0);
-  const photo = MOCK_PROFILE.photos[activePhoto];
+  const photo = profile.photos[activePhoto];
 
   if (compact) return (
     <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "var(--s4)" }}>
       <div className="flex items-center gap-3 p-3">
         <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-          <img src={MOCK_PROFILE.photos[0].url} alt={MOCK_PROFILE.display_name}
+          <img src={profile.photos[0].url} alt={profile.display_name}
             className="w-full h-full object-cover object-center" />
         </div>
         <div>
-          <div className="font-bold text-foreground text-sm">{MOCK_PROFILE.display_name}, {MOCK_PROFILE.age}</div>
-          <div className="text-xs text-foreground/50">{MOCK_PROFILE.location}</div>
-          <div className="text-xs text-foreground/35">ID: {MOCK_PROFILE.profile_id}</div>
+          <div className="font-bold text-foreground text-sm">{profile.display_name}, {profile.age}</div>
+          <div className="text-xs text-foreground/50">{profile.location}</div>
+          <div className="text-xs text-foreground/35">ID: {profile.profile_id}</div>
         </div>
       </div>
     </div>
@@ -370,16 +490,16 @@ function ProfileCard({ compact = false }: { compact?: boolean }) {
     <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "var(--s4)", minWidth: 0 }}>
       {/* Main photo with flag overlay */}
       <div className="relative w-full overflow-hidden" style={{ height: 300 }}>
-        <img src={photo.url} alt={MOCK_PROFILE.display_name}
+        <img src={photo.url} alt={profile.display_name}
           className="w-full h-full object-cover object-center transition-opacity duration-300" />
         {/* Dark gradient + name scrim */}
         <div className="absolute inset-x-0 bottom-0 h-28"
           style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)" }} />
         <div className="absolute bottom-3 left-3">
           <div className="text-white font-bold text-lg leading-tight">
-            {MOCK_PROFILE.display_name}, {MOCK_PROFILE.age}
+            {profile.display_name}, {profile.age}
           </div>
-          <div className="text-white/70 text-xs">📍 {MOCK_PROFILE.location}</div>
+          <div className="text-white/70 text-xs">📍 {profile.location}</div>
         </div>
         {/* Flag badge at top */}
         <div className="absolute top-2 left-2 right-2 flex items-start gap-1.5 px-2 py-1.5 rounded-lg"
@@ -390,13 +510,13 @@ function ProfileCard({ compact = false }: { compact?: boolean }) {
         {/* Photo counter */}
         <div className="absolute top-2 right-2 text-[10px] font-bold text-white/70 px-2 py-0.5 rounded-full"
           style={{ background: "rgba(0,0,0,0.5)" }}>
-          {activePhoto + 1}/{MOCK_PROFILE.photos.length}
+          {activePhoto + 1}/{profile.photos.length}
         </div>
       </div>
 
       {/* Thumbnail strip */}
       <div className="flex gap-2 px-3 pt-3">
-        {MOCK_PROFILE.photos.map((p, i) => (
+        {profile.photos.map((p, i) => (
           <button key={i} onClick={() => setActivePhoto(i)}
             className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
               i === activePhoto ? "border-violet-500" : "border-transparent opacity-60 hover:opacity-80"
@@ -414,7 +534,7 @@ function ProfileCard({ compact = false }: { compact?: boolean }) {
       <div className="px-4 pt-3 pb-1">
         <div className="rounded-xl border border-white/8 p-3 max-h-28 overflow-y-auto" style={{ background: "var(--s2)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-1">Bio</p>
-          <p className="text-sm text-foreground/75 leading-relaxed">{MOCK_PROFILE.bio_text}</p>
+          <p className="text-sm text-foreground/75 leading-relaxed">{profile.bio_text}</p>
         </div>
       </div>
 
@@ -422,13 +542,43 @@ function ProfileCard({ compact = false }: { compact?: boolean }) {
       <div className="px-4 py-3">
         <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">System Signals</p>
         <div className="space-y-1.5">
-          {MOCK_PROFILE.signals.map(s => (
+          {profile.signals.map(s => (
             <div key={s} className="flex items-start gap-2 text-xs text-amber-400">
               <AlertTriangle size={11} className="flex-shrink-0 mt-0.5" />
               <span>{s}</span>
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Profile selector ─────────────────────────────────────────────────────────
+
+function ProfileSelector({ selected, onChange }: { selected: number; onChange: (i: number) => void }) {
+  return (
+    <div className="rounded-2xl border border-white/10 p-3 mb-4" style={{ background: "var(--s4)" }}>
+      <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2.5">Select Profile to Review</p>
+      <div className="flex gap-2.5">
+        {PROFILES.map((p, i) => (
+          <button key={p.profile_id} onClick={() => onChange(i)}
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 text-left transition-all flex-1 ${
+              selected === i
+                ? "border-violet-500 bg-violet-900/30"
+                : "border-white/10 hover:border-violet-500/40 hover:bg-white/4"
+            }`}>
+            <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+              <img src={p.photos[0].url} alt={p.display_name}
+                className="w-full h-full object-cover object-center" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-bold text-foreground truncate">{p.display_name}, {p.age}</div>
+              <div className="text-[10px] text-foreground/45 truncate">{p.profile_id}</div>
+              <div className="text-[10px] text-violet-400/70 truncate">{p.location}</div>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -444,9 +594,12 @@ const RISK_FLAGS = [
 
 // ─── Step 1 · Manual Annotation ───────────────────────────────────────────────
 
-function Step1({ detectedTokens, onSubmit }: {
-  detectedTokens: PiiToken[];
-  onSubmit: (a: AnnotationState) => void;
+function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, onSubmit }: {
+  profile:              MockProfile;
+  detectedTokens:       PiiToken[];
+  selectedProfileIdx:   number;
+  onProfileChange:      (i: number) => void;
+  onSubmit:             (a: AnnotationState) => void;
 }) {
   const [profileLabel,     setProfileLabel]     = useState<ProfileLabel | null>(null);
   const [riskFlags,        setRiskFlags]         = useState<Set<string>>(new Set());
@@ -455,6 +608,17 @@ function Step1({ detectedTokens, onSubmit }: {
   const [manualRedactions, setManualRedactions]  = useState<PiiToken[]>([]);
   const [confidence,       setConfidence]        = useState(50);
   const [notes,            setNotes]             = useState("");
+
+  // Reset local state when profile changes
+  useEffect(() => {
+    setProfileLabel(null);
+    setRiskFlags(new Set());
+    setSelectedCats(new Set());
+    setRedactedIds(new Set());
+    setManualRedactions([]);
+    setConfidence(50);
+    setNotes("");
+  }, [selectedProfileIdx]);
 
   const toggleFlag = (id: string) => setRiskFlags(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const toggleCat  = (id: string) => setSelectedCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -472,9 +636,12 @@ function Step1({ detectedTokens, onSubmit }: {
 
   return (
     <div className="flex gap-5 items-start">
-      <ProfileCard />
+      <ProfileCard profile={profile} />
 
       <div className="w-[430px] flex-shrink-0 space-y-4">
+        {/* Profile selector */}
+        <ProfileSelector selected={selectedProfileIdx} onChange={onProfileChange} />
+
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-violet-600/30"
           style={{ background: "rgba(109,40,217,0.12)" }}>
           <span className="text-2xl">✏️</span>
@@ -489,9 +656,9 @@ function Step1({ detectedTokens, onSubmit }: {
           <p className="text-sm font-semibold text-foreground mb-3">1 · Profile Label <span className="text-red-400">*</span></p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",      act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-950/30 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/40" },
-              { val: "impersonation" as ProfileLabel, label: "Likely Impersonation",act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-950/30 border-red-700/50 text-red-400 hover:bg-red-900/40" },
-              { val: "unsure"        as ProfileLabel, label: "Unsure",              act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-950/30 border-amber-700/50 text-amber-400 hover:bg-amber-900/40" },
+              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",       act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-950/30 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/40" },
+              { val: "impersonation" as ProfileLabel, label: "Impersonation",        act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-950/30 border-red-700/50 text-red-400 hover:bg-red-900/40" },
+              { val: "unsure"        as ProfileLabel, label: "Unsure",               act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-950/30 border-amber-700/50 text-amber-400 hover:bg-amber-900/40" },
             ] as const).map(o => (
               <button key={o.val} onClick={() => setProfileLabel(o.val)}
                 className={`py-2.5 rounded-xl border-2 text-xs font-bold transition-all ${profileLabel === o.val ? o.act : o.idle}`}>
@@ -522,13 +689,15 @@ function Step1({ detectedTokens, onSubmit }: {
           </div>
         </div>
 
-        {/* 3 · Policy categories */}
+        {/* 3 · Policy categories — compact 2-col grid with tooltips */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-3">3 · Policy Categories</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-sm font-semibold text-foreground mb-1">3 · Policy Categories</p>
+          <p className="text-[10px] text-foreground/35 mb-2.5">Hover a chip for its definition · select all that apply</p>
+          <div className="grid grid-cols-2 gap-1.5">
             {POLICY_CATEGORIES.map(cat => (
               <button key={cat.id} onClick={() => toggleCat(cat.id)}
-                className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
+                title={cat.def}
+                className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold text-left transition-all truncate ${
                   selectedCats.has(cat.id)
                     ? "bg-violet-600 border-violet-600 text-white"
                     : "border-white/15 text-foreground/60 hover:border-violet-500/40 hover:bg-violet-900/20"
@@ -537,12 +706,16 @@ function Step1({ detectedTokens, onSubmit }: {
               </button>
             ))}
           </div>
+          {selectedCats.size > 0 && (
+            <p className="text-[10px] text-violet-400/70 mt-2">{selectedCats.size} categor{selectedCats.size === 1 ? "y" : "ies"} selected</p>
+          )}
         </div>
 
         {/* 4 · Bio redaction */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3">4 · Bio Redaction Tool</p>
           <BioEditor
+            bioText={profile.bio_text}
             detectedTokens={detectedTokens}
             redactedIds={redactedIds}
             manualRedactions={manualRedactions}
@@ -581,12 +754,14 @@ function Step1({ detectedTokens, onSubmit }: {
 
 // ─── Step 2 · AI Review ───────────────────────────────────────────────────────
 
-function Step2({ annotation, detectedTokens, onComplete }: {
+function Step2({ profile, annotation, detectedTokens, onComplete }: {
+  profile:        MockProfile;
   annotation:     AnnotationState;
   detectedTokens: PiiToken[];
   onComplete:     () => void;
 }) {
   const [phase, setPhase] = useState(0);
+  const ai = profile.ai_result;
 
   useEffect(() => {
     const t = [
@@ -599,12 +774,12 @@ function Step2({ annotation, detectedTokens, onComplete }: {
   }, []);
 
   const aiSuggestedIds = new Set(
-    detectedTokens.filter(t => AI_RESULT.suggestedRedactionTypes.includes(t.type)).map(t => t.id),
+    detectedTokens.filter(t => ai.suggestedRedactionTypes.includes(t.type)).map(t => t.id),
   );
-  const agrees   = [...aiSuggestedIds].filter(id => annotation.redactedIds.has(id)).length;
-  const onlyAI   = [...aiSuggestedIds].filter(id => !annotation.redactedIds.has(id)).length;
+  const agrees    = [...aiSuggestedIds].filter(id => annotation.redactedIds.has(id)).length;
+  const onlyAI    = [...aiSuggestedIds].filter(id => !annotation.redactedIds.has(id)).length;
   const onlyHuman = [...annotation.redactedIds].filter(id => !aiSuggestedIds.has(id)).length;
-  const diff = diffDecisions(annotation.profileLabel, AI_RESULT.recommendation);
+  const diff = diffDecisions(annotation.profileLabel, ai.recommendation);
 
   const steps = [
     "Scanning bio for contact patterns…",
@@ -615,7 +790,7 @@ function Step2({ annotation, detectedTokens, onComplete }: {
 
   return (
     <div className="flex gap-5 items-start">
-      <ProfileCard />
+      <ProfileCard profile={profile} />
       <div className="w-[430px] flex-shrink-0 space-y-4">
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30"
           style={{ background: "rgba(37,99,235,0.12)" }}>
@@ -648,11 +823,11 @@ function Step2({ annotation, detectedTokens, onComplete }: {
             <div className="rounded-2xl border border-amber-700/40 p-4" style={{ background: "rgba(217,119,6,0.12)" }}>
               <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">AI Recommendation</p>
               <div className="flex items-center gap-3 mb-3">
-                <div className="text-2xl font-black text-amber-400">{AI_RESULT.recommendation}</div>
-                <div className="text-sm text-foreground/50">Confidence: <span className="font-bold text-amber-300">{AI_RESULT.confidence}%</span></div>
+                <div className="text-2xl font-black text-amber-400">{ai.recommendation}</div>
+                <div className="text-sm text-foreground/50">Confidence: <span className="font-bold text-amber-300">{ai.confidence}%</span></div>
               </div>
               <div className="space-y-2">
-                {AI_RESULT.signals.map((s, i) => (
+                {ai.signals.map((s, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <AlertTriangle size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
                     <span className="text-xs text-foreground/60 leading-relaxed">{s}</span>
@@ -679,7 +854,7 @@ function Step2({ annotation, detectedTokens, onComplete }: {
                 </div>
                 <div className="flex-1 text-center py-2 rounded-xl border text-xs font-bold border-amber-600/40 text-amber-300"
                   style={{ background: "rgba(217,119,6,0.18)" }}>
-                  AI: {AI_RESULT.recommendation}
+                  AI: {ai.recommendation}
                 </div>
               </div>
               {!diff.agrees && <p className="text-xs text-amber-400/70 mt-2 text-center">{diff.message}</p>}
@@ -704,28 +879,30 @@ const QA_REASONS: { id: QAReason; label: string }[] = [
   { id: "insufficient_evidence", label: "Insufficient evidence" },
 ];
 
-function Step3({ annotation, detectedTokens, onSubmit }: {
+function Step3({ profile, annotation, detectedTokens, onSubmit }: {
+  profile:        MockProfile;
   annotation:     AnnotationState;
   detectedTokens: PiiToken[];
   onSubmit:       (qa: QAState) => void;
 }) {
+  const ai = profile.ai_result;
   const aiSuggestedIds = new Set(
-    detectedTokens.filter(t => AI_RESULT.suggestedRedactionTypes.includes(t.type)).map(t => t.id),
+    detectedTokens.filter(t => ai.suggestedRedactionTypes.includes(t.type)).map(t => t.id),
   );
 
-  const [finalLabel,         setFinalLabel]         = useState<FinalLabel | null>(null);
-  const [activeRedactionIds, setActiveRedactionIds] = useState<Set<string>>(new Set(annotation.redactedIds));
-  const [qaReason,           setQaReason]           = useState<QAReason | null>(null);
-  const [qaNotes,            setQaNotes]            = useState("");
-  const [showPreview,        setShowPreview]         = useState(false);
+  const [finalLabel,          setFinalLabel]         = useState<FinalLabel | null>(null);
+  const [activeRedactionIds,  setActiveRedactionIds] = useState<Set<string>>(new Set(annotation.redactedIds));
+  const [qaReason,            setQaReason]           = useState<QAReason | null>(null);
+  const [qaNotes,             setQaNotes]            = useState("");
+  const [showPreview,         setShowPreview]        = useState(false);
 
-  const allTokens = [...detectedTokens, ...annotation.manualRedactions];
-  const toggleRed = (id: string) => setActiveRedactionIds(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const applyAI   = () => setActiveRedactionIds(p => { const n = new Set(p); aiSuggestedIds.forEach(id => n.add(id)); return n; });
-  const keepHuman = () => setActiveRedactionIds(new Set(annotation.redactedIds));
+  const allTokens  = [...detectedTokens, ...annotation.manualRedactions];
+  const toggleRed  = (id: string) => setActiveRedactionIds(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const applyAI    = () => setActiveRedactionIds(p => { const n = new Set(p); aiSuggestedIds.forEach(id => n.add(id)); return n; });
+  const keepHuman  = () => setActiveRedactionIds(new Set(annotation.redactedIds));
 
   const finalRedactions: Redaction[] = allTokens.map(t => ({ ...t, active: activeRedactionIds.has(t.id) }));
-  const previewBio = applyRedactions(BIO_TEXT, finalRedactions);
+  const previewBio = applyRedactions(profile.bio_text, finalRedactions);
 
   return (
     <div className="space-y-4">
@@ -774,14 +951,14 @@ function Step3({ annotation, detectedTokens, onSubmit }: {
 
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Result</p>
-          <div className="text-sm font-black mb-1 text-amber-400">⚠ {AI_RESULT.recommendation}</div>
+          <div className="text-sm font-black mb-1 text-amber-400">⚠ {ai.recommendation}</div>
           <div className="text-xs text-foreground/50 space-y-1 mb-3">
-            <div>Confidence: <strong className="text-foreground/70">{AI_RESULT.confidence}%</strong></div>
-            <div>Categories: <strong className="text-foreground/70">{AI_RESULT.predictedCategories.map(id => POLICY_CATEGORIES.find(c => c.id === id)?.label).join(", ")}</strong></div>
+            <div>Confidence: <strong className="text-foreground/70">{ai.confidence}%</strong></div>
+            <div>Categories: <strong className="text-foreground/70">{ai.predictedCategories.map(id => POLICY_CATEGORIES.find(c => c.id === id)?.label).filter(Boolean).join(", ")}</strong></div>
           </div>
           <p className="text-xs font-semibold text-foreground/35 mb-2">AI suggested redactions:</p>
           <div className="space-y-1.5">
-            {detectedTokens.filter(t => AI_RESULT.suggestedRedactionTypes.includes(t.type)).map(tok => (
+            {detectedTokens.filter(t => ai.suggestedRedactionTypes.includes(t.type)).map(tok => (
               <div key={tok.id} className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-amber-500 flex-shrink-0" />
                 <span className="text-xs font-mono text-foreground/60 flex-1">{tok.original.slice(0, 22)}{tok.original.length > 22 ? "…" : ""}</span>
@@ -853,7 +1030,8 @@ function Step3({ annotation, detectedTokens, onSubmit }: {
 
 // ─── Step 4 · Delivery ────────────────────────────────────────────────────────
 
-function Step4({ annotation, qa, detectedTokens, onReset }: {
+function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
+  profile:        MockProfile;
   annotation:     AnnotationState;
   qa:             QAState;
   detectedTokens: PiiToken[];
@@ -862,29 +1040,29 @@ function Step4({ annotation, qa, detectedTokens, onReset }: {
   const navigate = useNavigate();
   const [showJson, setShowJson] = useState(false);
 
-  const allTokens      = [...detectedTokens, ...annotation.manualRedactions];
+  const allTokens       = [...detectedTokens, ...annotation.manualRedactions];
   const finalRedactions: Redaction[] = allTokens.map(t => ({ ...t, active: qa.activeRedactionIds.has(t.id) }));
-  const finalBio       = applyRedactions(BIO_TEXT, finalRedactions);
-  const activeList     = allTokens.filter(t => qa.activeRedactionIds.has(t.id));
+  const finalBio        = applyRedactions(profile.bio_text, finalRedactions);
+  const activeList      = allTokens.filter(t => qa.activeRedactionIds.has(t.id));
 
   const appliedCategories = [
     ...annotation.selectedCategories,
-    ...AI_RESULT.predictedCategories,
+    ...profile.ai_result.predictedCategories,
   ].filter((v, i, a) => a.indexOf(v) === i);
 
   const now = new Date();
   const ts  = (off: number) => new Date(now.getTime() - off * 1000).toISOString();
 
   const packet = {
-    profile_id:        MOCK_PROFILE.profile_id,
+    profile_id:        profile.profile_id,
     final_decision:    qa.finalLabel,
     final_categories:  appliedCategories.map(id => POLICY_CATEGORIES.find(c => c.id === id)?.label ?? id),
-    confidence:        Math.round((annotation.confidence + AI_RESULT.confidence) / 2),
+    confidence:        Math.round((annotation.confidence + profile.ai_result.confidence) / 2),
     redactions:        activeList.map(r => ({ type: r.type, original_preview: r.original.slice(0, 12) + (r.original.length > 12 ? "…" : ""), replacement: "[REDACTED]" })),
     audit_trail: [
-      { actor: "Annotator",   action: `Labelled: ${annotation.profileLabel}`,                                  ts: ts(180) },
-      { actor: "AI Model",    action: `Recommended: ${AI_RESULT.recommendation} (${AI_RESULT.confidence}%)`,   ts: ts(90)  },
-      { actor: "QA Reviewer", action: `Final: ${qa.finalLabel}${qa.qaReason ? ` · ${qa.qaReason}` : ""}`,     ts: ts(0)   },
+      { actor: "Annotator",   action: `Labelled: ${annotation.profileLabel}`,                                                    ts: ts(180) },
+      { actor: "AI Model",    action: `Recommended: ${profile.ai_result.recommendation} (${profile.ai_result.confidence}%)`,    ts: ts(90)  },
+      { actor: "QA Reviewer", action: `Final: ${qa.finalLabel}${qa.qaReason ? ` · ${qa.qaReason}` : ""}`,                       ts: ts(0)   },
     ],
   };
 
@@ -895,10 +1073,10 @@ function Step4({ annotation, qa, detectedTokens, onReset }: {
   }[qa.finalLabel ?? "escalate"];
 
   const kpis = [
-    { icon: <Shield size={16} className="text-violet-400" />,    label: "Sensitive info removed", value: `${activeList.length}`,             sub: "tokens redacted",           bg: "rgba(109,40,217,0.20)" },
-    { icon: <AlertTriangle size={16} className="text-amber-400"/>,label: "Escalations triggered", value: qa.finalLabel === "escalate" ? "1" : "0", sub: "senior review queued",  bg: "rgba(217,119,6,0.20)"  },
-    { icon: <Users size={16} className="text-blue-400" />,        label: "QA overrides",          value: qa.qaReason ? "1" : "0",            sub: qa.qaReason ? QA_REASONS.find(r => r.id === qa.qaReason)?.label ?? "" : "none", bg: "rgba(37,99,235,0.20)" },
-    { icon: <Zap size={16} className="text-emerald-400" />,       label: "Time to decision",       value: "~3 min",                           sub: "annotation → AI → QA",      bg: "rgba(5,150,105,0.20)"  },
+    { icon: <Shield size={16} className="text-violet-400" />,     label: "Sensitive info removed", value: `${activeList.length}`,                  sub: "tokens redacted",           bg: "rgba(109,40,217,0.20)" },
+    { icon: <AlertTriangle size={16} className="text-amber-400"/>, label: "Escalations triggered", value: qa.finalLabel === "escalate" ? "1" : "0", sub: "senior review queued",      bg: "rgba(217,119,6,0.20)"  },
+    { icon: <Users size={16} className="text-blue-400" />,         label: "QA overrides",          value: qa.qaReason ? "1" : "0",                  sub: qa.qaReason ? QA_REASONS.find(r => r.id === qa.qaReason)?.label ?? "" : "none", bg: "rgba(37,99,235,0.20)" },
+    { icon: <Zap size={16} className="text-emerald-400" />,        label: "Time to decision",       value: "~3 min",                                 sub: "annotation → AI → QA",      bg: "rgba(5,150,105,0.20)"  },
   ];
 
   return (
@@ -974,7 +1152,7 @@ function Step4({ annotation, qa, detectedTokens, onReset }: {
 
       <div className="flex gap-3 w-full">
         <Button variant="outline" onClick={onReset} className="flex-1 gap-2 h-12 border-white/15 text-foreground/80 hover:bg-white/5">
-          <RotateCcw size={14} /> Run Same Example Again
+          <RotateCcw size={14} /> Try Another Profile
         </Button>
         <Button onClick={() => navigate("/use-cases")} className="flex-1 bg-violet-600 hover:bg-violet-700 gap-2 h-12">
           <ArrowLeft size={14} /> Back to DataStudio
@@ -988,13 +1166,23 @@ function Step4({ annotation, qa, detectedTokens, onReset }: {
 
 export default function ImpersonationRedaction() {
   const navigate = useNavigate();
-  const detectedTokens = useMemo(() => detectPII(BIO_TEXT), []);
 
+  const [selectedProfileIdx, setSelectedProfileIdx] = useState(0);
   const [stage,      setStage]      = useState<Stage>(1);
   const [annotation, setAnnotation] = useState<AnnotationState | null>(null);
   const [qa,         setQa]         = useState<QAState | null>(null);
 
+  const profile        = PROFILES[selectedProfileIdx];
+  const detectedTokens = useMemo(() => detectPII(profile.bio_text), [selectedProfileIdx]);
+
   const reset = () => { setStage(1); setAnnotation(null); setQa(null); };
+
+  const handleProfileChange = (idx: number) => {
+    setSelectedProfileIdx(idx);
+    setStage(1);
+    setAnnotation(null);
+    setQa(null);
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "var(--s0)" }}>
@@ -1010,7 +1198,7 @@ export default function ImpersonationRedaction() {
               TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <span className="text-sm text-white/70 whitespace-nowrap">Dating Trust &amp; Safety</span>
+            <span className="text-sm text-white/70 whitespace-nowrap">Impersonation Review</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle />
@@ -1020,7 +1208,7 @@ export default function ImpersonationRedaction() {
             </button>
             <ShieldAlert size={14} className="text-violet-400" />
             <span className="text-xs bg-violet-600/20 text-violet-300 border border-violet-600/30 px-3 py-1 rounded-full font-semibold">
-              Trust &amp; Safety · Live Demo
+              Content Moderation · Live Demo
             </span>
           </div>
         </div>
@@ -1041,20 +1229,38 @@ export default function ImpersonationRedaction() {
 
         <div className="mt-2">
           {stage === 1 && (
-            <Step1 detectedTokens={detectedTokens}
-              onSubmit={a => { setAnnotation(a); setStage(2); }} />
+            <Step1
+              profile={profile}
+              detectedTokens={detectedTokens}
+              selectedProfileIdx={selectedProfileIdx}
+              onProfileChange={handleProfileChange}
+              onSubmit={a => { setAnnotation(a); setStage(2); }}
+            />
           )}
           {stage === 2 && annotation && (
-            <Step2 annotation={annotation} detectedTokens={detectedTokens}
-              onComplete={() => setStage(3)} />
+            <Step2
+              profile={profile}
+              annotation={annotation}
+              detectedTokens={detectedTokens}
+              onComplete={() => setStage(3)}
+            />
           )}
           {stage === 3 && annotation && (
-            <Step3 annotation={annotation} detectedTokens={detectedTokens}
-              onSubmit={q => { setQa(q); setStage(4); }} />
+            <Step3
+              profile={profile}
+              annotation={annotation}
+              detectedTokens={detectedTokens}
+              onSubmit={q => { setQa(q); setStage(4); }}
+            />
           )}
           {stage === 4 && annotation && qa && (
-            <Step4 annotation={annotation} qa={qa} detectedTokens={detectedTokens}
-              onReset={reset} />
+            <Step4
+              profile={profile}
+              annotation={annotation}
+              qa={qa}
+              detectedTokens={detectedTokens}
+              onReset={reset}
+            />
           )}
         </div>
       </div>
