@@ -21,7 +21,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AudioAnnotation from "./pages/AudioAnnotation.tsx";
 import AudioAnnotationTest from "./pages/AudioAnnotationTest.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import CatfishDetection from "./pages/CatfishDetection.tsx";
+import ImpersonationRedaction from "./pages/ImpersonationRedaction.tsx";
 import CheatingOrSkill from "./pages/CheatingOrSkill.tsx";
 
 const queryClient = new QueryClient();
@@ -47,7 +47,7 @@ const App = () => (
             <Route path="review" element={<InvoiceReviewExport />} />
           </Route>
           <Route path="/use-cases/audio-annotation" element={<AudioAnnotationTest />} />
-          <Route path="/use-cases/dating-trust-safety" element={<CatfishDetection />} />
+          <Route path="/use-cases/dating-trust-safety" element={<ImpersonationRedaction />} />
           <Route path="/use-cases/cheating-or-skill" element={<CheatingOrSkill />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />

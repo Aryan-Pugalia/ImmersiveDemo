@@ -73,12 +73,12 @@ export const useCases: UseCase[] = [
   {
     id: "11",
     slug: "dating-trust-safety",
-    title: "Dating Trust & Safety",
-    description: "Experience catfish detection end-to-end — annotate a profile, watch AI score it, then QA-review and override. Human-in-the-loop Trust & Safety at scale.",
-    icon: "verified_user",
+    title: "Impersonation Review + Policy Redaction",
+    description: "Profile labeling, content monitoring, and redaction of sensitive info + policy violations. Annotate, watch AI review, QA-override, and deliver a clean decision packet.",
+    icon: "policy",
     idTag: "T&S-501",
     categoryTag: "Trust & Safety",
-    secondaryTag: "Catfish Detection",
+    secondaryTag: "Impersonation + Redaction",
   },
   {
     id: "7",
