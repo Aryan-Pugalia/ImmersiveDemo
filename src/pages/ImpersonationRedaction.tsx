@@ -128,7 +128,7 @@ const PROFILES: MockProfile[] = [
         flag:    "Reverse-image match: 81% — linked to fitness influencer @fit_by_jamie",
       },
       {
-        url:     "https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?w=600&h=750&fit=crop&crop=top",
+        url:     "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=600&h=750&fit=crop&crop=faces",
         caption: "Photo 2 — Flagged",
         flag:    "Firearm visible in frame — regulated goods policy flag triggered",
         violationType: "weapon",
@@ -523,20 +523,24 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
         )}
 
         {/* Dark gradient name scrim */}
-        <div className="absolute inset-x-0 bottom-0 h-32"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%)" }} />
+        <div className="absolute inset-x-0 bottom-0 h-40"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)" }} />
         <div className="absolute bottom-3 left-3">
-          <div className="text-white font-bold text-xl leading-tight">
+          <div className="text-white font-bold text-xl leading-tight"
+            style={{ textShadow: "0 1px 8px rgba(0,0,0,1)" }}>
             {profile.display_name}, {profile.age}
           </div>
-          <div className="text-white/70 text-sm">📍 {profile.location}</div>
+          <div className="text-white text-sm opacity-90"
+            style={{ textShadow: "0 1px 6px rgba(0,0,0,1)" }}>
+            📍 {profile.location}
+          </div>
         </div>
 
         {/* Flag banner at top */}
         <div className="absolute top-2 left-2 right-14 flex items-start gap-1.5 px-2.5 py-2 rounded-lg"
-          style={{ background: "rgba(0,0,0,0.70)", backdropFilter: "blur(6px)" }}>
+          style={{ background: "rgba(0,0,0,0.82)", backdropFilter: "blur(6px)" }}>
           <AlertTriangle size={13} className="text-amber-400 mt-0.5 flex-shrink-0" />
-          <span className="text-xs text-amber-300 leading-snug">{photo.flag}</span>
+          <span className="text-xs text-amber-300 leading-snug font-medium">{photo.flag}</span>
         </div>
 
         {/* Weapon badge */}
@@ -599,7 +603,7 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
         <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">System Signals</p>
         <div className="space-y-2">
           {profile.signals.map(s => (
-            <div key={s} className="flex items-start gap-2 text-sm text-amber-400">
+            <div key={s} className="flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400">
               <AlertTriangle size={13} className="flex-shrink-0 mt-0.5" />
               <span>{s}</span>
             </div>
@@ -701,8 +705,8 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
           style={{ background: "rgba(109,40,217,0.12)" }}>
           <span className="text-2xl">✏️</span>
           <div>
-            <div className="text-base font-bold text-violet-300">You are the Human Annotator</div>
-            <div className="text-sm text-violet-400/80">Review this profile and submit your assessment</div>
+            <div className="text-base font-bold text-violet-700 dark:text-violet-300">You are the Human Annotator</div>
+            <div className="text-sm text-violet-600 dark:text-violet-400/80">Review this profile and submit your assessment</div>
           </div>
         </div>
 
@@ -711,9 +715,9 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
           <p className="text-base font-semibold text-foreground mb-3">1 · Profile Label <span className="text-red-400">*</span></p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",  act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-950/30 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/40" },
-              { val: "impersonation" as ProfileLabel, label: "Impersonation",   act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-950/30 border-red-700/50 text-red-400 hover:bg-red-900/40" },
-              { val: "unsure"        as ProfileLabel, label: "Unsure",          act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-950/30 border-amber-700/50 text-amber-400 hover:bg-amber-900/40" },
+              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",  act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 dark:border-emerald-700/50 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40" },
+              { val: "impersonation" as ProfileLabel, label: "Impersonation",   act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-50 dark:bg-red-950/30 border-red-500 dark:border-red-700/50 text-red-800 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40" },
+              { val: "unsure"        as ProfileLabel, label: "Unsure",          act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-50 dark:bg-amber-950/30 border-amber-500 dark:border-amber-700/50 text-amber-800 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40" },
             ] as const).map(o => (
               <button key={o.val} onClick={() => setProfileLabel(o.val)}
                 className={`py-3 rounded-xl border-2 text-sm font-bold transition-all ${profileLabel === o.val ? o.act : o.idle}`}>
@@ -730,7 +734,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
             {RISK_FLAGS.map(f => (
               <button key={f.id} onClick={() => toggleFlag(f.id)}
                 className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border text-sm text-left transition-all ${
-                  riskFlags.has(f.id) ? "border-violet-500/60 text-violet-300" : "border-white/10 text-foreground/70 hover:bg-white/5"
+                  riskFlags.has(f.id) ? "border-violet-500/60 text-violet-700 dark:text-violet-300" : "border-border text-foreground/70 hover:bg-muted/40"
                 }`}
                 style={riskFlags.has(f.id) ? { background: "rgba(109,40,217,0.18)" } : {}}>
                 <div className={`w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all ${
@@ -755,7 +759,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
                 className={`px-2.5 py-2 rounded-lg border text-xs font-semibold text-left transition-all truncate ${
                   selectedCats.has(cat.id)
                     ? "bg-violet-600 border-violet-600 text-white"
-                    : "border-white/15 text-foreground/60 hover:border-violet-500/40 hover:bg-violet-900/20"
+                    : "border-border text-foreground/70 hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20"
                 }`}>
                 {cat.label}
               </button>
@@ -851,8 +855,8 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
           style={{ background: "rgba(37,99,235,0.12)" }}>
           <Brain size={24} className="text-blue-400 flex-shrink-0" />
           <div className="flex-1">
-            <div className="text-base font-bold text-blue-300">AI-Assisted Review</div>
-            <div className="text-sm text-blue-400/80">Deterministic simulation · no real model</div>
+            <div className="text-base font-bold text-blue-700 dark:text-blue-300">AI-Assisted Review</div>
+            <div className="text-sm text-blue-600 dark:text-blue-400/80">Deterministic simulation · no real model</div>
           </div>
           {phase >= 4 && <span className="text-sm px-2 py-0.5 rounded-full font-semibold border border-blue-600/40 text-blue-300" style={{ background: "rgba(37,99,235,0.25)" }}>Complete</span>}
         </div>
@@ -878,8 +882,8 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
             <div className="rounded-2xl border border-amber-700/40 p-4" style={{ background: "rgba(217,119,6,0.12)" }}>
               <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">AI Recommendation</p>
               <div className="flex items-center gap-3 mb-3">
-                <div className="text-2xl font-black text-amber-400">{ai.recommendation}</div>
-                <div className="text-base text-foreground/50">Confidence: <span className="font-bold text-amber-300">{ai.confidence}%</span></div>
+                <div className="text-2xl font-black text-amber-600 dark:text-amber-400">{ai.recommendation}</div>
+                <div className="text-base text-foreground/50">Confidence: <span className="font-bold text-amber-700 dark:text-amber-300">{ai.confidence}%</span></div>
               </div>
               <div className="space-y-2">
                 {ai.signals.map((s, i) => (
@@ -903,16 +907,16 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
             <div className="rounded-xl border border-white/10 p-3" style={{ background: "var(--s2)" }}>
               <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-2">Annotator vs AI</p>
               <div className="flex gap-2">
-                <div className={`flex-1 text-center py-2.5 rounded-xl border text-sm font-bold ${diff.agrees ? "border-emerald-700/50 text-emerald-400" : "border-amber-700/50 text-amber-400"}`}
+                <div className={`flex-1 text-center py-2.5 rounded-xl border text-sm font-bold ${diff.agrees ? "border-emerald-600/50 text-emerald-700 dark:text-emerald-400" : "border-amber-600/50 text-amber-700 dark:text-amber-400"}`}
                   style={diff.agrees ? { background: "rgba(5,150,105,0.12)" } : { background: "rgba(217,119,6,0.12)" }}>
                   You: {annotation.profileLabel}
                 </div>
-                <div className="flex-1 text-center py-2.5 rounded-xl border text-sm font-bold border-amber-600/40 text-amber-300"
+                <div className="flex-1 text-center py-2.5 rounded-xl border text-sm font-bold border-amber-600/40 text-amber-700 dark:text-amber-300"
                   style={{ background: "rgba(217,119,6,0.18)" }}>
                   AI: {ai.recommendation}
                 </div>
               </div>
-              {!diff.agrees && <p className="text-sm text-amber-400/70 mt-2 text-center">{diff.message}</p>}
+              {!diff.agrees && <p className="text-sm text-amber-700 dark:text-amber-400/70 mt-2 text-center">{diff.message}</p>}
             </div>
 
             <Button onClick={onComplete} className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
@@ -965,8 +969,8 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
         style={{ background: "rgba(79,70,229,0.12)" }}>
         <Shield size={24} className="text-indigo-400 flex-shrink-0" />
         <div>
-          <div className="text-base font-bold text-indigo-300">Human QA Review — TP</div>
-          <div className="text-sm text-indigo-400/80">You are a senior QA reviewer. Review both decisions and make the final call.</div>
+          <div className="text-base font-bold text-indigo-700 dark:text-indigo-300">Human QA Review — TP</div>
+          <div className="text-sm text-indigo-600 dark:text-indigo-400/80">You are a senior QA reviewer. Review both decisions and make the final call.</div>
         </div>
       </div>
 
@@ -1005,7 +1009,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
 
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Result</p>
-          <div className="text-base font-black mb-1 text-amber-400">⚠ {ai.recommendation}</div>
+          <div className="text-base font-black mb-1 text-amber-600 dark:text-amber-400">⚠ {ai.recommendation}</div>
           <div className="text-sm text-foreground/50 space-y-1 mb-3">
             <div>Confidence: <strong className="text-foreground/70">{ai.confidence}%</strong></div>
             <div>Categories: <strong className="text-foreground/70">{ai.predictedCategories.map(id => POLICY_CATEGORIES.find(c => c.id === id)?.label).filter(Boolean).join(", ")}</strong></div>
@@ -1060,7 +1064,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
           {QA_REASONS.map(r => (
             <button key={r.id} onClick={() => setQaReason(qaReason === r.id ? null : r.id)}
               className={`px-3 py-2 rounded-full border text-sm font-semibold transition-all ${
-                qaReason === r.id ? "bg-violet-600 border-violet-600 text-white" : "border-white/15 text-foreground/55 hover:border-violet-500/40"
+                qaReason === r.id ? "bg-violet-600 border-violet-600 text-white" : "border-border text-foreground/70 hover:border-violet-500"
               }`}>
               {r.label}
             </button>
