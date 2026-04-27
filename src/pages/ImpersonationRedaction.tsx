@@ -39,10 +39,23 @@ const MOCK_PROFILE = {
   age: 29,
   location: "San Francisco, CA",
   bio_text: BIO_TEXT,
+  // Photo 1: polished headshot — looks stock; Photo 2: outdoor shot — different lighting/background
+  photos: [
+    {
+      url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=520&h=640&fit=crop&crop=faces",
+      caption: "Photo 1 — Primary",
+      flag: "Reverse-image match: 74% similarity to stock portfolio",
+    },
+    {
+      url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=520&h=640&fit=crop&crop=faces",
+      caption: "Photo 2 — Secondary",
+      flag: "Metadata mismatch: EXIF location ≠ stated city",
+    },
+  ],
   signals: [
+    "Photo 1 reverse-image match: 74% similarity to stock portfolio",
     "Rapid profile edits (3 edits in 2 hours)",
     "Reused bio snippet (matched 2 other profiles)",
-    "Cross-platform handle detected",
     "Location ping mismatch (IP: Chicago, stated: SF)",
   ],
 };
@@ -181,16 +194,15 @@ function ProgressStepper({ stage }: { stage: Stage }) {
   );
 }
 
-// ─── SVG avatar placeholder ───────────────────────────────────────────────────
+// ─── Photo flag badge ─────────────────────────────────────────────────────────
 
-function Avatar({ seed = 0, size = 80 }: { seed?: number; size?: number }) {
-  const h = [260, 200, 300, 170][seed % 4];
+function FlagBadge({ text }: { text: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="12" fill={`hsl(${h},45%,18%)`} />
-      <circle cx="40" cy="32" r="14" fill={`hsl(${h},50%,35%)`} />
-      <ellipse cx="40" cy="68" rx="22" ry="14" fill={`hsl(${h},45%,28%)`} />
-    </svg>
+    <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 flex items-start gap-1.5"
+      style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%)" }}>
+      <AlertTriangle size={11} className="text-amber-400 mt-0.5 flex-shrink-0" />
+      <span className="text-[10px] text-amber-300 leading-tight">{text}</span>
+    </div>
   );
 }
 
@@ -335,10 +347,16 @@ function BioEditor({
 // ─── Profile preview card ─────────────────────────────────────────────────────
 
 function ProfileCard({ compact = false }: { compact?: boolean }) {
+  const [activePhoto, setActivePhoto] = useState(0);
+  const photo = MOCK_PROFILE.photos[activePhoto];
+
   if (compact) return (
     <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "var(--s4)" }}>
-      <div className="flex items-center gap-3 p-4">
-        <Avatar size={48} seed={0} />
+      <div className="flex items-center gap-3 p-3">
+        <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+          <img src={MOCK_PROFILE.photos[0].url} alt={MOCK_PROFILE.display_name}
+            className="w-full h-full object-cover object-center" />
+        </div>
         <div>
           <div className="font-bold text-foreground text-sm">{MOCK_PROFILE.display_name}, {MOCK_PROFILE.age}</div>
           <div className="text-xs text-foreground/50">{MOCK_PROFILE.location}</div>
@@ -349,25 +367,66 @@ function ProfileCard({ compact = false }: { compact?: boolean }) {
   );
 
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "var(--s4)" }}>
-      <div className="flex gap-2 p-4 pb-0">
-        <Avatar size={90} seed={0} /><Avatar size={90} seed={2} />
-      </div>
-      <div className="p-4">
-        <div className="flex items-baseline gap-2 mb-0.5">
-          <h2 className="text-lg font-bold text-foreground">{MOCK_PROFILE.display_name}</h2>
-          <span className="text-foreground/40">{MOCK_PROFILE.age}</span>
+    <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "var(--s4)", minWidth: 0 }}>
+      {/* Main photo with flag overlay */}
+      <div className="relative w-full overflow-hidden" style={{ height: 300 }}>
+        <img src={photo.url} alt={MOCK_PROFILE.display_name}
+          className="w-full h-full object-cover object-center transition-opacity duration-300" />
+        {/* Dark gradient + name scrim */}
+        <div className="absolute inset-x-0 bottom-0 h-28"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)" }} />
+        <div className="absolute bottom-3 left-3">
+          <div className="text-white font-bold text-lg leading-tight">
+            {MOCK_PROFILE.display_name}, {MOCK_PROFILE.age}
+          </div>
+          <div className="text-white/70 text-xs">📍 {MOCK_PROFILE.location}</div>
         </div>
-        <p className="text-xs text-foreground/50 mb-3">📍 {MOCK_PROFILE.location} · ID: {MOCK_PROFILE.profile_id}</p>
-        <div className="rounded-xl border border-white/8 p-3 mb-4 max-h-36 overflow-y-auto" style={{ background: "var(--s2)" }}>
+        {/* Flag badge at top */}
+        <div className="absolute top-2 left-2 right-2 flex items-start gap-1.5 px-2 py-1.5 rounded-lg"
+          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}>
+          <AlertTriangle size={11} className="text-amber-400 mt-0.5 flex-shrink-0" />
+          <span className="text-[10px] text-amber-300 leading-tight">{photo.flag}</span>
+        </div>
+        {/* Photo counter */}
+        <div className="absolute top-2 right-2 text-[10px] font-bold text-white/70 px-2 py-0.5 rounded-full"
+          style={{ background: "rgba(0,0,0,0.5)" }}>
+          {activePhoto + 1}/{MOCK_PROFILE.photos.length}
+        </div>
+      </div>
+
+      {/* Thumbnail strip */}
+      <div className="flex gap-2 px-3 pt-3">
+        {MOCK_PROFILE.photos.map((p, i) => (
+          <button key={i} onClick={() => setActivePhoto(i)}
+            className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+              i === activePhoto ? "border-violet-500" : "border-transparent opacity-60 hover:opacity-80"
+            }`}>
+            <img src={p.url} alt={p.caption} className="w-full h-full object-cover object-center" />
+          </button>
+        ))}
+        <div className="flex-1 flex flex-col justify-center pl-1">
+          <div className="text-xs text-foreground/40 italic">{photo.caption}</div>
+          <div className="text-[10px] text-foreground/30 mt-0.5">Click thumbnails to review each photo</div>
+        </div>
+      </div>
+
+      {/* Bio */}
+      <div className="px-4 pt-3 pb-1">
+        <div className="rounded-xl border border-white/8 p-3 max-h-28 overflow-y-auto" style={{ background: "var(--s2)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-1">Bio</p>
           <p className="text-sm text-foreground/75 leading-relaxed">{MOCK_PROFILE.bio_text}</p>
         </div>
+      </div>
+
+      {/* System signals */}
+      <div className="px-4 py-3">
         <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">System Signals</p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="space-y-1.5">
           {MOCK_PROFILE.signals.map(s => (
-            <span key={s} className="text-xs px-2 py-1 rounded-full border border-amber-700/40 text-amber-400"
-              style={{ background: "rgba(217,119,6,0.1)" }}>⚠ {s}</span>
+            <div key={s} className="flex items-start gap-2 text-xs text-amber-400">
+              <AlertTriangle size={11} className="flex-shrink-0 mt-0.5" />
+              <span>{s}</span>
+            </div>
           ))}
         </div>
       </div>
