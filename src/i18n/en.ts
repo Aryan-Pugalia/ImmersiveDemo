@@ -49,8 +49,8 @@ export const en = {
       description: "Label gameplay clips as skill or cheating, watch AI flag anomalies, then QA-override the call. Human-in-the-loop Gaming Trust & Safety at scale.",
     },
     "dating-trust-safety": {
-      title: "Dating Trust & Safety",
-      description: "Experience catfish detection end-to-end — annotate a profile, watch AI score it, then QA-review and override. Human-in-the-loop Trust & Safety at scale.",
+      title: "Impersonation Review + Policy Redaction",
+      description: "Annotate a suspicious dating profile, watch AI flag embedded contact info and policy violations, QA-override the call, and deliver a clean redacted decision packet.",
     },
     "invoice-labeler": {
       title: "Invoice Labeler",

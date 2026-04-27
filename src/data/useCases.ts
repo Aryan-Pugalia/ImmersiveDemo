@@ -77,7 +77,7 @@ export const useCases: UseCase[] = [
     description: "Profile labeling, content monitoring, and redaction of sensitive info + policy violations. Annotate, watch AI review, QA-override, and deliver a clean decision packet.",
     icon: "policy",
     idTag: "T&S-501",
-    categoryTag: "Trust & Safety",
+    categoryTag: "Content Moderation",
     secondaryTag: "Impersonation + Redaction",
   },
   {
