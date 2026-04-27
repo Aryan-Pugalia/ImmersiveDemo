@@ -36,9 +36,13 @@ const POLICY_CATEGORIES = [
 // ─── Profile interface ────────────────────────────────────────────────────────
 
 interface ProfilePhoto {
-  url:     string;
-  caption: string;
-  flag:    string;
+  url:            string;
+  caption:        string;
+  flag:           string;
+  /** If true, render blurred with a content-warning reveal overlay */
+  blurred?:       boolean;
+  /** Optional badge shown on the photo corner */
+  violationType?: "weapon" | "sexual_content";
 }
 
 interface AiResult {
@@ -76,12 +80,12 @@ const PROFILES: MockProfile[] = [
       "— DM for details, no lowballers \uD83D\uDD2B",
     photos: [
       {
-        url:     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=520&h=640&fit=crop&crop=faces",
+        url:     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=750&fit=crop&crop=faces",
         caption: "Photo 1 — Primary",
         flag:    "Reverse-image match: 74% similarity to stock portfolio",
       },
       {
-        url:     "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=520&h=640&fit=crop&crop=faces",
+        url:     "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=750&fit=crop&crop=faces",
         caption: "Photo 2 — Secondary",
         flag:    "Metadata mismatch: EXIF location \u2260 stated city",
       },
@@ -106,7 +110,7 @@ const PROFILES: MockProfile[] = [
     },
   },
 
-  // ── Profile 2: Jamie Rivera — Hate Speech + Illegal Goods ────────────────
+  // ── Profile 2: Jamie Rivera — Hate Speech + Illegal Goods (weapon in photo) ─
   {
     profile_id:   "USR-38817",
     display_name: "Jamie Rivera",
@@ -119,18 +123,19 @@ const PROFILES: MockProfile[] = [
       "or foreigners, keeping it 100%. Real deal only \uD83D\uDD25\uD83C\uDDF8",
     photos: [
       {
-        url:     "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=520&h=640&fit=crop&crop=faces",
+        url:     "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&h=750&fit=crop&crop=faces",
         caption: "Photo 1 — Primary",
         flag:    "Reverse-image match: 81% — linked to fitness influencer @fit_by_jamie",
       },
       {
-        url:     "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=520&h=640&fit=crop&crop=faces",
-        caption: "Photo 2 — Secondary",
-        flag:    "Stock photo detected: found in 3 commercial image databases",
+        url:     "https://images.unsplash.com/photo-1595433707802-6b2626ef1c91?w=600&h=750&fit=crop&crop=top",
+        caption: "Photo 2 — Flagged",
+        flag:    "Firearm visible in frame — regulated goods policy flag triggered",
+        violationType: "weapon",
       },
     ],
     signals: [
-      "Photo 1 reverse-image match: 81% similarity to fitness influencer",
+      "Photo 2 firearm detection: regulated item visible in profile image",
       "Discriminatory keywords detected in bio (automated scan)",
       "Off-platform handle found in bio text (Snapchat)",
       "Regulated item keywords: AR-15, tactical attachments",
@@ -149,7 +154,7 @@ const PROFILES: MockProfile[] = [
     },
   },
 
-  // ── Profile 3: Sam Chen — Scams/Fraud + Platform Integrity ───────────────
+  // ── Profile 3: Sam Chen — Scams/Fraud + Platform Integrity (blurred photo) ─
   {
     profile_id:   "USR-51293",
     display_name: "Sam Chen",
@@ -163,18 +168,20 @@ const PROFILES: MockProfile[] = [
       "Limited spots left, don\u2019t wait!",
     photos: [
       {
-        url:     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=520&h=640&fit=crop&crop=faces",
+        url:     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=750&fit=crop&crop=faces",
         caption: "Photo 1 — Primary",
         flag:    "Reverse-image match: 68% — same photo found on 3 other dating profiles",
       },
       {
-        url:     "https://images.unsplash.com/photo-1463453091185-61582044d556?w=520&h=640&fit=crop&crop=faces",
-        caption: "Photo 2 — Secondary",
-        flag:    "AI-generated face probability: 73% (GAN artifact pattern detected)",
+        url:     "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&h=750&fit=crop&crop=faces",
+        caption: "Photo 2 — Flagged",
+        flag:    "Potentially explicit content — blurred pending reviewer confirmation",
+        blurred:       true,
+        violationType: "sexual_content",
       },
     ],
     signals: [
-      "Photo reverse-image match: 68% — linked to 3 separate dating profiles",
+      "Photo 2 flagged: potentially explicit content — pending manual review",
       "Financial promise language: '30–40% monthly returns' (romance scam pattern)",
       "Multiple off-platform redirects: WhatsApp, Telegram, external website",
       "Account age: 2 days · 47 messages sent in 6 hours (bot-like velocity)",
@@ -292,35 +299,23 @@ function ProgressStepper({ stage }: { stage: Stage }) {
         return (
           <div key={step.n} className="flex items-center">
             <div className="flex flex-col items-center">
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
                 done    ? "bg-violet-600 border-violet-600 text-white" :
                 current ? "bg-[var(--s6)] border-violet-500 text-violet-400 ring-4 ring-violet-900/40" :
                           "bg-[var(--s4)] border-white/10 text-white/30"
               }`}>
-                {done ? <Check size={15} /> : step.n}
+                {done ? <Check size={16} /> : step.n}
               </div>
-              <span className={`mt-1 text-xs font-semibold whitespace-nowrap ${
+              <span className={`mt-1 text-sm font-semibold whitespace-nowrap ${
                 current ? "text-violet-400" : done ? "text-foreground/60" : "text-foreground/30"
               }`}>{step.label}</span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`w-14 h-0.5 mx-1 mb-5 transition-all duration-500 ${stage > step.n ? "bg-violet-600" : "bg-white/10"}`} />
+              <div className={`w-16 h-0.5 mx-1 mb-6 transition-all duration-500 ${stage > step.n ? "bg-violet-600" : "bg-white/10"}`} />
             )}
           </div>
         );
       })}
-    </div>
-  );
-}
-
-// ─── Photo flag badge ─────────────────────────────────────────────────────────
-
-function FlagBadge({ text }: { text: string }) {
-  return (
-    <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 flex items-start gap-1.5"
-      style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%)" }}>
-      <AlertTriangle size={11} className="text-amber-400 mt-0.5 flex-shrink-0" />
-      <span className="text-[10px] text-amber-300 leading-tight">{text}</span>
     </div>
   );
 }
@@ -397,11 +392,11 @@ function BioEditor({
     <div className="space-y-3">
       <div className="flex gap-2 flex-wrap">
         <button disabled={locked} onClick={() => onAutoMark(["email", "phone"])}
-          className="px-3 py-1.5 rounded-lg border border-amber-700/50 text-amber-400 text-xs font-semibold hover:bg-amber-950/40 transition disabled:opacity-40 disabled:cursor-not-allowed">
+          className="px-3 py-2 rounded-lg border border-amber-700/50 text-amber-400 text-sm font-semibold hover:bg-amber-950/40 transition disabled:opacity-40 disabled:cursor-not-allowed">
           🔍 Auto-mark phone/email
         </button>
         <button disabled={locked} onClick={() => onAutoMark(["handle", "link"])}
-          className="px-3 py-1.5 rounded-lg border border-blue-700/50 text-blue-400 text-xs font-semibold hover:bg-blue-950/40 transition disabled:opacity-40 disabled:cursor-not-allowed">
+          className="px-3 py-2 rounded-lg border border-blue-700/50 text-blue-400 text-sm font-semibold hover:bg-blue-950/40 transition disabled:opacity-40 disabled:cursor-not-allowed">
           🔗 Auto-mark handles/links
         </button>
       </div>
@@ -436,20 +431,20 @@ function BioEditor({
       {!locked && pending && (
         <div className="flex items-center gap-2 p-2 rounded-lg border border-violet-600/30"
           style={{ background: "rgba(109,40,217,0.12)" }}>
-          <Scissors size={13} className="text-violet-400" />
-          <span className="text-xs text-violet-300 flex-1">
+          <Scissors size={14} className="text-violet-400" />
+          <span className="text-sm text-violet-300 flex-1">
             Selected: <strong>"{pending.slice(0, 40)}{pending.length > 40 ? "…" : ""}"</strong>
           </span>
           <button onClick={redactSelection}
-            className="px-3 py-1 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition">
+            className="px-3 py-1 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold transition">
             Redact selection
           </button>
-          <button onClick={() => setPending("")} className="text-foreground/40 hover:text-foreground/60 text-xs">✕</button>
+          <button onClick={() => setPending("")} className="text-foreground/40 hover:text-foreground/60 text-sm">✕</button>
         </div>
       )}
 
       <div className="flex gap-2 flex-wrap items-center">
-        <span className="text-xs text-foreground/30">Key:</span>
+        <span className="text-sm text-foreground/30">Key:</span>
         {(["email","phone","handle","link"] as const).map(type => {
           const col = PII_COL[type];
           return (
@@ -468,7 +463,15 @@ function BioEditor({
 
 function ProfileCard({ profile, compact = false }: { profile: MockProfile; compact?: boolean }) {
   const [activePhoto, setActivePhoto] = useState(0);
+  const [revealedPhotos, setRevealedPhotos] = useState<Set<number>>(new Set());
   const photo = profile.photos[activePhoto];
+  const isRevealed = revealedPhotos.has(activePhoto);
+
+  // Reset state when profile changes
+  useEffect(() => {
+    setActivePhoto(0);
+    setRevealedPhotos(new Set());
+  }, [profile.profile_id]);
 
   if (compact) return (
     <div className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: "var(--s4)" }}>
@@ -478,9 +481,9 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
             className="w-full h-full object-cover object-center" />
         </div>
         <div>
-          <div className="font-bold text-foreground text-sm">{profile.display_name}, {profile.age}</div>
-          <div className="text-xs text-foreground/50">{profile.location}</div>
-          <div className="text-xs text-foreground/35">ID: {profile.profile_id}</div>
+          <div className="font-bold text-foreground text-base">{profile.display_name}, {profile.age}</div>
+          <div className="text-sm text-foreground/50">{profile.location}</div>
+          <div className="text-sm text-foreground/35">ID: {profile.profile_id}</div>
         </div>
       </div>
     </div>
@@ -488,52 +491,105 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
 
   return (
     <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "var(--s4)", minWidth: 0 }}>
-      {/* Main photo with flag overlay */}
-      <div className="relative w-full overflow-hidden" style={{ height: 300 }}>
-        <img src={photo.url} alt={profile.display_name}
-          className="w-full h-full object-cover object-center transition-opacity duration-300" />
-        {/* Dark gradient + name scrim */}
-        <div className="absolute inset-x-0 bottom-0 h-28"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)" }} />
+      {/* Main photo with overlays */}
+      <div className="relative w-full overflow-hidden" style={{ height: 420 }}>
+
+        {/* Blurred / normal image */}
+        {photo.blurred && !isRevealed ? (
+          <>
+            <img src={photo.url} alt={profile.display_name}
+              className="w-full h-full object-cover object-center"
+              style={{ filter: "blur(22px)", transform: "scale(1.1)" }} />
+            {/* Content-warning overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6"
+              style={{ background: "rgba(0,0,0,0.55)" }}>
+              <div className="text-5xl">🔞</div>
+              <p className="text-base font-bold text-white text-center leading-snug">
+                Potentially Explicit Content
+              </p>
+              <p className="text-sm text-white/65 text-center">
+                AI flagged this photo for manual review
+              </p>
+              <button
+                onClick={() => setRevealedPhotos(prev => new Set([...prev, activePhoto]))}
+                className="mt-1 px-5 py-2.5 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold transition">
+                Click to Review
+              </button>
+            </div>
+          </>
+        ) : (
+          <img src={photo.url} alt={profile.display_name}
+            className="w-full h-full object-cover object-center transition-opacity duration-300" />
+        )}
+
+        {/* Dark gradient name scrim */}
+        <div className="absolute inset-x-0 bottom-0 h-32"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%)" }} />
         <div className="absolute bottom-3 left-3">
-          <div className="text-white font-bold text-lg leading-tight">
+          <div className="text-white font-bold text-xl leading-tight">
             {profile.display_name}, {profile.age}
           </div>
-          <div className="text-white/70 text-xs">📍 {profile.location}</div>
+          <div className="text-white/70 text-sm">📍 {profile.location}</div>
         </div>
-        {/* Flag badge at top */}
-        <div className="absolute top-2 left-2 right-2 flex items-start gap-1.5 px-2 py-1.5 rounded-lg"
-          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}>
-          <AlertTriangle size={11} className="text-amber-400 mt-0.5 flex-shrink-0" />
-          <span className="text-[10px] text-amber-300 leading-tight">{photo.flag}</span>
+
+        {/* Flag banner at top */}
+        <div className="absolute top-2 left-2 right-14 flex items-start gap-1.5 px-2.5 py-2 rounded-lg"
+          style={{ background: "rgba(0,0,0,0.70)", backdropFilter: "blur(6px)" }}>
+          <AlertTriangle size={13} className="text-amber-400 mt-0.5 flex-shrink-0" />
+          <span className="text-xs text-amber-300 leading-snug">{photo.flag}</span>
         </div>
+
+        {/* Weapon badge */}
+        {photo.violationType === "weapon" && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-white"
+            style={{ background: "rgba(220,38,38,0.85)" }}>
+            🔫 WEAPON
+          </div>
+        )}
+
+        {/* Sexual content badge (when revealed) */}
+        {photo.violationType === "sexual_content" && isRevealed && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-white"
+            style={{ background: "rgba(190,18,60,0.85)" }}>
+            🔞 EXPLICIT
+          </div>
+        )}
+
         {/* Photo counter */}
-        <div className="absolute top-2 right-2 text-[10px] font-bold text-white/70 px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(0,0,0,0.5)" }}>
+        <div className="absolute bottom-3 right-3 text-xs font-bold text-white/70 px-2 py-0.5 rounded-full"
+          style={{ background: "rgba(0,0,0,0.55)" }}>
           {activePhoto + 1}/{profile.photos.length}
         </div>
       </div>
 
       {/* Thumbnail strip */}
-      <div className="flex gap-2 px-3 pt-3">
+      <div className="flex gap-2 px-3 pt-3 items-center">
         {profile.photos.map((p, i) => (
           <button key={i} onClick={() => setActivePhoto(i)}
             className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
               i === activePhoto ? "border-violet-500" : "border-transparent opacity-60 hover:opacity-80"
             }`}>
-            <img src={p.url} alt={p.caption} className="w-full h-full object-cover object-center" />
+            <img src={p.url} alt={p.caption}
+              className="w-full h-full object-cover object-center"
+              style={p.blurred && !revealedPhotos.has(i) ? { filter: "blur(8px)", transform: "scale(1.1)" } : {}} />
+            {p.violationType === "weapon" && (
+              <div className="absolute bottom-0 left-0 right-0 bg-red-700/80 text-[9px] font-bold text-white text-center py-0.5">WEAPON</div>
+            )}
+            {p.violationType === "sexual_content" && (
+              <div className="absolute bottom-0 left-0 right-0 bg-pink-900/80 text-[9px] font-bold text-white text-center py-0.5">EXPLICIT</div>
+            )}
           </button>
         ))}
-        <div className="flex-1 flex flex-col justify-center pl-1">
-          <div className="text-xs text-foreground/40 italic">{photo.caption}</div>
-          <div className="text-[10px] text-foreground/30 mt-0.5">Click thumbnails to review each photo</div>
+        <div className="flex-1 flex flex-col justify-center pl-1 min-w-0">
+          <div className="text-sm text-foreground/50 italic truncate">{photo.caption}</div>
+          <div className="text-xs text-foreground/30 mt-0.5">Click thumbnails to switch</div>
         </div>
       </div>
 
-      {/* Bio */}
+      {/* Bio — no scroll */}
       <div className="px-4 pt-3 pb-1">
-        <div className="rounded-xl border border-white/8 p-3 max-h-28 overflow-y-auto" style={{ background: "var(--s2)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-1">Bio</p>
+        <div className="rounded-xl border border-white/8 p-3" style={{ background: "var(--s2)" }}>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-1.5">Bio</p>
           <p className="text-sm text-foreground/75 leading-relaxed">{profile.bio_text}</p>
         </div>
       </div>
@@ -541,10 +597,10 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
       {/* System signals */}
       <div className="px-4 py-3">
         <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">System Signals</p>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {profile.signals.map(s => (
-            <div key={s} className="flex items-start gap-2 text-xs text-amber-400">
-              <AlertTriangle size={11} className="flex-shrink-0 mt-0.5" />
+            <div key={s} className="flex items-start gap-2 text-sm text-amber-400">
+              <AlertTriangle size={13} className="flex-shrink-0 mt-0.5" />
               <span>{s}</span>
             </div>
           ))}
@@ -560,10 +616,10 @@ function ProfileSelector({ selected, onChange }: { selected: number; onChange: (
   return (
     <div className="rounded-2xl border border-white/10 p-3 mb-4" style={{ background: "var(--s4)" }}>
       <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2.5">Select Profile to Review</p>
-      <div className="flex gap-2.5">
+      <div className="grid grid-cols-3 gap-2">
         {PROFILES.map((p, i) => (
           <button key={p.profile_id} onClick={() => onChange(i)}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border-2 text-left transition-all flex-1 ${
+            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border-2 text-left transition-all min-w-0 overflow-hidden ${
               selected === i
                 ? "border-violet-500 bg-violet-900/30"
                 : "border-white/10 hover:border-violet-500/40 hover:bg-white/4"
@@ -572,10 +628,10 @@ function ProfileSelector({ selected, onChange }: { selected: number; onChange: (
               <img src={p.photos[0].url} alt={p.display_name}
                 className="w-full h-full object-cover object-center" />
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-bold text-foreground truncate">{p.display_name}, {p.age}</div>
-              <div className="text-[10px] text-foreground/45 truncate">{p.profile_id}</div>
-              <div className="text-[10px] text-violet-400/70 truncate">{p.location}</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-bold text-foreground truncate">{p.display_name}, {p.age}</div>
+              <div className="text-xs text-foreground/45 truncate">{p.profile_id}</div>
+              <div className="text-xs text-violet-400/70 truncate">{p.location}</div>
             </div>
           </button>
         ))}
@@ -609,7 +665,6 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
   const [confidence,       setConfidence]        = useState(50);
   const [notes,            setNotes]             = useState("");
 
-  // Reset local state when profile changes
   useEffect(() => {
     setProfileLabel(null);
     setRiskFlags(new Set());
@@ -638,7 +693,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
     <div className="flex gap-5 items-start">
       <ProfileCard profile={profile} />
 
-      <div className="w-[430px] flex-shrink-0 space-y-4">
+      <div className="w-[450px] flex-shrink-0 space-y-4">
         {/* Profile selector */}
         <ProfileSelector selected={selectedProfileIdx} onChange={onProfileChange} />
 
@@ -646,22 +701,22 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
           style={{ background: "rgba(109,40,217,0.12)" }}>
           <span className="text-2xl">✏️</span>
           <div>
-            <div className="text-sm font-bold text-violet-300">You are the Human Annotator</div>
-            <div className="text-xs text-violet-400/80">Review this profile and submit your assessment</div>
+            <div className="text-base font-bold text-violet-300">You are the Human Annotator</div>
+            <div className="text-sm text-violet-400/80">Review this profile and submit your assessment</div>
           </div>
         </div>
 
         {/* 1 · Profile label */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-3">1 · Profile Label <span className="text-red-400">*</span></p>
+          <p className="text-base font-semibold text-foreground mb-3">1 · Profile Label <span className="text-red-400">*</span></p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",       act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-950/30 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/40" },
-              { val: "impersonation" as ProfileLabel, label: "Impersonation",        act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-950/30 border-red-700/50 text-red-400 hover:bg-red-900/40" },
-              { val: "unsure"        as ProfileLabel, label: "Unsure",               act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-950/30 border-amber-700/50 text-amber-400 hover:bg-amber-900/40" },
+              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",  act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-950/30 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/40" },
+              { val: "impersonation" as ProfileLabel, label: "Impersonation",   act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-950/30 border-red-700/50 text-red-400 hover:bg-red-900/40" },
+              { val: "unsure"        as ProfileLabel, label: "Unsure",          act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-950/30 border-amber-700/50 text-amber-400 hover:bg-amber-900/40" },
             ] as const).map(o => (
               <button key={o.val} onClick={() => setProfileLabel(o.val)}
-                className={`py-2.5 rounded-xl border-2 text-xs font-bold transition-all ${profileLabel === o.val ? o.act : o.idle}`}>
+                className={`py-3 rounded-xl border-2 text-sm font-bold transition-all ${profileLabel === o.val ? o.act : o.idle}`}>
                 {o.label}
               </button>
             ))}
@@ -670,11 +725,11 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
 
         {/* 2 · Risk flags */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-3">2 · Risk Flags</p>
+          <p className="text-base font-semibold text-foreground mb-3">2 · Risk Flags</p>
           <div className="space-y-2">
             {RISK_FLAGS.map(f => (
               <button key={f.id} onClick={() => toggleFlag(f.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm text-left transition-all ${
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border text-sm text-left transition-all ${
                   riskFlags.has(f.id) ? "border-violet-500/60 text-violet-300" : "border-white/10 text-foreground/70 hover:bg-white/5"
                 }`}
                 style={riskFlags.has(f.id) ? { background: "rgba(109,40,217,0.18)" } : {}}>
@@ -691,13 +746,13 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
 
         {/* 3 · Policy categories — compact 2-col grid with tooltips */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-1">3 · Policy Categories</p>
-          <p className="text-[10px] text-foreground/35 mb-2.5">Hover a chip for its definition · select all that apply</p>
+          <p className="text-base font-semibold text-foreground mb-1">3 · Policy Categories</p>
+          <p className="text-xs text-foreground/35 mb-2.5">Hover a chip for its definition · select all that apply</p>
           <div className="grid grid-cols-2 gap-1.5">
             {POLICY_CATEGORIES.map(cat => (
               <button key={cat.id} onClick={() => toggleCat(cat.id)}
                 title={cat.def}
-                className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold text-left transition-all truncate ${
+                className={`px-2.5 py-2 rounded-lg border text-xs font-semibold text-left transition-all truncate ${
                   selectedCats.has(cat.id)
                     ? "bg-violet-600 border-violet-600 text-white"
                     : "border-white/15 text-foreground/60 hover:border-violet-500/40 hover:bg-violet-900/20"
@@ -707,13 +762,13 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
             ))}
           </div>
           {selectedCats.size > 0 && (
-            <p className="text-[10px] text-violet-400/70 mt-2">{selectedCats.size} categor{selectedCats.size === 1 ? "y" : "ies"} selected</p>
+            <p className="text-xs text-violet-400/70 mt-2">{selectedCats.size} categor{selectedCats.size === 1 ? "y" : "ies"} selected</p>
           )}
         </div>
 
         {/* 4 · Bio redaction */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-3">4 · Bio Redaction Tool</p>
+          <p className="text-base font-semibold text-foreground mb-3">4 · Bio Redaction Tool</p>
           <BioEditor
             bioText={profile.bio_text}
             detectedTokens={detectedTokens}
@@ -724,15 +779,15 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
             onAutoMark={autoMark}
             locked={false}
           />
-          <p className="text-xs text-foreground/35 mt-2">{redactedIds.size} token{redactedIds.size !== 1 ? "s" : ""} marked for redaction</p>
+          <p className="text-sm text-foreground/35 mt-2">{redactedIds.size} token{redactedIds.size !== 1 ? "s" : ""} marked for redaction</p>
         </div>
 
         {/* 5 · Confidence + notes */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-3">5 · Confidence &amp; Notes</p>
+          <p className="text-base font-semibold text-foreground mb-3">5 · Confidence &amp; Notes</p>
           <div className="flex justify-between mb-1">
-            <span className="text-xs text-foreground/50">Confidence</span>
-            <span className="text-xs font-bold text-violet-400">{confidence}%</span>
+            <span className="text-sm text-foreground/50">Confidence</span>
+            <span className="text-sm font-bold text-violet-400">{confidence}%</span>
           </div>
           <input type="range" min={0} max={100} value={confidence}
             onChange={e => setConfidence(Number(e.target.value))}
@@ -746,7 +801,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
           className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
           Submit Annotation →
         </Button>
-        {!canSubmit && <p className="text-xs text-foreground/40 text-center">Select a profile label and at least one risk flag or category</p>}
+        {!canSubmit && <p className="text-sm text-foreground/40 text-center">Select a profile label and at least one risk flag or category</p>}
       </div>
     </div>
   );
@@ -791,27 +846,27 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
   return (
     <div className="flex gap-5 items-start">
       <ProfileCard profile={profile} />
-      <div className="w-[430px] flex-shrink-0 space-y-4">
+      <div className="w-[450px] flex-shrink-0 space-y-4">
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30"
           style={{ background: "rgba(37,99,235,0.12)" }}>
-          <Brain size={22} className="text-blue-400 flex-shrink-0" />
+          <Brain size={24} className="text-blue-400 flex-shrink-0" />
           <div className="flex-1">
-            <div className="text-sm font-bold text-blue-300">AI-Assisted Review</div>
-            <div className="text-xs text-blue-400/80">Deterministic simulation · no real model</div>
+            <div className="text-base font-bold text-blue-300">AI-Assisted Review</div>
+            <div className="text-sm text-blue-400/80">Deterministic simulation · no real model</div>
           </div>
-          {phase >= 4 && <span className="text-xs px-2 py-0.5 rounded-full font-semibold border border-blue-600/40 text-blue-300" style={{ background: "rgba(37,99,235,0.25)" }}>Complete</span>}
+          {phase >= 4 && <span className="text-sm px-2 py-0.5 rounded-full font-semibold border border-blue-600/40 text-blue-300" style={{ background: "rgba(37,99,235,0.25)" }}>Complete</span>}
         </div>
 
         <div className="rounded-2xl border border-white/10 p-4 space-y-3" style={{ background: "var(--s4)" }}>
           {steps.map((label, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
                 phase > i ? "bg-blue-600" : "bg-white/8 border border-white/15"
               }`}>
-                {phase > i ? <Check size={11} className="text-white" /> :
+                {phase > i ? <Check size={13} className="text-white" /> :
                   phase === i ? <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" /> : null}
               </div>
-              <span className={`text-xs transition-colors ${phase > i ? "text-foreground/70" : phase === i ? "text-blue-300" : "text-foreground/25"}`}>
+              <span className={`text-sm transition-colors ${phase > i ? "text-foreground/70" : phase === i ? "text-blue-300" : "text-foreground/25"}`}>
                 {label}
               </span>
             </div>
@@ -821,43 +876,43 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
         {phase >= 4 && (
           <>
             <div className="rounded-2xl border border-amber-700/40 p-4" style={{ background: "rgba(217,119,6,0.12)" }}>
-              <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">AI Recommendation</p>
+              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">AI Recommendation</p>
               <div className="flex items-center gap-3 mb-3">
                 <div className="text-2xl font-black text-amber-400">{ai.recommendation}</div>
-                <div className="text-sm text-foreground/50">Confidence: <span className="font-bold text-amber-300">{ai.confidence}%</span></div>
+                <div className="text-base text-foreground/50">Confidence: <span className="font-bold text-amber-300">{ai.confidence}%</span></div>
               </div>
               <div className="space-y-2">
                 {ai.signals.map((s, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <AlertTriangle size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs text-foreground/60 leading-relaxed">{s}</span>
+                    <AlertTriangle size={13} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-foreground/60 leading-relaxed">{s}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-              <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">Redaction Comparison</p>
-              <div className="space-y-2 text-xs">
-                {agrees > 0 && <div className="flex items-center gap-2 text-emerald-400"><Check size={12} />{agrees} redaction{agrees > 1 ? "s" : ""} match AI suggestion</div>}
-                {onlyAI > 0 && <div className="flex items-center gap-2 text-amber-400"><AlertTriangle size={12} />AI suggests {onlyAI} additional you didn't mark</div>}
-                {onlyHuman > 0 && <div className="flex items-center gap-2 text-blue-400"><ShieldAlert size={12} />You marked {onlyHuman} AI didn't flag</div>}
+              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">Redaction Comparison</p>
+              <div className="space-y-2 text-sm">
+                {agrees > 0 && <div className="flex items-center gap-2 text-emerald-400"><Check size={13} />{agrees} redaction{agrees > 1 ? "s" : ""} match AI suggestion</div>}
+                {onlyAI > 0 && <div className="flex items-center gap-2 text-amber-400"><AlertTriangle size={13} />AI suggests {onlyAI} additional you didn't mark</div>}
+                {onlyHuman > 0 && <div className="flex items-center gap-2 text-blue-400"><ShieldAlert size={13} />You marked {onlyHuman} AI didn't flag</div>}
               </div>
             </div>
 
             <div className="rounded-xl border border-white/10 p-3" style={{ background: "var(--s2)" }}>
-              <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Annotator vs AI</p>
+              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-2">Annotator vs AI</p>
               <div className="flex gap-2">
-                <div className={`flex-1 text-center py-2 rounded-xl border text-xs font-bold ${diff.agrees ? "border-emerald-700/50 text-emerald-400" : "border-amber-700/50 text-amber-400"}`}
+                <div className={`flex-1 text-center py-2.5 rounded-xl border text-sm font-bold ${diff.agrees ? "border-emerald-700/50 text-emerald-400" : "border-amber-700/50 text-amber-400"}`}
                   style={diff.agrees ? { background: "rgba(5,150,105,0.12)" } : { background: "rgba(217,119,6,0.12)" }}>
                   You: {annotation.profileLabel}
                 </div>
-                <div className="flex-1 text-center py-2 rounded-xl border text-xs font-bold border-amber-600/40 text-amber-300"
+                <div className="flex-1 text-center py-2.5 rounded-xl border text-sm font-bold border-amber-600/40 text-amber-300"
                   style={{ background: "rgba(217,119,6,0.18)" }}>
                   AI: {ai.recommendation}
                 </div>
               </div>
-              {!diff.agrees && <p className="text-xs text-amber-400/70 mt-2 text-center">{diff.message}</p>}
+              {!diff.agrees && <p className="text-sm text-amber-400/70 mt-2 text-center">{diff.message}</p>}
             </div>
 
             <Button onClick={onComplete} className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
@@ -908,35 +963,34 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
     <div className="space-y-4">
       <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30"
         style={{ background: "rgba(79,70,229,0.12)" }}>
-        <Shield size={22} className="text-indigo-400 flex-shrink-0" />
+        <Shield size={24} className="text-indigo-400 flex-shrink-0" />
         <div>
-          <div className="text-sm font-bold text-indigo-300">Human QA Review — TP</div>
-          <div className="text-xs text-indigo-400/80">You are a senior QA reviewer. Review both decisions and make the final call.</div>
+          <div className="text-base font-bold text-indigo-300">Human QA Review — TP</div>
+          <div className="text-sm text-indigo-400/80">You are a senior QA reviewer. Review both decisions and make the final call.</div>
         </div>
       </div>
 
-      {/* Side-by-side */}
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">👤 Annotator Result</p>
-          <div className={`text-sm font-black mb-2 ${annotation.profileLabel === "genuine" ? "text-emerald-400" : annotation.profileLabel === "impersonation" ? "text-red-400" : "text-amber-400"}`}>
+          <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">👤 Annotator Result</p>
+          <div className={`text-base font-black mb-2 ${annotation.profileLabel === "genuine" ? "text-emerald-400" : annotation.profileLabel === "impersonation" ? "text-red-400" : "text-amber-400"}`}>
             {annotation.profileLabel === "genuine" ? "✓ Likely Genuine" : annotation.profileLabel === "impersonation" ? "✗ Likely Impersonation" : "? Unsure"}
           </div>
-          <div className="text-xs text-foreground/50 space-y-1 mb-3">
+          <div className="text-sm text-foreground/50 space-y-1 mb-3">
             <div>Confidence: <strong className="text-foreground/70">{annotation.confidence}%</strong></div>
             <div>Categories: <strong className="text-foreground/70">{[...annotation.selectedCategories].map(id => POLICY_CATEGORIES.find(c => c.id === id)?.label).filter(Boolean).join(", ") || "—"}</strong></div>
             {annotation.notes && <div className="italic text-foreground/40">"{annotation.notes}"</div>}
           </div>
-          <p className="text-xs font-semibold text-foreground/35 mb-2">Redaction toggles:</p>
-          <div className="space-y-1.5 max-h-36 overflow-y-auto">
+          <p className="text-sm font-semibold text-foreground/35 mb-2">Redaction toggles:</p>
+          <div className="space-y-1.5 max-h-40 overflow-y-auto">
             {allTokens.map(tok => (
               <label key={tok.id} className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={activeRedactionIds.has(tok.id)} onChange={() => toggleRed(tok.id)}
                   className="accent-violet-600 w-3 h-3 flex-shrink-0" />
-                <span className={`text-xs font-mono flex-1 ${activeRedactionIds.has(tok.id) ? "line-through text-red-400" : "text-foreground/60"}`}>
+                <span className={`text-sm font-mono flex-1 ${activeRedactionIds.has(tok.id) ? "line-through text-red-400" : "text-foreground/60"}`}>
                   {tok.original.slice(0, 22)}{tok.original.length > 22 ? "…" : ""}
                 </span>
-                <span className="text-[10px] px-1.5 rounded-full border"
+                <span className="text-xs px-1.5 rounded-full border"
                   style={{ color: PII_COL[tok.type]?.text ?? "#fff", borderColor: PII_COL[tok.type]?.border ?? "white", background: PII_COL[tok.type]?.bg ?? "transparent" }}>
                   {tok.type}
                 </span>
@@ -944,49 +998,47 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
             ))}
           </div>
           <div className="flex gap-2 mt-3 pt-3 border-t border-white/8">
-            <button onClick={applyAI} className="flex-1 px-2 py-1.5 rounded-lg border border-amber-700/50 text-amber-400 text-xs font-semibold hover:bg-amber-950/30 transition">Apply AI redactions</button>
-            <button onClick={keepHuman} className="flex-1 px-2 py-1.5 rounded-lg border border-violet-700/50 text-violet-400 text-xs font-semibold hover:bg-violet-950/30 transition">Keep annotator</button>
+            <button onClick={applyAI} className="flex-1 px-2 py-2 rounded-lg border border-amber-700/50 text-amber-400 text-sm font-semibold hover:bg-amber-950/30 transition">Apply AI redactions</button>
+            <button onClick={keepHuman} className="flex-1 px-2 py-2 rounded-lg border border-violet-700/50 text-violet-400 text-sm font-semibold hover:bg-violet-950/30 transition">Keep annotator</button>
           </div>
         </div>
 
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Result</p>
-          <div className="text-sm font-black mb-1 text-amber-400">⚠ {ai.recommendation}</div>
-          <div className="text-xs text-foreground/50 space-y-1 mb-3">
+          <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Result</p>
+          <div className="text-base font-black mb-1 text-amber-400">⚠ {ai.recommendation}</div>
+          <div className="text-sm text-foreground/50 space-y-1 mb-3">
             <div>Confidence: <strong className="text-foreground/70">{ai.confidence}%</strong></div>
             <div>Categories: <strong className="text-foreground/70">{ai.predictedCategories.map(id => POLICY_CATEGORIES.find(c => c.id === id)?.label).filter(Boolean).join(", ")}</strong></div>
           </div>
-          <p className="text-xs font-semibold text-foreground/35 mb-2">AI suggested redactions:</p>
+          <p className="text-sm font-semibold text-foreground/35 mb-2">AI suggested redactions:</p>
           <div className="space-y-1.5">
             {detectedTokens.filter(t => ai.suggestedRedactionTypes.includes(t.type)).map(tok => (
               <div key={tok.id} className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-amber-500 flex-shrink-0" />
-                <span className="text-xs font-mono text-foreground/60 flex-1">{tok.original.slice(0, 22)}{tok.original.length > 22 ? "…" : ""}</span>
-                <span className="text-[10px] text-amber-400/70">{tok.type}</span>
+                <span className="text-sm font-mono text-foreground/60 flex-1">{tok.original.slice(0, 22)}{tok.original.length > 22 ? "…" : ""}</span>
+                <span className="text-xs text-amber-400/70">{tok.type}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Preview */}
       <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-foreground">Redacted Bio Preview</p>
-          <button onClick={() => setShowPreview(v => !v)} className="flex items-center gap-1.5 text-xs text-foreground/50 hover:text-foreground/70 transition">
-            {showPreview ? <EyeOff size={13} /> : <Eye size={13} />}{showPreview ? "Hide" : "Show"}
+          <p className="text-base font-semibold text-foreground">Redacted Bio Preview</p>
+          <button onClick={() => setShowPreview(v => !v)} className="flex items-center gap-1.5 text-sm text-foreground/50 hover:text-foreground/70 transition">
+            {showPreview ? <EyeOff size={14} /> : <Eye size={14} />}{showPreview ? "Hide" : "Show"}
           </button>
         </div>
         {showPreview && (
-          <p className="text-xs font-mono leading-relaxed text-foreground/70 p-3 rounded-lg border border-white/8" style={{ background: "var(--s2)" }}>
+          <p className="text-sm font-mono leading-relaxed text-foreground/70 p-3 rounded-lg border border-white/8" style={{ background: "var(--s2)" }}>
             {previewBio}
           </p>
         )}
       </div>
 
-      {/* QA decision */}
       <div className="rounded-2xl border border-white/10 p-5" style={{ background: "var(--s4)" }}>
-        <p className="text-sm font-bold text-foreground mb-4">Final QA Decision</p>
+        <p className="text-base font-bold text-foreground mb-4">Final QA Decision</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {([
             { val: "approve"  as FinalLabel, icon: "✓", label: "Approve",  sub: "Profile passes review", idle: "border-emerald-700/50 text-emerald-400",  idleBg: "rgba(5,150,105,0.12)",  act: "border-emerald-500 bg-emerald-500 text-white" },
@@ -997,17 +1049,17 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
               className={`p-3 rounded-xl border-2 text-left transition-all ${finalLabel === o.val ? o.act : o.idle}`}
               style={finalLabel !== o.val ? { background: o.idleBg } : {}}>
               <div className="text-xl mb-1">{o.icon}</div>
-              <div className="text-sm font-bold">{o.label}</div>
-              <div className="text-xs opacity-70 mt-0.5">{o.sub}</div>
+              <div className="text-base font-bold">{o.label}</div>
+              <div className="text-sm opacity-70 mt-0.5">{o.sub}</div>
             </button>
           ))}
         </div>
 
-        <p className="text-xs font-semibold text-foreground/50 mb-2">QA Reason (select if overriding AI):</p>
+        <p className="text-sm font-semibold text-foreground/50 mb-2">QA Reason (select if overriding AI):</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {QA_REASONS.map(r => (
             <button key={r.id} onClick={() => setQaReason(qaReason === r.id ? null : r.id)}
-              className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
+              className={`px-3 py-2 rounded-full border text-sm font-semibold transition-all ${
                 qaReason === r.id ? "bg-violet-600 border-violet-600 text-white" : "border-white/15 text-foreground/55 hover:border-violet-500/40"
               }`}>
               {r.label}
@@ -1073,41 +1125,39 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
   }[qa.finalLabel ?? "escalate"];
 
   const kpis = [
-    { icon: <Shield size={16} className="text-violet-400" />,     label: "Sensitive info removed", value: `${activeList.length}`,                  sub: "tokens redacted",           bg: "rgba(109,40,217,0.20)" },
-    { icon: <AlertTriangle size={16} className="text-amber-400"/>, label: "Escalations triggered", value: qa.finalLabel === "escalate" ? "1" : "0", sub: "senior review queued",      bg: "rgba(217,119,6,0.20)"  },
-    { icon: <Users size={16} className="text-blue-400" />,         label: "QA overrides",          value: qa.qaReason ? "1" : "0",                  sub: qa.qaReason ? QA_REASONS.find(r => r.id === qa.qaReason)?.label ?? "" : "none", bg: "rgba(37,99,235,0.20)" },
-    { icon: <Zap size={16} className="text-emerald-400" />,        label: "Time to decision",       value: "~3 min",                                 sub: "annotation → AI → QA",      bg: "rgba(5,150,105,0.20)"  },
+    { icon: <Shield size={18} className="text-violet-400" />,     label: "Sensitive info removed", value: `${activeList.length}`,                  sub: "tokens redacted",           bg: "rgba(109,40,217,0.20)" },
+    { icon: <AlertTriangle size={18} className="text-amber-400"/>, label: "Escalations triggered", value: qa.finalLabel === "escalate" ? "1" : "0", sub: "senior review queued",      bg: "rgba(217,119,6,0.20)"  },
+    { icon: <Users size={18} className="text-blue-400" />,         label: "QA overrides",          value: qa.qaReason ? "1" : "0",                  sub: qa.qaReason ? QA_REASONS.find(r => r.id === qa.qaReason)?.label ?? "" : "none", bg: "rgba(37,99,235,0.20)" },
+    { icon: <Zap size={18} className="text-emerald-400" />,        label: "Time to decision",       value: "~3 min",                                 sub: "annotation → AI → QA",      bg: "rgba(5,150,105,0.20)"  },
   ];
 
   return (
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
-      <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "var(--s8)" }}>
+      <div className="inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-1.5 rounded-full" style={{ background: "var(--s8)" }}>
         📬 Step 4: Final Decision Delivered
       </div>
 
       <div className={`w-full rounded-2xl border-2 p-6 text-center ${cfg.ring}`} style={{ background: cfg.bg }}>
         <div className="text-5xl mb-3">{cfg.icon}</div>
         <div className={`text-2xl font-black mb-2 ${cfg.head}`}>Profile {cfg.label}</div>
-        <p className="text-sm text-foreground/60">Final decision: <strong className="text-foreground/80">{qa.finalLabel}</strong></p>
-        {qa.qaNotes && <p className="text-xs text-foreground/40 mt-2 italic">"{qa.qaNotes}"</p>}
+        <p className="text-base text-foreground/60">Final decision: <strong className="text-foreground/80">{qa.finalLabel}</strong></p>
+        {qa.qaNotes && <p className="text-sm text-foreground/40 mt-2 italic">"{qa.qaNotes}"</p>}
       </div>
 
-      {/* Final redacted bio */}
       <div className="w-full rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-        <p className="text-sm font-semibold text-foreground mb-2">Final Redacted Bio</p>
-        <p className="text-xs font-mono leading-relaxed text-foreground/70 p-3 rounded-lg border border-white/8" style={{ background: "var(--s2)" }}>
+        <p className="text-base font-semibold text-foreground mb-2">Final Redacted Bio</p>
+        <p className="text-sm font-mono leading-relaxed text-foreground/70 p-3 rounded-lg border border-white/8" style={{ background: "var(--s2)" }}>
           {finalBio}
         </p>
       </div>
 
-      {/* Policy categories */}
       <div className="w-full rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-        <p className="text-sm font-semibold text-foreground mb-2">Policy Categories Applied</p>
+        <p className="text-base font-semibold text-foreground mb-2">Policy Categories Applied</p>
         <div className="flex flex-wrap gap-2">
           {appliedCategories.map(id => {
             const cat = POLICY_CATEGORIES.find(c => c.id === id);
             return cat ? (
-              <span key={id} className="px-3 py-1 rounded-full border border-violet-600/40 text-violet-300 text-xs font-semibold"
+              <span key={id} className="px-3 py-1 rounded-full border border-violet-600/40 text-violet-300 text-sm font-semibold"
                 style={{ background: "rgba(109,40,217,0.18)" }}>
                 {cat.label}
               </span>
@@ -1116,35 +1166,33 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
         </div>
       </div>
 
-      {/* Decision packet JSON */}
       <div className="w-full rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-foreground flex items-center gap-2"><FileText size={14} /> Decision Packet</p>
+          <p className="text-base font-semibold text-foreground flex items-center gap-2"><FileText size={15} /> Decision Packet</p>
           <button onClick={() => setShowJson(v => !v)}
-            className="flex items-center gap-1.5 text-xs text-foreground/50 hover:text-foreground/70 transition">
-            {showJson ? <EyeOff size={12} /> : <Eye size={12} />}{showJson ? "Hide JSON" : "View JSON"}
+            className="flex items-center gap-1.5 text-sm text-foreground/50 hover:text-foreground/70 transition">
+            {showJson ? <EyeOff size={13} /> : <Eye size={13} />}{showJson ? "Hide JSON" : "View JSON"}
           </button>
         </div>
         {showJson && (
-          <pre className="text-xs font-mono text-emerald-300/80 p-3 rounded-xl overflow-x-auto border border-white/8"
+          <pre className="text-sm font-mono text-emerald-300/80 p-3 rounded-xl overflow-x-auto border border-white/8"
             style={{ background: "rgba(0,0,0,0.4)" }}>
             {JSON.stringify(packet, null, 2)}
           </pre>
         )}
       </div>
 
-      {/* KPI tiles */}
       <div className="w-full">
-        <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3 text-center">Demo Metrics <span className="normal-case font-normal">(simulated)</span></p>
+        <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3 text-center">Demo Metrics <span className="normal-case font-normal">(simulated)</span></p>
         <div className="grid grid-cols-2 gap-3">
           {kpis.map((kpi, i) => (
             <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-              <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-2" style={{ background: kpi.bg }}>
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-2" style={{ background: kpi.bg }}>
                 {kpi.icon}
               </div>
-              <div className="text-xl font-black text-foreground">{kpi.value}</div>
-              <div className="text-xs font-semibold text-foreground/75">{kpi.label}</div>
-              <div className="text-xs text-foreground/40 mt-0.5">{kpi.sub}</div>
+              <div className="text-2xl font-black text-foreground">{kpi.value}</div>
+              <div className="text-sm font-semibold text-foreground/75">{kpi.label}</div>
+              <div className="text-sm text-foreground/40 mt-0.5">{kpi.sub}</div>
             </div>
           ))}
         </div>
@@ -1152,10 +1200,10 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
 
       <div className="flex gap-3 w-full">
         <Button variant="outline" onClick={onReset} className="flex-1 gap-2 h-12 border-white/15 text-foreground/80 hover:bg-white/5">
-          <RotateCcw size={14} /> Try Another Profile
+          <RotateCcw size={15} /> Try Another Profile
         </Button>
         <Button onClick={() => navigate("/use-cases")} className="flex-1 bg-violet-600 hover:bg-violet-700 gap-2 h-12">
-          <ArrowLeft size={14} /> Back to DataStudio
+          <ArrowLeft size={15} /> Back to DataStudio
         </Button>
       </div>
     </div>
@@ -1203,11 +1251,11 @@ export default function ImpersonationRedaction() {
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle />
             <button onClick={reset}
-              className="flex items-center gap-1.5 text-xs text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border border-white/10 hover:border-white/25 transition">
-              <RefreshCw size={12} /> Reset Demo
+              className="flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border border-white/10 hover:border-white/25 transition">
+              <RefreshCw size={13} /> Reset Demo
             </button>
-            <ShieldAlert size={14} className="text-violet-400" />
-            <span className="text-xs bg-violet-600/20 text-violet-300 border border-violet-600/30 px-3 py-1 rounded-full font-semibold">
+            <ShieldAlert size={15} className="text-violet-400" />
+            <span className="text-sm bg-violet-600/20 text-violet-300 border border-violet-600/30 px-3 py-1 rounded-full font-semibold">
               Content Moderation · Live Demo
             </span>
           </div>
