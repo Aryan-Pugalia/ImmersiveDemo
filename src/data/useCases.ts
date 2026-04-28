@@ -81,6 +81,16 @@ export const useCases: UseCase[] = [
     secondaryTag: "Impersonation + Redaction",
   },
   {
+    id: "13",
+    slug: "video-object-tracking",
+    title: "Tracking Through Obstacles – Gaming AI",
+    description: "Review multi-object video tracking across occlusions and ID switches. Correct partial/full occlusion failures, draw annotations on problem frames, QA the fix, and deliver a clean tracking output.",
+    icon: "track_changes",
+    idTag: "VID-601",
+    categoryTag: "Video Annotation / Object Tracking",
+    secondaryTag: "Gaming AI",
+  },
+  {
     id: "7",
     slug: "invoice-labeler",
     title: "Invoice Labeler",

@@ -56,6 +56,10 @@ export const en = {
       title: "Invoice Labeler",
       description: "Label and extract structured fields from invoices and receipts — vendor, totals, line items — with bounding-box annotation and JSON export.",
     },
+    "video-object-tracking": {
+      title: "Tracking Through Obstacles – Gaming AI",
+      description: "Review multi-object video tracking across occlusions and ID switches. Correct failures, draw annotations on problem frames, QA the fix, and deliver a clean tracking output.",
+    },
   } as Record<string, { title: string; description: string }>,
 
   // ── Capabilities marquee ──────────────────────────────────────────────────
