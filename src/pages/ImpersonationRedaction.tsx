@@ -490,7 +490,7 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
   );
 
   return (
-    <div className="rounded-2xl border border-white/10 overflow-hidden flex-1" style={{ background: "var(--s4)", minWidth: 0 }}>
+    <div className="rounded-2xl border border-border overflow-hidden flex-1" style={{ background: "var(--s4)", minWidth: 0 }}>
       {/* Main photo with overlays */}
       <div className="relative w-full overflow-hidden" style={{ height: 420 }}>
 
@@ -525,14 +525,18 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
         {/* Dark gradient name scrim */}
         <div className="absolute inset-x-0 bottom-0 h-40"
           style={{ background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)" }} />
-        <div className="absolute bottom-3 left-3">
-          <div className="text-white font-bold text-xl leading-tight"
-            style={{ textShadow: "0 1px 8px rgba(0,0,0,1)" }}>
-            {profile.display_name}, {profile.age}
+        <div className="absolute bottom-3 left-3 right-3">
+          <div className="inline-block px-2.5 py-1 rounded-lg mb-1"
+            style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(4px)" }}>
+            <div className="text-white font-bold text-lg leading-tight">
+              {profile.display_name}, {profile.age}
+            </div>
           </div>
-          <div className="text-white text-sm opacity-90"
-            style={{ textShadow: "0 1px 6px rgba(0,0,0,1)" }}>
-            📍 {profile.location}
+          <div className="block">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm font-medium text-white"
+              style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}>
+              📍 {profile.location}
+            </span>
           </div>
         </div>
 
@@ -618,15 +622,15 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
 
 function ProfileSelector({ selected, onChange }: { selected: number; onChange: (i: number) => void }) {
   return (
-    <div className="rounded-2xl border border-white/10 p-3 mb-4" style={{ background: "var(--s4)" }}>
+    <div className="rounded-2xl border border-border p-3 mb-4" style={{ background: "var(--s4)" }}>
       <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2.5">Select Profile to Review</p>
       <div className="grid grid-cols-3 gap-2">
         {PROFILES.map((p, i) => (
           <button key={p.profile_id} onClick={() => onChange(i)}
             className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border-2 text-left transition-all min-w-0 overflow-hidden ${
               selected === i
-                ? "border-violet-500 bg-violet-900/30"
-                : "border-white/10 hover:border-violet-500/40 hover:bg-white/4"
+                ? "border-violet-500 bg-violet-100 dark:bg-violet-900/30"
+                : "border-border hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-white/4"
             }`}>
             <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
               <img src={p.photos[0].url} alt={p.display_name}
@@ -635,7 +639,7 @@ function ProfileSelector({ selected, onChange }: { selected: number; onChange: (
             <div className="min-w-0 flex-1">
               <div className="text-sm font-bold text-foreground truncate">{p.display_name}, {p.age}</div>
               <div className="text-xs text-foreground/45 truncate">{p.profile_id}</div>
-              <div className="text-xs text-violet-400/70 truncate">{p.location}</div>
+              <div className="text-xs text-violet-700 dark:text-violet-400/70 truncate">{p.location}</div>
             </div>
           </button>
         ))}
@@ -701,23 +705,22 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
         {/* Profile selector */}
         <ProfileSelector selected={selectedProfileIdx} onChange={onProfileChange} />
 
-        <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-violet-600/30"
-          style={{ background: "rgba(109,40,217,0.12)" }}>
+        <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-violet-400 dark:border-violet-600/30 bg-violet-100 dark:bg-[rgba(109,40,217,0.12)]">
           <span className="text-2xl">✏️</span>
           <div>
-            <div className="text-base font-bold text-violet-700 dark:text-violet-300">You are the Human Annotator</div>
-            <div className="text-sm text-violet-600 dark:text-violet-400/80">Review this profile and submit your assessment</div>
+            <div className="text-base font-bold text-violet-950 dark:text-violet-300">You are the Human Annotator</div>
+            <div className="text-sm text-violet-800 dark:text-violet-400/80">Review this profile and submit your assessment</div>
           </div>
         </div>
 
         {/* 1 · Profile label */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+        <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-base font-semibold text-foreground mb-3">1 · Profile Label <span className="text-red-400">*</span></p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",  act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 dark:border-emerald-700/50 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40" },
-              { val: "impersonation" as ProfileLabel, label: "Impersonation",   act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-50 dark:bg-red-950/30 border-red-500 dark:border-red-700/50 text-red-800 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40" },
-              { val: "unsure"        as ProfileLabel, label: "Unsure",          act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-50 dark:bg-amber-950/30 border-amber-500 dark:border-amber-700/50 text-amber-800 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40" },
+              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",  act: "bg-emerald-500 border-emerald-500 text-white", idle: "bg-emerald-100 dark:bg-emerald-950/30 border-emerald-600 dark:border-emerald-700/50 text-emerald-900 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/40" },
+              { val: "impersonation" as ProfileLabel, label: "Impersonation",   act: "bg-red-500 border-red-500 text-white",         idle: "bg-red-100 dark:bg-red-950/30 border-red-600 dark:border-red-700/50 text-red-900 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/40" },
+              { val: "unsure"        as ProfileLabel, label: "Unsure",          act: "bg-amber-500 border-amber-500 text-white",     idle: "bg-amber-100 dark:bg-amber-950/30 border-amber-600 dark:border-amber-700/50 text-amber-900 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/40" },
             ] as const).map(o => (
               <button key={o.val} onClick={() => setProfileLabel(o.val)}
                 className={`py-3 rounded-xl border-2 text-sm font-bold transition-all ${profileLabel === o.val ? o.act : o.idle}`}>
@@ -728,7 +731,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
         </div>
 
         {/* 2 · Risk flags */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+        <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-base font-semibold text-foreground mb-3">2 · Risk Flags</p>
           <div className="space-y-2">
             {RISK_FLAGS.map(f => (
@@ -738,7 +741,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
                 }`}
                 style={riskFlags.has(f.id) ? { background: "rgba(109,40,217,0.18)" } : {}}>
                 <div className={`w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                  riskFlags.has(f.id) ? "bg-violet-600 border-violet-600" : "border-white/20"
+                  riskFlags.has(f.id) ? "bg-violet-600 border-violet-600" : "border-gray-400 dark:border-white/20"
                 }`}>
                   {riskFlags.has(f.id) && <Check size={10} className="text-white" />}
                 </div>
@@ -749,7 +752,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
         </div>
 
         {/* 3 · Policy categories — compact 2-col grid with tooltips */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+        <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-base font-semibold text-foreground mb-1">3 · Policy Categories</p>
           <p className="text-xs text-foreground/35 mb-2.5">Hover a chip for its definition · select all that apply</p>
           <div className="grid grid-cols-2 gap-1.5">
@@ -771,7 +774,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
         </div>
 
         {/* 4 · Bio redaction */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+        <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-base font-semibold text-foreground mb-3">4 · Bio Redaction Tool</p>
           <BioEditor
             bioText={profile.bio_text}
@@ -787,7 +790,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
         </div>
 
         {/* 5 · Confidence + notes */}
-        <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+        <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-base font-semibold text-foreground mb-3">5 · Confidence &amp; Notes</p>
           <div className="flex justify-between mb-1">
             <span className="text-sm text-foreground/50">Confidence</span>
@@ -895,7 +898,7 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+            <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
               <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">Redaction Comparison</p>
               <div className="space-y-2 text-sm">
                 {agrees > 0 && <div className="flex items-center gap-2 text-emerald-400"><Check size={13} />{agrees} redaction{agrees > 1 ? "s" : ""} match AI suggestion</div>}
@@ -1027,7 +1030,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+      <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
         <div className="flex items-center justify-between mb-2">
           <p className="text-base font-semibold text-foreground">Redacted Bio Preview</p>
           <button onClick={() => setShowPreview(v => !v)} className="flex items-center gap-1.5 text-sm text-foreground/50 hover:text-foreground/70 transition">
@@ -1148,14 +1151,14 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
         {qa.qaNotes && <p className="text-sm text-foreground/40 mt-2 italic">"{qa.qaNotes}"</p>}
       </div>
 
-      <div className="w-full rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+      <div className="w-full rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
         <p className="text-base font-semibold text-foreground mb-2">Final Redacted Bio</p>
         <p className="text-sm font-mono leading-relaxed text-foreground/70 p-3 rounded-lg border border-white/8" style={{ background: "var(--s2)" }}>
           {finalBio}
         </p>
       </div>
 
-      <div className="w-full rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+      <div className="w-full rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
         <p className="text-base font-semibold text-foreground mb-2">Policy Categories Applied</p>
         <div className="flex flex-wrap gap-2">
           {appliedCategories.map(id => {
@@ -1170,7 +1173,7 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
         </div>
       </div>
 
-      <div className="w-full rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+      <div className="w-full rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
         <div className="flex items-center justify-between mb-3">
           <p className="text-base font-semibold text-foreground flex items-center gap-2"><FileText size={15} /> Decision Packet</p>
           <button onClick={() => setShowJson(v => !v)}
@@ -1190,7 +1193,7 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
         <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3 text-center">Demo Metrics <span className="normal-case font-normal">(simulated)</span></p>
         <div className="grid grid-cols-2 gap-3">
           {kpis.map((kpi, i) => (
-            <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
+            <div key={i} className="rounded-xl border border-border p-4" style={{ background: "var(--s4)" }}>
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-2" style={{ background: kpi.bg }}>
                 {kpi.icon}
               </div>
