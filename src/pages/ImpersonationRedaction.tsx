@@ -526,18 +526,18 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
         )}
 
         {/* Dark gradient name scrim */}
-        <div className="absolute inset-x-0 bottom-0 h-40"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)" }} />
+        <div className="absolute inset-x-0 bottom-0 h-48"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.75) 50%, transparent 100%)" }} />
         <div className="absolute bottom-3 left-3 right-3">
-          <div className="inline-block px-2.5 py-1 rounded-lg mb-1"
-            style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(4px)" }}>
-            <div className="text-white font-bold text-lg leading-tight">
+          <div className="inline-block px-3 py-1.5 rounded-lg mb-1.5"
+            style={{ background: "rgba(0,0,0,0.92)", border: "1px solid rgba(255,255,255,0.12)" }}>
+            <div style={{ color: "#ffffff", fontWeight: 800, fontSize: "17px", lineHeight: "1.2", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
               {profile.display_name}, {profile.age}
             </div>
           </div>
           <div className="block">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-sm font-medium text-white"
-              style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold"
+              style={{ background: "rgba(0,0,0,0.88)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.10)", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
               📍 {profile.location}
             </span>
           </div>
