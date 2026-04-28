@@ -56,6 +56,10 @@ export const en = {
       title: "Invoice Labeler",
       description: "Label and extract structured fields from invoices and receipts — vendor, totals, line items — with bounding-box annotation and JSON export.",
     },
+    "intelligent-archives": {
+      title: "Intelligent Document Archives",
+      description: "Digitize, structure, and activate enterprise archives using secure scanning, intelligent indexing, and governed retrieval.",
+    },
     "video-object-tracking": {
       title: "Tracking Through Obstacles – Gaming AI",
       description: "Review multi-object video tracking across occlusions and ID switches. Correct failures, draw annotations on problem frames, QA the fix, and deliver a clean tracking output.",

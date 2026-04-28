@@ -81,6 +81,16 @@ export const useCases: UseCase[] = [
     secondaryTag: "Impersonation + Redaction",
   },
   {
+    id: "14",
+    slug: "intelligent-archives",
+    title: "Intelligent Document Archives",
+    description: "Digitize, structure, and activate enterprise archives using secure scanning, intelligent indexing, and governed retrieval. From physical records to AI-ready enterprise knowledge.",
+    icon: "folder_data",
+    idTag: "IM-001",
+    categoryTag: "Digitization · Search · Enterprise AI",
+    secondaryTag: "Governance",
+  },
+  {
     id: "13",
     slug: "video-object-tracking",
     title: "Tracking Through Obstacles – Gaming AI",
