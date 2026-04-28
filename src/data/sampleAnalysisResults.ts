@@ -233,7 +233,7 @@ export const SAMPLE_ANALYSIS_RESULTS: Record<string, SegmentationResult> = {
 
   // ── NIH OpenI chest X-rays ────────────────────────────────────────────────
 
-  "https://openi.nlm.nih.gov/imgs/512/CXR100_IM-0019-1001.png": {
+  "/samples/chest-nodule-xray.png": {
     imageType: "Chest X-Ray",
     summary:
       "PA chest radiograph demonstrates a solitary pulmonary nodule in the right lower lobe measuring 1.8 cm. Smooth borders and moderate density suggest a benign aetiology; however, given size, CT correlation and PET scan are recommended to exclude early-stage lung malignancy.",
@@ -268,7 +268,7 @@ export const SAMPLE_ANALYSIS_RESULTS: Record<string, SegmentationResult> = {
     ],
   },
 
-  "https://openi.nlm.nih.gov/imgs/512/CXR200_IM-0547-1001.png": {
+  "/samples/chest-perihilar-xray.png": {
     imageType: "Chest X-Ray",
     summary:
       "PA chest radiograph shows a large perihilar mass in the right lung with associated right-sided pleural effusion. The mass demonstrates lobulated margins and causes rightward tracheal deviation. Findings are highly suspicious for centrally arising lung carcinoma with regional spread.",
@@ -303,7 +303,7 @@ export const SAMPLE_ANALYSIS_RESULTS: Record<string, SegmentationResult> = {
     ],
   },
 
-  "https://openi.nlm.nih.gov/imgs/512/CXR300_IM-1003-1001.png": {
+  "/samples/chest-hilar-xray.png": {
     imageType: "Chest X-Ray",
     summary:
       "PA chest radiograph demonstrates bilateral hilar lymph node enlargement with a right paratracheal soft tissue mass, raising concern for mediastinal lymphoma or sarcoidosis with malignant transformation. No pulmonary consolidation. Clinical correlation with serum LDH, beta-2 microglobulin and CT-chest recommended.",

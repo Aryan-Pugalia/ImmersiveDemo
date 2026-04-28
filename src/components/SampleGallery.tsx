@@ -36,21 +36,20 @@ const SAMPLES = [
     description: "Fundus imaging with posterior pole choroidal tumour",
     url: "/samples/retinal-scan.jpg",
   },
-  // ── NIH OpenI (Indiana University CXR — public domain) ────────────────────
   {
     name: "Pulmonary Nodule X-Ray",
     description: "Solitary 1.8 cm right lower lobe pulmonary nodule",
-    url: "https://openi.nlm.nih.gov/imgs/512/CXR100_IM-0019-1001.png",
+    url: "/samples/chest-nodule-xray.png",
   },
   {
     name: "Right Lung Mass X-Ray",
     description: "Large right perihilar mass with ipsilateral effusion",
-    url: "https://openi.nlm.nih.gov/imgs/512/CXR200_IM-0547-1001.png",
+    url: "/samples/chest-perihilar-xray.png",
   },
   {
     name: "Hilar Adenopathy X-Ray",
     description: "Bilateral hilar enlargement consistent with mediastinal involvement",
-    url: "https://openi.nlm.nih.gov/imgs/512/CXR300_IM-1003-1001.png",
+    url: "/samples/chest-hilar-xray.png",
   },
 ];
 
