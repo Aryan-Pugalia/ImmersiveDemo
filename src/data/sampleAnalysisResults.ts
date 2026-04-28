@@ -233,7 +233,7 @@ export const SAMPLE_ANALYSIS_RESULTS: Record<string, SegmentationResult> = {
 
   // ── NIH OpenI chest X-rays ────────────────────────────────────────────────
 
-  "/samples/chest-nodule-xray.png": {
+  "/samples/chest-nodule-xray.jpg": {
     imageType: "Chest X-Ray",
     summary:
       "PA chest radiograph demonstrates a solitary pulmonary nodule in the right lower lobe measuring 1.8 cm. Smooth borders and moderate density suggest a benign aetiology; however, given size, CT correlation and PET scan are recommended to exclude early-stage lung malignancy.",

@@ -39,7 +39,7 @@ const SAMPLES = [
   {
     name: "Pulmonary Nodule X-Ray",
     description: "Solitary 1.8 cm right lower lobe pulmonary nodule",
-    url: "/samples/chest-nodule-xray.png",
+    url: "/samples/chest-nodule-xray.jpg",
   },
   {
     name: "Right Lung Mass X-Ray",
