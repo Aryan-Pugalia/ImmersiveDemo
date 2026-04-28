@@ -5,20 +5,52 @@ interface SampleGalleryProps {
 }
 
 const SAMPLES = [
+  // ── Local samples ─────────────────────────────────────────────────────────
   {
     name: "Lung Tumor X-Ray",
-    description: "Chest radiograph with visible lung mass",
+    description: "Chest radiograph with spiculated right upper lobe mass",
     url: "/samples/lung-tumor-xray.jpg",
   },
   {
     name: "Brain Tumor MRI",
-    description: "Axial MRI with glioblastoma",
+    description: "Axial MRI with glioblastoma and midline shift",
     url: "/samples/brain-tumor-mri.jpg",
   },
   {
     name: "Liver CT Scan",
-    description: "Contrast-enhanced CT with hepatic lesion",
+    description: "Contrast-enhanced CT with hepatocellular carcinoma",
     url: "/samples/liver-tumor-ct.jpg",
+  },
+  {
+    name: "Cerebral Metastases MRI",
+    description: "T1-contrast MRI with multiple ring-enhancing lesions",
+    url: "/samples/brain-mri.jpg",
+  },
+  {
+    name: "Pleural Mass Chest X-Ray",
+    description: "PA chest radiograph with right pleural-based mass",
+    url: "/samples/chest-xray.jpg",
+  },
+  {
+    name: "Retinal Choroidal Lesion",
+    description: "Fundus imaging with posterior pole choroidal tumour",
+    url: "/samples/retinal-scan.jpg",
+  },
+  // ── NIH OpenI (Indiana University CXR — public domain) ────────────────────
+  {
+    name: "Pulmonary Nodule X-Ray",
+    description: "Solitary 1.8 cm right lower lobe pulmonary nodule",
+    url: "https://openi.nlm.nih.gov/imgs/512/CXR100_IM-0019-1001.png",
+  },
+  {
+    name: "Right Lung Mass X-Ray",
+    description: "Large right perihilar mass with ipsilateral effusion",
+    url: "https://openi.nlm.nih.gov/imgs/512/CXR200_IM-0547-1001.png",
+  },
+  {
+    name: "Hilar Adenopathy X-Ray",
+    description: "Bilateral hilar enlargement consistent with mediastinal involvement",
+    url: "https://openi.nlm.nih.gov/imgs/512/CXR300_IM-1003-1001.png",
   },
 ];
 
