@@ -1,11 +1,11 @@
 /**
  * IntelligentArchives.tsx
  * ─────────────────────────────────────────────────────────────────────────────
- * Iron Mountain – Intelligent Document Archives
+ * Intelligent Document Archives
  * Priority #1 monetisation play: Intelligent Archive / Enterprise AI
  *
  * Modules:
- *   A – Archive Source selector (maps to IM data assets)
+ *   A – Archive Source selector (maps to data assets)
  *   B – Digitisation → Structuring → Intelligence pipeline
  *   C – InSight DXP mock UI (search, filter, AI metadata)
  *   D – Retrieval & Activation timeline
@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-// ─── Iron Mountain palette ────────────────────────────────────────────────────
+// ─── Accent palette ───────────────────────────────────────────────────────────
 const IM      = "#C8102E";
 const IM_SOFT = "rgba(200,16,46,0.10)";
 const IM_MID  = "rgba(200,16,46,0.20)";
@@ -85,7 +85,7 @@ const ARCHIVE_SOURCES: Record<ArchiveSource, {
 const PIPELINE_STAGES = [
   {
     label: "Digitization", subtitle: "Scan · Convert · Ingest",
-    detail: "High-fidelity document scanning via Iron Mountain SecureBase facilities. OCR, barcode recognition, and image enhancement. Output: raw digital files + metadata JSON. Chain-of-custody initiated at scan time.",
+    detail: "High-fidelity document scanning via secure scanning facilities. OCR, barcode recognition, and image enhancement. Output: raw digital files + metadata JSON. Chain-of-custody initiated at scan time.",
     bullets: ["300+ DPI scanning", "Multi-language OCR", "Barcode & QR indexing", "Chain-of-custody started"],
     videoSrc: "/videos/im-scanning.mp4",
     videoPoster: "/videos/im-scanning-poster.jpg",
@@ -184,7 +184,7 @@ const PRESENTER_SCRIPTS: Record<DemoModule, { title: string; points: string[]; h
   source: {
     title: "Why Archive Source Matters",
     points: [
-      "Iron Mountain manages 950M+ boxes globally — the largest physical archive in enterprise.",
+      "Enterprise clients manage hundreds of millions of physical boxes — the largest archives in the industry.",
       "Priority #1 play: Intelligent Archive operates on CLIENT-OWNED data — lowest possible data risk.",
       "Physical records (~62%) are the biggest opportunity with near-zero consent friction.",
       "Digitised content is already structured — fastest path to AI activation.",
@@ -195,10 +195,10 @@ const PRESENTER_SCRIPTS: Record<DemoModule, { title: string; points: string[]; h
   pipeline: {
     title: "The Digitisation-to-Intelligence Stack",
     points: [
-      "Stage 1 – Digitisation: Iron Mountain's existing scan ops become the data pipeline.",
+      "Stage 1 – Digitisation: existing scan operations become the data pipeline.",
       "Stage 2 – Structuring: InSight DXP classifies and indexes every document automatically.",
       "Stage 3 – Intelligence: AI activates search, workflows, and insights on the structured archive.",
-      "This end-to-end stack is already proprietary IM infrastructure — minimal new capex.",
+      "This end-to-end stack leverages existing client infrastructure — minimal new capex.",
       "TP provides the annotation, QA, and RLHF layer between Stage 2 and 3.",
     ],
     handoff: "→ TP's role: train the models powering InSight DXP classification and extraction accuracy.",
@@ -206,7 +206,7 @@ const PRESENTER_SCRIPTS: Record<DemoModule, { title: string; points: string[]; h
   insight: {
     title: "InSight DXP — The Product",
     points: [
-      "InSight DXP is Iron Mountain's AI-powered document management platform.",
+      "InSight DXP is an AI-powered document management platform.",
       "Enables natural-language search across millions of classified, indexed records.",
       "AI metadata (labels, summaries, extracted fields) cuts manual review time by 70-85%.",
       "Client retains full ownership — InSight never exposes data cross-client.",
@@ -288,7 +288,7 @@ function ModuleA({
           Choose Archive Source
         </h2>
         <p className="text-sm text-muted-foreground">
-          Select an Iron Mountain data asset type to see how it maps to the Intelligent Archive monetisation play.
+          Select an archive data asset type to see how it maps to the Intelligent Archive monetisation play.
         </p>
       </div>
 
@@ -379,7 +379,7 @@ function ModuleB({
           Digitisation → Intelligence Pipeline
         </h2>
         <p className="text-sm text-muted-foreground">
-          Tap a stage to see how Iron Mountain converts physical archives into an enterprise AI knowledge layer.
+          Tap a stage to see how physical archives are converted into an enterprise AI knowledge layer.
         </p>
       </div>
 
@@ -905,7 +905,7 @@ export default function IntelligentArchives() {
             </span>
             <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full font-bold ml-1"
               style={{ background: IM_SOFT, color: IM }}>
-              Iron Mountain
+              Enterprise AI
             </span>
           </div>
 
