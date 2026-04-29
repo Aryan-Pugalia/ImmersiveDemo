@@ -91,101 +91,9 @@ const EVENT_TYPES: { id: EventType; label: string; color: string }[] = [
 ];
 
 // ─── Mocked tracking keyframes ────────────────────────────────────────────────
-// CS:GO overhead radar-style clip. PLR-01 (cyan) is the suspect player.
-// Enters smoke cloud at t≈2.5s → fully hidden → exits with wrong ID (PLR-05).
-
-const KEYFRAMES: TrackKeyframe[] = [
-  // ── Phase 1: Clean tracking — players in open area ───────────────────────
-  { t: 0.0, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.07, 0.38, 0.13, 0.16], conf: 0.97, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.42, 0.18, 0.12, 0.15], conf: 0.94, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.70, 0.57, 0.12, 0.15], conf: 0.91, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 0.5, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.12, 0.39, 0.13, 0.16], conf: 0.96, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.46, 0.20, 0.12, 0.15], conf: 0.93, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.67, 0.54, 0.12, 0.15], conf: 0.90, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 1.0, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.18, 0.40, 0.13, 0.16], conf: 0.95, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.50, 0.22, 0.12, 0.15], conf: 0.92, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.64, 0.52, 0.12, 0.15], conf: 0.89, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 1.5, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.24, 0.40, 0.13, 0.16], conf: 0.95, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.54, 0.24, 0.12, 0.15], conf: 0.91, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.61, 0.50, 0.12, 0.15], conf: 0.88, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 2.0, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.30, 0.41, 0.13, 0.16], conf: 0.94, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.57, 0.26, 0.12, 0.15], conf: 0.90, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.58, 0.49, 0.12, 0.15], conf: 0.87, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  // ── Phase 2: PLR-01 enters smoke cloud — partial occlusion (t=2.5) ──────
-  { t: 2.5, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.35, 0.41, 0.13, 0.16], conf: 0.77, status: "partial_occlusion", color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.61, 0.28, 0.12, 0.15], conf: 0.89, status: "tracking",         color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.55, 0.47, 0.12, 0.15], conf: 0.85, status: "tracking",         color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 3.0, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.39, 0.42, 0.13, 0.16], conf: 0.59, status: "partial_occlusion", color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.63, 0.30, 0.12, 0.15], conf: 0.88, status: "tracking",         color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.52, 0.46, 0.12, 0.15], conf: 0.84, status: "tracking",         color: TRACK_COLORS["PLR-03"] },
-  ]},
-  // ── Phase 3: Fully inside smoke — track lost (t=3.5–5.0) ────────────────
-  { t: 3.5, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.42, 0.43, 0.13, 0.16], conf: 0.32, status: "full_occlusion", color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.65, 0.31, 0.12, 0.15], conf: 0.87, status: "tracking",       color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.49, 0.45, 0.12, 0.15], conf: 0.83, status: "tracking",       color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 4.0, tracks: [
-    { id: "PLR-01", label: "PLR-01", bbox: [0.44, 0.46, 0.13, 0.16], conf: 0.17, status: "lost",       color: "#ef4444" },
-    { id: "PLR-02", label: "PLR-02", bbox: [0.67, 0.33, 0.12, 0.15], conf: 0.86, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03", bbox: [0.46, 0.44, 0.12, 0.15], conf: 0.82, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 4.5, tracks: [
-    { id: "PLR-01", label: "PLR-01 (?)", bbox: [0.47, 0.49, 0.13, 0.16], conf: 0.11, status: "lost",   color: "#ef4444" },
-    { id: "PLR-02", label: "PLR-02",     bbox: [0.69, 0.34, 0.12, 0.15], conf: 0.85, status: "tracking", color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",     bbox: [0.43, 0.43, 0.12, 0.15], conf: 0.81, status: "tracking", color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 5.0, tracks: [
-    { id: "PLR-01", label: "PLR-01 (?)", bbox: [0.51, 0.52, 0.13, 0.16], conf: 0.08, status: "lost",   color: "#ef4444" },
-    { id: "PLR-02", label: "PLR-02",     bbox: [0.71, 0.36, 0.12, 0.15], conf: 0.84, status: "tracking", color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",     bbox: [0.40, 0.42, 0.12, 0.15], conf: 0.80, status: "tracking", color: TRACK_COLORS["PLR-03"] },
-  ]},
-  // ── Phase 4: Exits smoke — ID switch (t=5.5) ─────────────────────────────
-  { t: 5.5, tracks: [
-    { id: "PLR-05", label: "PLR-05 ⚠",  bbox: [0.54, 0.41, 0.13, 0.16], conf: 0.41, status: "id_switch",  color: TRACK_COLORS["PLR-05"] },
-    { id: "PLR-02", label: "PLR-02",     bbox: [0.73, 0.37, 0.12, 0.15], conf: 0.83, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",     bbox: [0.37, 0.41, 0.12, 0.15], conf: 0.79, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 6.0, tracks: [
-    { id: "PLR-05", label: "PLR-05 ⚠",  bbox: [0.58, 0.41, 0.13, 0.16], conf: 0.44, status: "id_switch",  color: TRACK_COLORS["PLR-05"] },
-    { id: "PLR-02", label: "PLR-02",     bbox: [0.75, 0.38, 0.12, 0.15], conf: 0.82, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",     bbox: [0.34, 0.40, 0.12, 0.15], conf: 0.78, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  // ── Phase 5: Correct ID restored after human fix (t=6.5+) ────────────────
-  { t: 6.5, tracks: [
-    { id: "PLR-01", label: "PLR-01",  bbox: [0.62, 0.40, 0.13, 0.16], conf: 0.73, status: "recovered",  color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02",  bbox: [0.77, 0.39, 0.12, 0.15], conf: 0.81, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",  bbox: [0.31, 0.39, 0.12, 0.15], conf: 0.77, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 7.0, tracks: [
-    { id: "PLR-01", label: "PLR-01",  bbox: [0.66, 0.40, 0.13, 0.16], conf: 0.85, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02",  bbox: [0.79, 0.40, 0.12, 0.15], conf: 0.80, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",  bbox: [0.28, 0.38, 0.12, 0.15], conf: 0.76, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 7.5, tracks: [
-    { id: "PLR-01", label: "PLR-01",  bbox: [0.70, 0.40, 0.13, 0.16], conf: 0.90, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02",  bbox: [0.81, 0.41, 0.12, 0.15], conf: 0.79, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",  bbox: [0.25, 0.37, 0.12, 0.15], conf: 0.75, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-  { t: 8.0, tracks: [
-    { id: "PLR-01", label: "PLR-01",  bbox: [0.74, 0.40, 0.13, 0.16], conf: 0.94, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
-    { id: "PLR-02", label: "PLR-02",  bbox: [0.83, 0.42, 0.12, 0.15], conf: 0.78, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
-    { id: "PLR-03", label: "PLR-03",  bbox: [0.22, 0.36, 0.12, 0.15], conf: 0.74, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
-  ]},
-];
+// The video already has the AI tracking overlay baked in (green box).
+// No additional canvas tracks are drawn — KEYFRAMES is intentionally empty.
+const KEYFRAMES: TrackKeyframe[] = [];
 
 // Problem frames the user can jump to
 const PROBLEM_FRAMES = [
@@ -390,27 +298,9 @@ function VideoPanel({
           {stage === 1 && (
             <span className="px-2 py-0.5 rounded text-xs font-bold"
               style={{ background: "rgba(0,0,0,0.75)", color: "#a855f7" }}>
-              3 TRACKS ACTIVE
+              AI TRACKER LIVE
             </span>
           )}
-        </div>
-        {/* Confidence HUD */}
-        {stage === 1 && (() => {
-          const tracks = interpolateTracks(currentTime);
-          const primary = tracks.find(t => t.id === "PLR-01" || t.id === "PLR-05");
-          if (!primary) return null;
-          const meta = STATUS_META[primary.status];
-          return (
-            <div className="absolute top-3 right-3 pointer-events-none"
-              style={{ background: "rgba(0,0,0,0.80)", borderRadius: 8, border: `1px solid ${meta.color}44`, padding: "6px 10px" }}>
-              <div className="text-xs text-white/50 uppercase tracking-wider mb-0.5">Primary Target</div>
-              <div className="text-sm font-bold font-mono" style={{ color: meta.color }}>{meta.icon} {meta.label}</div>
-              <div className="text-xs mt-0.5" style={{ color: `${meta.color}99` }}>
-                conf {Math.round(primary.conf * 100)}%
-              </div>
-            </div>
-          );
-        })()}
       </div>
 
       {/* Controls */}
@@ -502,9 +392,6 @@ function Stage1({
   onStep:      (dir: 1 | -1) => void;
   onSubmit:    () => void;
 }) {
-  const tracks = useMemo(() => interpolateTracks(currentTime), [currentTime]);
-  const failures = tracks.filter(t => t.status === "lost" || t.status === "id_switch");
-
   return (
     <div className="flex gap-5 items-start">
       <VideoPanel videoRef={videoRef} canvasRef={canvasRef} duration={duration}
@@ -519,50 +406,19 @@ function Stage1({
           <Crosshair size={22} className="text-blue-400 flex-shrink-0" />
           <div>
             <div className="text-sm font-bold text-blue-300">AI Tracker — Model Output</div>
-            <div className="text-xs text-blue-400/70">Mocked predictions · no real inference</div>
+            <div className="text-xs text-blue-400/70">Tracking overlay baked into video</div>
           </div>
         </div>
 
-        {/* Live track list */}
-        <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">Live Tracks</p>
-          <div className="space-y-2.5">
-            {tracks.map(t => {
-              const meta = STATUS_META[t.status];
-              return (
-                <div key={t.id} className="flex items-center gap-2.5 p-2.5 rounded-xl border"
-                  style={{ borderColor: `${t.color}35`, background: `${t.color}0a` }}>
-                  <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: t.color }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold font-mono truncate" style={{ color: t.color }}>{t.label}</div>
-                    <div className="text-xs mt-0.5" style={{ color: meta.color }}>{meta.icon} {meta.label}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold" style={{ color: t.conf < 0.35 ? "#ef4444" : t.conf < 0.7 ? "#f59e0b" : "#22c55e" }}>
-                      {Math.round(t.conf * 100)}%
-                    </div>
-                    <div className="text-xs text-foreground/35">conf</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* AI output note */}
+        <div className="rounded-2xl border border-blue-800/40 p-4" style={{ background: "rgba(37,99,235,0.10)" }}>
+          <p className="text-xs font-bold text-blue-400/60 uppercase tracking-wider mb-2">AI Tracker Output</p>
+          <p className="text-sm text-foreground/60 leading-relaxed">
+            The <strong className="text-foreground/80">green bounding box</strong> in the video is the AI
+            model's live tracking output. Watch for moments where the box drifts, freezes, or loses
+            the target through obstacles.
+          </p>
         </div>
-
-        {/* Failures panel */}
-        {failures.length > 0 && (
-          <div className="rounded-2xl border border-red-800/40 p-4" style={{ background: "rgba(220,38,38,0.10)" }}>
-            <p className="text-xs font-bold text-red-400/60 uppercase tracking-wider mb-2">AI Failures Detected</p>
-            <div className="space-y-2">
-              {failures.map(f => (
-                <div key={f.id} className="flex items-center gap-2 text-sm text-red-300">
-                  <AlertTriangle size={13} className="text-red-400 flex-shrink-0" />
-                  <span>{f.id}: {STATUS_META[f.status].label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Problem frame jump list */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
