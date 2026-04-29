@@ -27,6 +27,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("tp-theme", theme);
   }, [theme]);
 
+  // Listen for theme changes posted from the parent page (homepage iframe container)
+  useEffect(() => {
+    function handleMessage(e: MessageEvent) {
+      if (e.data?.type === "tp-theme") {
+        const incoming = e.data.theme as Theme;
+        setTheme(incoming);
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
   const toggleTheme = () =>
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
 

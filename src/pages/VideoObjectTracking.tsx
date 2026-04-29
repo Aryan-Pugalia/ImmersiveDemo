@@ -670,7 +670,6 @@ export default function VideoObjectTracking() {
             <span className="text-sm text-foreground/70 truncate">Tracking Through Obstacles</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <ThemeToggle />
             <button onClick={reset}
               className={`flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border transition ${isLight ? "border-black/15 hover:border-black/30" : "border-white/10 hover:border-white/25"}`}>
               <RefreshCw size={13} /> Reset

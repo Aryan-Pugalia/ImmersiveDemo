@@ -1011,7 +1011,6 @@ export default function IntelligentArchives() {
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <ThemeToggle />
             {view !== "landing" && (
               <button onClick={goBack}
                 className={`flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border transition ${isLight ? "border-black/15 hover:border-black/30" : "border-white/10 hover:border-white/25"}`}>
