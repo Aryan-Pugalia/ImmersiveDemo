@@ -979,6 +979,8 @@ function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
 // ─── Main export ──────────────────────────────────────────────────────────────
 export default function IntelligentArchives() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isLight   = theme === "light";
   const [view,  setView]  = useState<"landing" | SubCase>("landing");
   const [stage, setStage] = useState<Stage>(1);
 
@@ -992,19 +994,19 @@ export default function IntelligentArchives() {
   return (
     <div className="min-h-screen" style={{ background: "var(--s0)" }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10" style={{ background: "hsl(0,0%,5%)" }}>
+      <header className={`sticky top-0 z-50 w-full border-b ${isLight ? "bg-white border-black/10" : "border-white/10"}`} style={isLight ? {} : { background: "hsl(0,0%,5%)" }}>
         <div className="flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={view === "landing" ? () => navigate("/use-cases") : goBack}
-              className="p-2 hover:bg-white/10 rounded-full transition shrink-0">
-              <ArrowLeft className="w-4 h-4 text-white" />
+              className={`p-2 rounded-full transition shrink-0 ${isLight ? "hover:bg-black/8" : "hover:bg-white/10"}`}>
+              <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <span onClick={() => navigate("/use-cases")}
-              className="text-sm font-bold text-white cursor-pointer hover:text-white/80 shrink-0">
+              className="text-sm font-bold text-foreground cursor-pointer hover:text-foreground/80 shrink-0">
               TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
             </span>
-            <ChevronRight className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <span className="text-sm text-white/70 truncate">
+            <ChevronRight className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
+            <span className="text-sm text-foreground/70 truncate">
               {view === "landing" ? "Intelligent Document Archives" : subTitle}
             </span>
           </div>
@@ -1012,7 +1014,7 @@ export default function IntelligentArchives() {
             <ThemeToggle />
             {view !== "landing" && (
               <button onClick={goBack}
-                className="flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border border-white/10 hover:border-white/25 transition">
+                className={`flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border transition ${isLight ? "border-black/15 hover:border-black/30" : "border-white/10 hover:border-white/25"}`}>
                 <RefreshCw size={13} /> All Use Cases
               </button>
             )}

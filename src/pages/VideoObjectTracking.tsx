@@ -599,6 +599,7 @@ function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: 
 export default function VideoObjectTracking() {
   const navigate   = useNavigate();
   const { theme }  = useTheme();
+  const isLight    = theme === "light";
   const videoRef   = useRef<HTMLVideoElement>(null);
   const canvasRef  = useRef<HTMLCanvasElement>(null);
 
@@ -654,27 +655,27 @@ export default function VideoObjectTracking() {
   return (
     <div className="min-h-screen" style={{ background: "var(--s0)" }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] w-full border-b border-white/10">
+      <header className={`sticky top-0 z-50 w-full border-b ${isLight ? "bg-white border-black/10" : "bg-[hsl(0,0%,5%)] border-white/10"}`}>
         <div className="flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={() => navigate("/use-cases")}
-              className="flex items-center justify-center p-2 hover:bg-white/10 rounded-full transition shrink-0">
-              <ArrowLeft className="w-4 h-4 text-white" />
+              className={`flex items-center justify-center p-2 rounded-full transition shrink-0 ${isLight ? "hover:bg-black/8" : "hover:bg-white/10"}`}>
+              <ArrowLeft className="w-4 h-4 text-foreground" />
             </button>
             <span onClick={() => navigate("/use-cases")}
-              className="text-sm font-bold text-white cursor-pointer hover:text-white/80 transition shrink-0">
+              className="text-sm font-bold text-foreground cursor-pointer hover:text-foreground/80 transition shrink-0">
               TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
             </span>
-            <ChevronRight className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <span className="text-sm text-white/70 truncate">Tracking Through Obstacles</span>
+            <ChevronRight className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
+            <span className="text-sm text-foreground/70 truncate">Tracking Through Obstacles</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle />
             <button onClick={reset}
-              className="flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border border-white/10 hover:border-white/25 transition">
+              className={`flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border transition ${isLight ? "border-black/15 hover:border-black/30" : "border-white/10 hover:border-white/25"}`}>
               <RefreshCw size={13} /> Reset
             </button>
-            <span className="text-sm bg-cyan-600/20 text-cyan-300 border border-cyan-600/30 px-3 py-1 rounded-full font-semibold">
+            <span className="text-sm bg-cyan-600/20 text-cyan-600 border border-cyan-600/30 px-3 py-1 rounded-full font-semibold">
               Video Annotation · Live Demo
             </span>
           </div>
