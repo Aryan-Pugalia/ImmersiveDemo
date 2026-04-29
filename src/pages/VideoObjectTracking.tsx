@@ -1010,7 +1010,7 @@ export default function VideoObjectTracking() {
             Tracking Through Obstacles <span className="text-cyan-400">— Gaming AI</span>
           </h1>
           <p className="text-sm text-foreground/50 mt-1 max-w-xl mx-auto">
-            AI tracking fails on occlusion. Humans correct. Models improve. See the full loop.
+            AI tracking fails on occlusion. Humans correct. Models improve. See the full loop. ✓ v2
           </p>
         </div>
 
