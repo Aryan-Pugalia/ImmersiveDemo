@@ -2,6 +2,7 @@
  * VideoObjectTracking.tsx
  * "Tracking Through Obstacles – Gaming AI"
  * 4-stage pipeline: AI Output → Human Annotation → QA Review → Delivered
+ * CS:GO / Tactical FPS overhead tracking with smoke occlusion scenario.
  * Real MP4 video with mocked tracking overlay — no backend required.
  */
 
@@ -62,13 +63,13 @@ type EventType =
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const VIDEO_SRC = "/videos/car-tracking.mp4";
+const VIDEO_SRC = "/videos/cs-game-tracking.mp4";
 
 const TRACK_COLORS: Record<string, string> = {
-  "UNIT-07": "#22d3ee",
-  "UNIT-04": "#f59e0b",
-  "UNIT-09": "#a855f7",
-  "UNIT-11": "#ef4444", // wrong ID after switch
+  "PLR-01": "#22d3ee",  // cyan  – primary suspect
+  "PLR-02": "#f59e0b",  // amber
+  "PLR-03": "#a855f7",  // purple
+  "PLR-05": "#ef4444",  // red   – wrong ID after smoke switch
 };
 
 const STATUS_META: Record<TrackStatus, { label: string; color: string; icon: string }> = {
@@ -90,107 +91,107 @@ const EVENT_TYPES: { id: EventType; label: string; color: string }[] = [
 ];
 
 // ─── Mocked tracking keyframes ────────────────────────────────────────────────
-// Designed for a typical overhead-angle road surveillance clip.
-// UNIT-07 (cyan) is the primary target; it gets occluded ~3-6s and ID-switches.
+// CS:GO overhead radar-style clip. PLR-01 (cyan) is the suspect player.
+// Enters smoke cloud at t≈2.5s → fully hidden → exits with wrong ID (PLR-05).
 
 const KEYFRAMES: TrackKeyframe[] = [
-  // ── Phase 1: Clean tracking ──────────────────────────────────────────────
+  // ── Phase 1: Clean tracking — players in open area ───────────────────────
   { t: 0.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.05, 0.40, 0.16, 0.18], conf: 0.97, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.40, 0.20, 0.14, 0.16], conf: 0.94, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.72, 0.55, 0.13, 0.17], conf: 0.91, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.07, 0.38, 0.13, 0.16], conf: 0.97, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.42, 0.18, 0.12, 0.15], conf: 0.94, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.70, 0.57, 0.12, 0.15], conf: 0.91, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 0.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.10, 0.40, 0.16, 0.18], conf: 0.96, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.44, 0.22, 0.14, 0.16], conf: 0.93, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.70, 0.53, 0.13, 0.17], conf: 0.90, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.12, 0.39, 0.13, 0.16], conf: 0.96, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.46, 0.20, 0.12, 0.15], conf: 0.93, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.67, 0.54, 0.12, 0.15], conf: 0.90, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 1.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.16, 0.41, 0.16, 0.18], conf: 0.95, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.48, 0.24, 0.14, 0.16], conf: 0.92, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.68, 0.51, 0.13, 0.17], conf: 0.89, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.18, 0.40, 0.13, 0.16], conf: 0.95, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.50, 0.22, 0.12, 0.15], conf: 0.92, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.64, 0.52, 0.12, 0.15], conf: 0.89, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 1.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.22, 0.41, 0.16, 0.18], conf: 0.95, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.52, 0.25, 0.14, 0.16], conf: 0.91, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.65, 0.50, 0.13, 0.17], conf: 0.88, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.24, 0.40, 0.13, 0.16], conf: 0.95, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.54, 0.24, 0.12, 0.15], conf: 0.91, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.61, 0.50, 0.12, 0.15], conf: 0.88, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 2.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.28, 0.42, 0.16, 0.18], conf: 0.94, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.56, 0.27, 0.14, 0.16], conf: 0.90, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.62, 0.49, 0.13, 0.17], conf: 0.87, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.30, 0.41, 0.13, 0.16], conf: 0.94, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.57, 0.26, 0.12, 0.15], conf: 0.90, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.58, 0.49, 0.12, 0.15], conf: 0.87, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
-  // ── Phase 2: Partial occlusion begins (t=2.5) ────────────────────────────
+  // ── Phase 2: PLR-01 enters smoke cloud — partial occlusion (t=2.5) ──────
   { t: 2.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.33, 0.42, 0.16, 0.18], conf: 0.79, status: "partial_occlusion", color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.60, 0.29, 0.14, 0.16], conf: 0.89, status: "tracking",         color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.59, 0.48, 0.13, 0.17], conf: 0.85, status: "tracking",         color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.35, 0.41, 0.13, 0.16], conf: 0.77, status: "partial_occlusion", color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.61, 0.28, 0.12, 0.15], conf: 0.89, status: "tracking",         color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.55, 0.47, 0.12, 0.15], conf: 0.85, status: "tracking",         color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 3.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.37, 0.43, 0.16, 0.18], conf: 0.61, status: "partial_occlusion", color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.62, 0.30, 0.14, 0.16], conf: 0.88, status: "tracking",         color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.56, 0.46, 0.13, 0.17], conf: 0.84, status: "tracking",         color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.39, 0.42, 0.13, 0.16], conf: 0.59, status: "partial_occlusion", color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.63, 0.30, 0.12, 0.15], conf: 0.88, status: "tracking",         color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.52, 0.46, 0.12, 0.15], conf: 0.84, status: "tracking",         color: TRACK_COLORS["PLR-03"] },
   ]},
-  // ── Phase 3: Full occlusion / track lost (t=3.5–5.5) ────────────────────
+  // ── Phase 3: Fully inside smoke — track lost (t=3.5–5.0) ────────────────
   { t: 3.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.40, 0.44, 0.16, 0.18], conf: 0.34, status: "full_occlusion", color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.64, 0.32, 0.14, 0.16], conf: 0.87, status: "tracking",       color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.53, 0.45, 0.13, 0.17], conf: 0.83, status: "tracking",       color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.42, 0.43, 0.13, 0.16], conf: 0.32, status: "full_occlusion", color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.65, 0.31, 0.12, 0.15], conf: 0.87, status: "tracking",       color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.49, 0.45, 0.12, 0.15], conf: 0.83, status: "tracking",       color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 4.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07", bbox: [0.42, 0.47, 0.16, 0.18], conf: 0.18, status: "lost",       color: "#ef4444" },
-    { id: "UNIT-04", label: "UNIT-04", bbox: [0.66, 0.33, 0.14, 0.16], conf: 0.86, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09", bbox: [0.50, 0.44, 0.13, 0.17], conf: 0.82, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01", bbox: [0.44, 0.46, 0.13, 0.16], conf: 0.17, status: "lost",       color: "#ef4444" },
+    { id: "PLR-02", label: "PLR-02", bbox: [0.67, 0.33, 0.12, 0.15], conf: 0.86, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03", bbox: [0.46, 0.44, 0.12, 0.15], conf: 0.82, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 4.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07 (?)", bbox: [0.46, 0.51, 0.16, 0.18], conf: 0.12, status: "lost",   color: "#ef4444" },
-    { id: "UNIT-04", label: "UNIT-04",     bbox: [0.68, 0.35, 0.14, 0.16], conf: 0.85, status: "tracking", color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",     bbox: [0.47, 0.43, 0.13, 0.17], conf: 0.81, status: "tracking", color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01 (?)", bbox: [0.47, 0.49, 0.13, 0.16], conf: 0.11, status: "lost",   color: "#ef4444" },
+    { id: "PLR-02", label: "PLR-02",     bbox: [0.69, 0.34, 0.12, 0.15], conf: 0.85, status: "tracking", color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",     bbox: [0.43, 0.43, 0.12, 0.15], conf: 0.81, status: "tracking", color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 5.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07 (?)", bbox: [0.50, 0.54, 0.16, 0.18], conf: 0.09, status: "lost",   color: "#ef4444" },
-    { id: "UNIT-04", label: "UNIT-04",     bbox: [0.70, 0.36, 0.14, 0.16], conf: 0.84, status: "tracking", color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",     bbox: [0.44, 0.42, 0.13, 0.17], conf: 0.80, status: "tracking", color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01 (?)", bbox: [0.51, 0.52, 0.13, 0.16], conf: 0.08, status: "lost",   color: "#ef4444" },
+    { id: "PLR-02", label: "PLR-02",     bbox: [0.71, 0.36, 0.12, 0.15], conf: 0.84, status: "tracking", color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",     bbox: [0.40, 0.42, 0.12, 0.15], conf: 0.80, status: "tracking", color: TRACK_COLORS["PLR-03"] },
   ]},
-  // ── Phase 4: ID switch on reappearance (t=5.5) ───────────────────────────
+  // ── Phase 4: Exits smoke — ID switch (t=5.5) ─────────────────────────────
   { t: 5.5, tracks: [
-    { id: "UNIT-11", label: "UNIT-11 ⚠",  bbox: [0.52, 0.42, 0.16, 0.18], conf: 0.43, status: "id_switch",  color: TRACK_COLORS["UNIT-11"] },
-    { id: "UNIT-04", label: "UNIT-04",     bbox: [0.72, 0.38, 0.14, 0.16], conf: 0.83, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",     bbox: [0.41, 0.41, 0.13, 0.17], conf: 0.79, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-05", label: "PLR-05 ⚠",  bbox: [0.54, 0.41, 0.13, 0.16], conf: 0.41, status: "id_switch",  color: TRACK_COLORS["PLR-05"] },
+    { id: "PLR-02", label: "PLR-02",     bbox: [0.73, 0.37, 0.12, 0.15], conf: 0.83, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",     bbox: [0.37, 0.41, 0.12, 0.15], conf: 0.79, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 6.0, tracks: [
-    { id: "UNIT-11", label: "UNIT-11 ⚠",  bbox: [0.56, 0.42, 0.16, 0.18], conf: 0.46, status: "id_switch",  color: TRACK_COLORS["UNIT-11"] },
-    { id: "UNIT-04", label: "UNIT-04",     bbox: [0.74, 0.39, 0.14, 0.16], conf: 0.82, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",     bbox: [0.38, 0.40, 0.13, 0.17], conf: 0.78, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-05", label: "PLR-05 ⚠",  bbox: [0.58, 0.41, 0.13, 0.16], conf: 0.44, status: "id_switch",  color: TRACK_COLORS["PLR-05"] },
+    { id: "PLR-02", label: "PLR-02",     bbox: [0.75, 0.38, 0.12, 0.15], conf: 0.82, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",     bbox: [0.34, 0.40, 0.12, 0.15], conf: 0.78, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
-  // ── Phase 5: Recovered with correct ID (t=6.5+) ──────────────────────────
+  // ── Phase 5: Correct ID restored after human fix (t=6.5+) ────────────────
   { t: 6.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07",  bbox: [0.60, 0.41, 0.16, 0.18], conf: 0.72, status: "recovered",  color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04",  bbox: [0.76, 0.40, 0.14, 0.16], conf: 0.81, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",  bbox: [0.35, 0.40, 0.13, 0.17], conf: 0.77, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01",  bbox: [0.62, 0.40, 0.13, 0.16], conf: 0.73, status: "recovered",  color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02",  bbox: [0.77, 0.39, 0.12, 0.15], conf: 0.81, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",  bbox: [0.31, 0.39, 0.12, 0.15], conf: 0.77, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 7.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07",  bbox: [0.64, 0.41, 0.16, 0.18], conf: 0.84, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04",  bbox: [0.78, 0.41, 0.14, 0.16], conf: 0.80, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",  bbox: [0.32, 0.39, 0.13, 0.17], conf: 0.76, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01",  bbox: [0.66, 0.40, 0.13, 0.16], conf: 0.85, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02",  bbox: [0.79, 0.40, 0.12, 0.15], conf: 0.80, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",  bbox: [0.28, 0.38, 0.12, 0.15], conf: 0.76, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 7.5, tracks: [
-    { id: "UNIT-07", label: "UNIT-07",  bbox: [0.68, 0.41, 0.16, 0.18], conf: 0.89, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04",  bbox: [0.80, 0.42, 0.14, 0.16], conf: 0.79, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",  bbox: [0.29, 0.38, 0.13, 0.17], conf: 0.75, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01",  bbox: [0.70, 0.40, 0.13, 0.16], conf: 0.90, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02",  bbox: [0.81, 0.41, 0.12, 0.15], conf: 0.79, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",  bbox: [0.25, 0.37, 0.12, 0.15], conf: 0.75, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
   { t: 8.0, tracks: [
-    { id: "UNIT-07", label: "UNIT-07",  bbox: [0.72, 0.41, 0.16, 0.18], conf: 0.93, status: "tracking",   color: TRACK_COLORS["UNIT-07"] },
-    { id: "UNIT-04", label: "UNIT-04",  bbox: [0.82, 0.43, 0.14, 0.16], conf: 0.78, status: "tracking",   color: TRACK_COLORS["UNIT-04"] },
-    { id: "UNIT-09", label: "UNIT-09",  bbox: [0.26, 0.37, 0.13, 0.17], conf: 0.74, status: "tracking",   color: TRACK_COLORS["UNIT-09"] },
+    { id: "PLR-01", label: "PLR-01",  bbox: [0.74, 0.40, 0.13, 0.16], conf: 0.94, status: "tracking",   color: TRACK_COLORS["PLR-01"] },
+    { id: "PLR-02", label: "PLR-02",  bbox: [0.83, 0.42, 0.12, 0.15], conf: 0.78, status: "tracking",   color: TRACK_COLORS["PLR-02"] },
+    { id: "PLR-03", label: "PLR-03",  bbox: [0.22, 0.36, 0.12, 0.15], conf: 0.74, status: "tracking",   color: TRACK_COLORS["PLR-03"] },
   ]},
 ];
 
 // Problem frames the user can jump to
 const PROBLEM_FRAMES = [
-  { label: "Partial Occlusion",  t: 2.5, icon: "◑", color: "#f59e0b", desc: "UNIT-07 enters obstacle zone" },
-  { label: "Track Lost",         t: 4.0, icon: "✕", color: "#ef4444", desc: "AI loses UNIT-07 — box drifts" },
-  { label: "ID Switch",          t: 5.5, icon: "⚠", color: "#ef4444", desc: "Wrong ID assigned on reappearance" },
+  { label: "Smoke Entry",   t: 2.5, icon: "◑", color: "#f59e0b", desc: "PLR-01 enters smoke cloud — visibility drops" },
+  { label: "Track Lost",    t: 4.0, icon: "✕", color: "#ef4444", desc: "AI loses PLR-01 inside smoke — box drifts" },
+  { label: "ID Switch",     t: 5.5, icon: "⚠", color: "#ef4444", desc: "Exits smoke — re-tagged as PLR-05 (wrong)" },
 ];
 
 // ─── Interpolation helper ─────────────────────────────────────────────────────
@@ -396,7 +397,7 @@ function VideoPanel({
         {/* Confidence HUD */}
         {stage === 1 && (() => {
           const tracks = interpolateTracks(currentTime);
-          const primary = tracks.find(t => t.id === "UNIT-07" || t.id === "UNIT-11");
+          const primary = tracks.find(t => t.id === "PLR-01" || t.id === "PLR-05");
           if (!primary) return null;
           const meta = STATUS_META[primary.status];
           return (
@@ -611,7 +612,7 @@ function Stage2({
   const [startPt, setStartPt]     = useState({ x: 0, y: 0 });
   const [currentRect, setCurrentRect] = useState<[number,number,number,number] | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventType>("re_identification");
-  const [selectedTrack, setSelectedTrack] = useState("UNIT-07");
+  const [selectedTrack, setSelectedTrack] = useState("PLR-01");
 
   const getRelPos = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvasRef.current!.getBoundingClientRect();
@@ -720,7 +721,7 @@ function Stage2({
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Assign to Track</p>
           <div className="grid grid-cols-2 gap-1.5">
-            {Object.keys(TRACK_COLORS).filter(k => k !== "UNIT-11").map(tid => (
+            {Object.keys(TRACK_COLORS).filter(k => k !== "PLR-05").map(tid => (
               <button key={tid} onClick={() => setSelectedTrack(tid)}
                 className="px-2 py-1.5 rounded-lg border text-xs font-bold font-mono transition"
                 style={{
@@ -917,10 +918,10 @@ function Stage3({
 function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: () => void }) {
   const navigate = useNavigate();
   const kpis = [
-    { icon: <Target size={18} className="text-cyan-400" />,    label: "Tracks Corrected",        value: "3",                       sub: "UNIT-07 re-identified",      bg: "rgba(6,182,212,0.18)" },
-    { icon: <Layers size={18} className="text-violet-400" />,  label: "Occlusion Events Labelled", value: `${annotations.length}`,   sub: "across all frames",          bg: "rgba(109,40,217,0.18)" },
-    { icon: <Activity size={18} className="text-emerald-400"/>, label: "ID Switch Corrections",   value: "1",                       sub: "UNIT-11 → UNIT-07",          bg: "rgba(5,150,105,0.18)" },
-    { icon: <ZapOff size={18} className="text-amber-400" />,   label: "Trajectory Errors Removed", value: `${Math.max(2, annotations.length)}`, sub: "drift & ghost boxes cleared", bg: "rgba(217,119,6,0.18)" },
+    { icon: <Target size={18} className="text-cyan-400" />,    label: "Players Re-Identified",     value: "3",                       sub: "PLR-01 re-linked after smoke",   bg: "rgba(6,182,212,0.18)" },
+    { icon: <Layers size={18} className="text-violet-400" />,  label: "Occlusion Events Labelled", value: `${annotations.length}`,   sub: "across all frames",              bg: "rgba(109,40,217,0.18)" },
+    { icon: <Activity size={18} className="text-emerald-400"/>, label: "ID Switch Corrections",    value: "1",                       sub: "PLR-05 → PLR-01 corrected",      bg: "rgba(5,150,105,0.18)" },
+    { icon: <ZapOff size={18} className="text-amber-400" />,   label: "Ghost Boxes Cleared",       value: `${Math.max(2, annotations.length)}`, sub: "smoke drift & phantom tracks", bg: "rgba(217,119,6,0.18)" },
   ];
 
   return (
@@ -957,9 +958,10 @@ function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: 
       <div className="w-full rounded-2xl border border-violet-700/40 p-5" style={{ background: "rgba(109,40,217,0.10)" }}>
         <p className="text-sm font-bold text-violet-300 mb-2 uppercase tracking-wider">Why Human-in-the-Loop Matters</p>
         <p className="text-sm text-foreground/60 leading-relaxed">
-          The AI lost track of UNIT-07 for <strong className="text-foreground/80">2.5 seconds</strong> and
-          assigned it a wrong ID on reappearance. Human annotators caught the drift and corrected the ID switch —
-          data the model can now learn from for the next occlusion scenario.
+          The AI lost track of PLR-01 for <strong className="text-foreground/80">2.5 seconds</strong> inside a
+          smoke cloud and assigned it the wrong ID (PLR-05) on reappearance. Human annotators caught the ID
+          switch and corrected the trajectory — data the model can now learn from for future smoke and
+          occlusion scenarios.
         </p>
       </div>
 
