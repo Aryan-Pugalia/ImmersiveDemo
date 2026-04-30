@@ -11,10 +11,10 @@ interface Option {
 
 const OPTIONS: Option[] = [
   { code: "en", flagCode: "us", label: "EN", name: "English"  },
-  { code: "ko", flagCode: "kr", label: "KO", name: "Korean"   },
+  { code: "ar", flagCode: "sa", label: "AR", name: "Arabic"   },
   { code: "es", flagCode: "es", label: "ES", name: "Spanish"  },
   { code: "fr", flagCode: "fr", label: "FR", name: "French"   },
-  { code: "ar", flagCode: "sa", label: "AR", name: "Arabic"   },
+  { code: "ko", flagCode: "kr", label: "KO", name: "Korean"   },
   { code: "zh", flagCode: "cn", label: "ZH", name: "Chinese"  },
 ];
 
