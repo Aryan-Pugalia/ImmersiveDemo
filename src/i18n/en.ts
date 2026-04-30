@@ -37,11 +37,11 @@ export const en = {
       description: "Transcribe multilingual speech and translate to English — with speaker diarization, segment timing, audio quality flags, and full QC reviewer workflow.",
     },
     "video-ab-testing": {
-      title: "Video A/B Testing",
+      title: "AI Video Comparison & RLHF Optimization",
       description: "Compare AI-generated video pairs with synced playback, frame stepping, and audio solo — flag temporal artifacts and A/V sync issues for preference learning.",
     },
     "image-ab-testing": {
-      title: "Image A/B Testing",
+      title: "Generative Image Evaluation & Preference Modeling",
       description: "Evaluate AI-generated image pairs against text prompts — rate realism, composition, and prompt alignment to build RLHF preference datasets.",
     },
     "cheating-or-skill": {
@@ -49,19 +49,19 @@ export const en = {
       description: "Label gameplay clips as skill or cheating, watch AI flag anomalies, then QA-override the call. Human-in-the-loop Gaming Trust & Safety at scale.",
     },
     "dating-trust-safety": {
-      title: "Impersonation Review + Policy Redaction",
+      title: "Digital Identity Protection & Policy Enforcement",
       description: "Annotate a suspicious dating profile, watch AI flag embedded contact info and policy violations, QA-override the call, and deliver a clean redacted decision packet.",
     },
     "invoice-labeler": {
-      title: "Invoice Labeler",
+      title: "Financial Document Intelligence & Extraction",
       description: "Label and extract structured fields from invoices and receipts — vendor, totals, line items — with bounding-box annotation and JSON export.",
     },
     "intelligent-archives": {
-      title: "Intelligent Document Archives",
+      title: "Enterprise Document Intelligence Platform",
       description: "Digitize, structure, and activate enterprise archives using secure scanning, intelligent indexing, and governed retrieval.",
     },
     "video-object-tracking": {
-      title: "Tracking Through Obstacles – Gaming AI",
+      title: "Advanced Multi-Object Tracking & Occlusion Handling",
       description: "Review multi-object video tracking across occlusions and ID switches. Correct failures, draw annotations on problem frames, QA the fix, and deliver a clean tracking output.",
     },
   } as Record<string, { title: string; description: string }>,
@@ -172,7 +172,7 @@ export const en = {
   // ── Per-page UI strings ───────────────────────────────────────────────────
   pages: {
     invoice: {
-      breadcrumb: "Invoice Labeler",
+      breadcrumb: "Financial Document Intelligence & Extraction",
       dashTitle: "Invoice Annotation Dashboard",
       dashSubtitle: "Label and extract structured data from invoices and receipts",
       totalDocs: "Total Documents",
@@ -250,7 +250,7 @@ export const en = {
       analyzing: "Analyzing image…",
     },
     imageAB: {
-      title: "Image A/B Testing",
+      title: "Generative Image Evaluation & Preference Modeling",
       badge: "RLHF · Preference",
       swapSides: "Swap Sides",
       swapped: "(swapped)",
@@ -291,7 +291,7 @@ export const en = {
       imagePrefix: "Image",
     },
     videoAB: {
-      title: "Video A/B Testing",
+      title: "AI Video Comparison & RLHF Optimization",
       badge: "RLHF · Video Preference",
       swapSides: "Swap Sides",
       swapAria: "Swap video sides",

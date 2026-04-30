@@ -23,7 +23,7 @@ const QA_DATA: Record<
   }
 > = {
   "invoice-labeler": {
-    title: "Invoice Labeler",
+    title: "Financial Document Intelligence & Extraction",
     overall: 94.2,
     iouScore: 91.8,
     kappaScore: 0.89,
@@ -73,7 +73,7 @@ const QA_DATA: Record<
       "1,150 point cloud frames annotated across 3 scenes. 3D IoU ≥ 0.85 on all vehicle classes. Dataset cleared and delivered.",
   },
   "video-ab-testing": {
-    title: "Video A/B Testing",
+    title: "AI Video Comparison & RLHF Optimization",
     overall: 84.1,
     iouScore: 81.6,
     kappaScore: 0.79,
@@ -91,7 +91,7 @@ const QA_DATA: Record<
       "1 video pair (GPT-Sora v1 vs Runway Gen-3) evaluated across 5 rubric dimensions + a 6-item imperfection checklist. 4 of 6 hidden flaws detected — bike-curb clip and lip-desync missed. Flagged for expert arbitration on overall preference.",
   },
   "image-ab-testing": {
-    title: "Image A/B Testing",
+    title: "Generative Image Evaluation & Preference Modeling",
     overall: 87.3,
     iouScore: 84.7,
     kappaScore: 0.81,

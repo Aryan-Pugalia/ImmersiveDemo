@@ -902,7 +902,7 @@ function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
           style={{ background: ACCENT_SOFT, color: ACCENT, border: `1px solid ${ACCENT_MID}` }}>
           IM-001 · Digitization · Search · Enterprise AI
         </div>
-        <h1 className="text-3xl font-black text-foreground mb-3">Intelligent Document Archives</h1>
+        <h1 className="text-3xl font-black text-foreground mb-3">Enterprise Document Intelligence Platform</h1>
         <p className="text-base text-foreground/55 max-w-2xl mx-auto">
           From physical records to AI-ready enterprise knowledge. Each workflow follows a
           human-annotation → AI verification → QA review → delivery pipeline.
@@ -989,7 +989,7 @@ export default function IntelligentArchives() {
   const next    = () => setStage(s => Math.min(s + 1, 4) as Stage);
 
   const subColor = view !== "landing" ? SUB_COLOR[view] : ACCENT;
-  const subTitle = SUB_CASES.find(s => s.id === view)?.title ?? "Intelligent Document Archives";
+  const subTitle = SUB_CASES.find(s => s.id === view)?.title ?? "Enterprise Document Intelligence Platform";
 
   return (
     <div className="min-h-screen" style={{ background: "var(--s0)" }}>
@@ -1007,7 +1007,7 @@ export default function IntelligentArchives() {
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
             <span className="text-sm text-foreground/70 truncate">
-              {view === "landing" ? "Intelligent Document Archives" : subTitle}
+              {view === "landing" ? "Enterprise Document Intelligence Platform" : subTitle}
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">

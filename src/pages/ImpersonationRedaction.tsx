@@ -1282,7 +1282,7 @@ export default function ImpersonationRedaction() {
               TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <span className="text-sm text-white/70 whitespace-nowrap">Impersonation Review</span>
+            <span className="text-sm text-white/70 whitespace-nowrap">Digital Identity Protection</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle />
@@ -1302,7 +1302,7 @@ export default function ImpersonationRedaction() {
       <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="text-center mb-4">
           <h1 className="text-2xl font-black text-white">
-            Impersonation Review <span className="text-violet-400">+ Policy Redaction</span>
+            Digital Identity Protection <span className="text-violet-400">& Policy Enforcement</span>
           </h1>
           <p className="text-sm text-foreground/50 mt-1 max-w-xl mx-auto">
             Profile labeling, content monitoring, and redaction of sensitive info + policy violations.

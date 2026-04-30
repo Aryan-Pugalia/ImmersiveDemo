@@ -667,7 +667,7 @@ export default function VideoObjectTracking() {
               TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
-            <span className="text-sm text-foreground/70 truncate">Tracking Through Obstacles</span>
+            <span className="text-sm text-foreground/70 truncate">Multi-Object Tracking</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={reset}
@@ -685,7 +685,7 @@ export default function VideoObjectTracking() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="text-center mb-4">
           <h1 className="text-2xl font-black text-white">
-            Tracking Through Obstacles <span className="text-cyan-400">— Gaming AI</span>
+            Advanced Multi-Object Tracking <span className="text-cyan-400">& Occlusion Handling</span>
           </h1>
           <p className="text-sm text-foreground/50 mt-1 max-w-xl mx-auto">
             AI tracking fails on occlusion. Humans correct. Models improve.
