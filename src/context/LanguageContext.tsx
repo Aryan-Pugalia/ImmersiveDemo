@@ -41,6 +41,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = language;
   }, [language]);
 
+  // Listen for language changes posted from the outer homepage nav
+  useEffect(() => {
+    function handleMessage(e: MessageEvent) {
+      if (e.data?.type === "tp-language" && VALID.includes(e.data.language)) {
+        setLang(e.data.language as Language);
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t: LANGS[language] }}>
       {children}
