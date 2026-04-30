@@ -25,6 +25,7 @@ import ImpersonationRedaction from "./pages/ImpersonationRedaction.tsx";
 import CheatingOrSkill from "./pages/CheatingOrSkill.tsx";
 import VideoObjectTracking from "./pages/VideoObjectTracking.tsx";
 import IntelligentArchives from "./pages/IntelligentArchives.tsx";
+import STEMReasoning from "./pages/STEMReasoning.tsx";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/use-cases/cheating-or-skill" element={<CheatingOrSkill />} />
           <Route path="/use-cases/video-object-tracking" element={<VideoObjectTracking />} />
           <Route path="/use-cases/intelligent-archives" element={<IntelligentArchives />} />
+          <Route path="/use-cases/stem-reasoning" element={<STEMReasoning />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />
           <Route path="/qa-report/:useCaseId" element={<QAReport />} />

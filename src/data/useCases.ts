@@ -101,6 +101,17 @@ export const useCases: UseCase[] = [
     secondaryTag: "Gaming AI",
   },
   {
+    id: "15",
+    slug: "stem-reasoning",
+    title: "STEM Reasoning Validation & Chain-of-Thought Annotation",
+    description:
+      "Expert annotators review step-by-step LaTeX calculus solutions, validate mathematical reasoning, and score chain-of-thought correctness. AI verification accelerates review, while human QA ensures gold-standard training and evaluation data for STEM-capable models.",
+    icon: "calculate",
+    idTag: "STEM-001",
+    categoryTag: "Reasoning Verification · RLHF",
+    secondaryTag: "STEM / Calculus",
+  },
+  {
     id: "7",
     slug: "invoice-labeler",
     title: "Financial Document Intelligence & Extraction",
