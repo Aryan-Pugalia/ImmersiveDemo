@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguagePicker } from "@/components/LanguagePicker";
 
 const CAP_KEYS = [
   "Text & NLP",
@@ -32,7 +31,6 @@ const Index = () => {
         <div className="header-inner" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <img src="/tp-ai-data-services-logo.png" alt="TP.ai Data Services" className="header-wordmark" />
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", paddingRight: "1.5rem" }}>
-            <LanguagePicker variant="pill" />
           </div>
         </div>
         <div className="header-divider" />
