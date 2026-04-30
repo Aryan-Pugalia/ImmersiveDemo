@@ -2,16 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "FABStudio Dev",
+      "name": "ImmersiveDemo",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 8080
-    },
-    {
-      "name": "audio-annotation-test",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "audio-annotation-test"],
-      "port": 5175
+      "port": 5173
     }
   ]
 }

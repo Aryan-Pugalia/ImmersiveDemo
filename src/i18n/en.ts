@@ -74,6 +74,10 @@ export const en = {
       title: "Advanced Multi-Object Tracking & Occlusion Handling",
       description: "Review multi-object video tracking across occlusions and ID switches. Correct failures, draw annotations on problem frames, QA the fix, and deliver a clean tracking output.",
     },
+    "driver-monitoring": {
+      title: "Automotive DMS Video Annotation",
+      description: "Review driver-facing IR clips flagged by a Driver Monitoring System. Validate distraction events, label driver gaze and hand position, QA the AI call, and export structured annotation packets for ADAS model training.",
+    },
   } as Record<string, { title: string; description: string }>,
 
   // ── Capabilities marquee ──────────────────────────────────────────────────

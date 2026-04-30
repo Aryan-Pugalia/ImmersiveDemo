@@ -7,7 +7,22 @@ export interface UseCase {
   idTag: string;
   categoryTag: string;
   secondaryTag: string;
+  filters: string[];
 }
+
+export const FILTERS = [
+  "All",
+  "RLHF",
+  "Automotive",
+  "Medical",
+  "Audio / Speech",
+  "Document AI",
+  "Trust & Safety",
+  "Video",
+  "Reasoning",
+] as const;
+
+export type FilterLabel = typeof FILTERS[number];
 
 export const useCases: UseCase[] = [
   {
@@ -19,6 +34,7 @@ export const useCases: UseCase[] = [
     idTag: "LID-001",
     categoryTag: "3D / Point Cloud",
     secondaryTag: "Autonomous",
+    filters: ["Automotive"],
   },
   {
     id: "6",
@@ -29,6 +45,7 @@ export const useCases: UseCase[] = [
     idTag: "MED-001",
     categoryTag: "Medical Imaging",
     secondaryTag: "AI-Assisted",
+    filters: ["Medical"],
   },
   {
     id: "10",
@@ -39,6 +56,7 @@ export const useCases: UseCase[] = [
     idTag: "AUD-401",
     categoryTag: "Speech / NLP",
     secondaryTag: "Multilingual",
+    filters: ["Audio / Speech"],
   },
   {
     id: "9",
@@ -49,6 +67,7 @@ export const useCases: UseCase[] = [
     idTag: "VID-301",
     categoryTag: "RLHF / Video GenAI",
     secondaryTag: "Multimodal",
+    filters: ["RLHF", "Video"],
   },
   {
     id: "8",
@@ -59,6 +78,7 @@ export const useCases: UseCase[] = [
     idTag: "IMG-201",
     categoryTag: "RLHF / GenAI",
     secondaryTag: "Preference",
+    filters: ["RLHF"],
   },
   {
     id: "12",
@@ -69,6 +89,7 @@ export const useCases: UseCase[] = [
     idTag: "GAM-118",
     categoryTag: "Gaming / T&S",
     secondaryTag: "GenAI + Human QA",
+    filters: ["Trust & Safety", "Video"],
   },
   {
     id: "11",
@@ -79,6 +100,7 @@ export const useCases: UseCase[] = [
     idTag: "T&S-501",
     categoryTag: "Content Moderation",
     secondaryTag: "Impersonation + Redaction",
+    filters: ["Trust & Safety"],
   },
   {
     id: "14",
@@ -89,6 +111,7 @@ export const useCases: UseCase[] = [
     idTag: "IM-001",
     categoryTag: "Digitization · Search · Enterprise AI",
     secondaryTag: "Governance",
+    filters: ["Document AI"],
   },
   {
     id: "13",
@@ -99,6 +122,7 @@ export const useCases: UseCase[] = [
     idTag: "VID-601",
     categoryTag: "Video Annotation / Object Tracking",
     secondaryTag: "Gaming AI",
+    filters: ["Video", "Trust & Safety"],
   },
   {
     id: "15",
@@ -110,6 +134,7 @@ export const useCases: UseCase[] = [
     idTag: "STEM-001",
     categoryTag: "Reasoning Verification · RLHF",
     secondaryTag: "STEM / Calculus",
+    filters: ["RLHF", "Reasoning"],
   },
   {
     id: "16",
@@ -121,6 +146,7 @@ export const useCases: UseCase[] = [
     idTag: "PHYS-001",
     categoryTag: "Reasoning Verification · RLHF",
     secondaryTag: "STEM / Physics",
+    filters: ["RLHF", "Reasoning"],
   },
   {
     id: "7",
@@ -131,6 +157,18 @@ export const useCases: UseCase[] = [
     idTag: "DOC-101",
     categoryTag: "Document AI",
     secondaryTag: "IDP",
+    filters: ["Document AI"],
+  },
+  {
+    id: "17",
+    slug: "driver-monitoring",
+    title: "Automotive DMS Video Annotation",
+    description: "Review driver-facing IR clips flagged by a Driver Monitoring System. Validate distraction events, label driver gaze and hand position, QA the AI call, and export structured annotation packets for ADAS model training.",
+    icon: "directions_car",
+    idTag: "DMS-001",
+    categoryTag: "Automotive / ADAS",
+    secondaryTag: "Video · DMS",
+    filters: ["Automotive", "Video"],
   },
 ];
 

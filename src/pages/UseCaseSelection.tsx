@@ -1,15 +1,28 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCases } from "@/data/useCases";
+import { useCases, FILTERS, FilterLabel } from "@/data/useCases";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguagePicker } from "@/components/LanguagePicker";
 import { ThemeToggle } from "@/components/ThemeToggle";
+
+const FILTER_ICONS: Record<string, string> = {
+  "All":           "apps",
+  "RLHF":          "thumb_up",
+  "Automotive":    "directions_car",
+  "Medical":       "radiology",
+  "Audio / Speech":"mic",
+  "Document AI":   "description",
+  "Trust & Safety":"policy",
+  "Video":         "movie",
+  "Reasoning":     "calculate",
+};
 
 const UseCaseSelection = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const [activeFilter, setActiveFilter] = useState<FilterLabel>("All");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -91,9 +104,51 @@ const UseCaseSelection = () => {
           </div>
         </div>
 
+        {/* Filter Chips */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {FILTERS.map((filter) => {
+            const isActive = activeFilter === filter;
+            const count = filter === "All"
+              ? useCases.length
+              : useCases.filter(uc => uc.filters.includes(filter)).length;
+            return (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-all duration-200"
+                style={{
+                  background: isActive ? "#9071f0" : "transparent",
+                  borderColor: isActive ? "#9071f0" : "rgba(144,113,240,0.25)",
+                  color: isActive ? "#fff" : "rgba(255,255,255,0.45)",
+                  boxShadow: isActive ? "0 0 16px rgba(144,113,240,0.35)" : "none",
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: "15px", lineHeight: 1 }}
+                >
+                  {FILTER_ICONS[filter]}
+                </span>
+                {filter}
+                <span
+                  className="text-xs font-mono px-1.5 py-0.5 rounded-full ml-0.5"
+                  style={{
+                    background: isActive ? "rgba(255,255,255,0.2)" : "rgba(144,113,240,0.15)",
+                    color: isActive ? "#fff" : "rgba(144,113,240,0.8)",
+                  }}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Use Case Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {useCases.map((useCase) => (
+          {useCases
+            .filter(uc => activeFilter === "All" || uc.filters.includes(activeFilter))
+            .map((useCase) => (
             <Link
               key={useCase.id}
               to={`/use-cases/${useCase.slug}`}
@@ -124,6 +179,13 @@ const UseCaseSelection = () => {
             </Link>
           ))}
         </div>
+
+        {/* Empty state */}
+        {useCases.filter(uc => activeFilter === "All" || uc.filters.includes(activeFilter)).length === 0 && (
+          <div className="text-center py-20 text-foreground/30 text-lg font-body">
+            No use cases found for <span className="text-primary font-bold">{activeFilter}</span>
+          </div>
+        )}
       </main>
     </div>
   );
