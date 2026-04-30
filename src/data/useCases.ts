@@ -112,6 +112,17 @@ export const useCases: UseCase[] = [
     secondaryTag: "STEM / Calculus",
   },
   {
+    id: "16",
+    slug: "physics-reasoning",
+    title: "Physics Reasoning Verification & Multistep Solution QA",
+    description:
+      "Expert physics annotators review multistep solutions involving equations, physical laws, and unit analysis. AI flags conceptual errors and unit mismatches; human QA delivers gold-standard training data for physics-capable reasoning models.",
+    icon: "science",
+    idTag: "PHYS-001",
+    categoryTag: "Reasoning Verification · RLHF",
+    secondaryTag: "STEM / Physics",
+  },
+  {
     id: "7",
     slug: "invoice-labeler",
     title: "Financial Document Intelligence & Extraction",
