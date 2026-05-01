@@ -51,6 +51,30 @@ export const zh: Translations = {
       title: "约会信任与安全",
       description: "端到端体验网络钓鱼检测——注释用户资料，观察AI评分，然后进行质检审核和覆盖。实现大规模人工介入的信任与安全。",
     },
+    "video-object-tracking": {
+      title: "高级多目标跟踪与遮挡处理",
+      description: "审核视频中跨遮挡和ID切换的多目标跟踪。纠正错误、在问题帧上绘制标注、完成质检，并交付干净的跟踪输出。",
+    },
+    "intelligent-archives": {
+      title: "企业文档智能平台",
+      description: "通过安全扫描、智能索引和有序检索，对企业档案进行数字化、结构化和激活。",
+    },
+    "stem-reasoning": {
+      title: "STEM推理验证与思维链标注",
+      description: "专家标注员逐步审核LaTeX微积分解题过程，验证数学推理，为具备STEM能力的模型评分思维链正确性。",
+    },
+    "physics-reasoning": {
+      title: "物理推理验证与多步解题质检",
+      description: "专家物理标注员审核包含方程、物理定律和单位分析的解题过程。AI标记概念错误，人工质检交付金标准训练数据。",
+    },
+    "driver-monitoring": {
+      title: "汽车DMS视频标注",
+      description: "审核驾驶员监控系统标记的红外视频片段。验证分神事件，标注驾驶员注视方向和手部位置，导出用于ADAS模型训练的标注数据包。",
+    },
+    "audio-quality-qa": {
+      title: "音频质量与信号完整性质检",
+      description: "7维音频质量标注——背景噪声、信号清晰度、削波、回声、丢帧等。AI验证、质检裁定和JSON导出，用于预训练数据管道。",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "文本与自然语言处理", subs: ["命名实体识别", "意图分类", "摘要QA", "指代消解"] },

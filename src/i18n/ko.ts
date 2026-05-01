@@ -51,6 +51,30 @@ export const ko: Translations = {
       title: "데이팅 트러스트 & 세이프티",
       description: "카피캣 탐지를 처음부터 끝까지 경험하세요 — 프로필에 주석을 달고, AI가 점수를 매기는 것을 확인한 후 QA 검토 및 재정의를 수행하세요. 인간이 참여하는 트러스트 & 세이프티를 대규모로 실현합니다.",
     },
+    "video-object-tracking": {
+      title: "고급 다중 객체 추적 & 가림 처리",
+      description: "가림 및 ID 전환이 발생하는 다중 객체 비디오 추적을 검토하세요. 오류를 수정하고 문제 프레임에 어노테이션을 그리고 QA를 수행하여 깔끔한 추적 결과를 제공합니다.",
+    },
+    "intelligent-archives": {
+      title: "기업 문서 인텔리전스 플랫폼",
+      description: "안전한 스캔, 지능형 인덱싱, 거버넌스 기반 검색을 통해 기업 아카이브를 디지털화, 구조화 및 활성화하세요.",
+    },
+    "stem-reasoning": {
+      title: "STEM 추론 검증 & 사고 체인 어노테이션",
+      description: "전문 어노테이터가 LaTeX 미적분 풀이를 단계별로 검토하고 수학적 추론을 검증하여 STEM 역량 모델을 위한 사고 체인 데이터를 구축합니다.",
+    },
+    "physics-reasoning": {
+      title: "물리 추론 검증 & 다단계 풀이 QA",
+      description: "전문 물리 어노테이터가 방정식, 물리 법칙, 단위 분석이 포함된 풀이를 검토합니다. AI가 개념 오류를 감지하고 인간 QA가 골드 스탠다드 학습 데이터를 제공합니다.",
+    },
+    "driver-monitoring": {
+      title: "자동차 DMS 비디오 어노테이션",
+      description: "운전자 모니터링 시스템이 감지한 IR 클립을 검토하세요. 주의 분산 이벤트를 검증하고 운전자 시선 및 손 위치를 레이블링하여 ADAS 모델 학습용 어노테이션 패킷을 내보냅니다.",
+    },
+    "audio-quality-qa": {
+      title: "오디오 품질 & 신호 무결성 QA",
+      description: "7개 차원의 오디오 품질 어노테이션 — 배경 소음, 신호 명확도, 클리핑, 에코, 드롭아웃. AI 검증, QA 조정, 사전 학습 파이프라인용 JSON 내보내기.",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "텍스트 & NLP",        subs: ["개체명 인식", "의도 분류", "요약 QA", "상호참조 해결"] },

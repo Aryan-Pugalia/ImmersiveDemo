@@ -51,6 +51,30 @@ export const fr: Translations = {
       title: "Confiance et Sécurité dans les Rencontres",
       description: "Vivez la détection de faux profils de bout en bout — annotez un profil, regardez l'IA le noter, puis effectuez un contrôle qualité et annulez. Confiance et sécurité humain-dans-la-boucle à grande échelle.",
     },
+    "video-object-tracking": {
+      title: "Suivi multi-objets avancé & gestion des occultations",
+      description: "Vérifiez le suivi vidéo multi-objets à travers les occultations et les changements d'identifiant. Corrigez les erreurs, annotez les images problématiques, effectuez un contrôle qualité et exportez un résultat propre.",
+    },
+    "intelligent-archives": {
+      title: "Plateforme d'intelligence documentaire d'entreprise",
+      description: "Numérisez, structurez et activez les archives d'entreprise grâce à la numérisation sécurisée, l'indexation intelligente et la récupération gouvernée.",
+    },
+    "stem-reasoning": {
+      title: "Validation du raisonnement STEM & annotation chaîne de pensée",
+      description: "Des annotateurs experts vérifient des solutions de calcul LaTeX étape par étape, valident le raisonnement mathématique et évaluent la chaîne de pensée pour des modèles STEM.",
+    },
+    "physics-reasoning": {
+      title: "Vérification du raisonnement physique & QA solutions multi-étapes",
+      description: "Des annotateurs experts vérifient des solutions comportant équations, lois physiques et analyse d'unités. L'IA signale les erreurs conceptuelles, le QA humain fournit des données d'entraînement étalon.",
+    },
+    "driver-monitoring": {
+      title: "Annotation vidéo DMS automobile",
+      description: "Vérifiez des clips IR filtrés par un système de surveillance du conducteur. Validez les événements de distraction, annotez le regard et la position des mains, et exportez les paquets pour l'entraînement ADAS.",
+    },
+    "audio-quality-qa": {
+      title: "QA qualité audio & intégrité du signal",
+      description: "Annotation qualité audio en 7 dimensions — bruit de fond, clarté du signal, écrêtage, écho, coupures. Vérification IA, adjudication QA et export JSON pour les pipelines de pré-entraînement.",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "Texte et TAL",          subs: ["Reconnaissance d'entités", "Classification d'intention", "Résumé QA", "Résolution de coréférence"] },

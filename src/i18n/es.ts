@@ -51,6 +51,30 @@ export const es: Translations = {
       title: "Confianza y Seguridad en Citas",
       description: "Experimenta la detección de catfish de extremo a extremo — anota un perfil, observa cómo la IA lo puntúa, luego revisa y anula. Confianza y seguridad con humanos en el bucle a escala.",
     },
+    "video-object-tracking": {
+      title: "Seguimiento multi-objeto avanzado & manejo de oclusiones",
+      description: "Revisa el seguimiento de vídeo multi-objeto a través de oclusiones y cambios de ID. Corrige errores, dibuja anotaciones en fotogramas problemáticos, realiza control de calidad y entrega un resultado limpio.",
+    },
+    "intelligent-archives": {
+      title: "Plataforma de inteligencia documental empresarial",
+      description: "Digitaliza, estructura y activa archivos empresariales mediante escaneo seguro, indexación inteligente y recuperación gobernada.",
+    },
+    "stem-reasoning": {
+      title: "Validación del razonamiento STEM & anotación cadena de pensamiento",
+      description: "Anotadores expertos revisan soluciones de cálculo en LaTeX paso a paso, validan el razonamiento matemático y puntúan la cadena de pensamiento para modelos con capacidad STEM.",
+    },
+    "physics-reasoning": {
+      title: "Verificación de razonamiento físico & QA soluciones multi-paso",
+      description: "Anotadores expertos en física revisan soluciones con ecuaciones, leyes físicas y análisis de unidades. La IA detecta errores conceptuales, el QA humano entrega datos de entrenamiento de referencia.",
+    },
+    "driver-monitoring": {
+      title: "Anotación de vídeo DMS automotriz",
+      description: "Revisa clips IR señalados por un Sistema de Monitoreo del Conductor. Valida eventos de distracción, etiqueta la mirada y posición de manos, y exporta paquetes para el entrenamiento ADAS.",
+    },
+    "audio-quality-qa": {
+      title: "QA de calidad de audio e integridad de señal",
+      description: "Anotación de calidad de audio en 7 dimensiones — ruido de fondo, claridad de señal, recorte, eco, pérdidas. Verificación IA, adjudicación QA y exportación JSON para pipelines de pre-entrenamiento.",
+    },
   },
   capabilities: {
     "Text & NLP":        { title: "Texto y PLN",         subs: ["Reconocimiento de entidades", "Clasificación de intención", "QA de resúmenes", "Resolución de correferencia"] },
