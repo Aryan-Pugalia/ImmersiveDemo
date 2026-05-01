@@ -15,9 +15,8 @@ export const FILTERS = [
   "Image",
   "Video",
   "Audio",
-  "Text",
+  "Text / Doc",
   "3D / LiDAR",
-  "Document",
 ] as const;
 
 export type FilterLabel = typeof FILTERS[number];
@@ -98,7 +97,7 @@ export const useCases: UseCase[] = [
     idTag: "T&S-501",
     categoryTag: "Content Moderation",
     secondaryTag: "Impersonation + Redaction",
-    filters: ["Image", "Text"],
+    filters: ["Image", "Text / Doc"],
   },
   {
     id: "14",
@@ -109,7 +108,7 @@ export const useCases: UseCase[] = [
     idTag: "IM-001",
     categoryTag: "Digitization · Search · Enterprise AI",
     secondaryTag: "Governance",
-    filters: ["Document", "Text"],
+    filters: ["Text / Doc", "Text / Doc"],
   },
   {
     id: "13",
@@ -132,7 +131,7 @@ export const useCases: UseCase[] = [
     idTag: "STEM-001",
     categoryTag: "Reasoning Verification · RLHF",
     secondaryTag: "STEM / Calculus",
-    filters: ["Text"],
+    filters: ["Text / Doc"],
   },
   {
     id: "16",
@@ -144,7 +143,7 @@ export const useCases: UseCase[] = [
     idTag: "PHYS-001",
     categoryTag: "Reasoning Verification · RLHF",
     secondaryTag: "STEM / Physics",
-    filters: ["Text"],
+    filters: ["Text / Doc"],
   },
   {
     id: "7",
@@ -155,7 +154,7 @@ export const useCases: UseCase[] = [
     idTag: "DOC-101",
     categoryTag: "Document AI",
     secondaryTag: "IDP",
-    filters: ["Document", "Image"],
+    filters: ["Text / Doc", "Image"],
   },
   {
     id: "17",

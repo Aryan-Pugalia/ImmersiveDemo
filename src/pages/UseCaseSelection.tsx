@@ -7,13 +7,12 @@ import { LanguagePicker } from "@/components/LanguagePicker";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const FILTER_ICONS: Record<string, string> = {
-  "All":       "apps",
-  "Image":     "image",
-  "Video":     "movie",
-  "Audio":     "mic",
-  "Text":      "article",
-  "3D / LiDAR":"view_in_ar",
-  "Document":  "description",
+  "All":        "apps",
+  "Image":      "image",
+  "Video":      "movie",
+  "Audio":      "mic",
+  "Text / Doc": "article",
+  "3D / LiDAR": "view_in_ar",
 };
 
 const UseCaseSelection = () => {
