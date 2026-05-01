@@ -161,9 +161,6 @@ const UseCaseSelection = () => {
                 <span className="material-symbols-outlined text-4xl text-foreground/40 card-icon-hover">
                   {useCase.icon}
                 </span>
-                <span className="text-sm font-bold tracking-[0.2em] uppercase text-foreground/30 font-body">
-                  ID: {useCase.idTag}
-                </span>
               </div>
               <h3 className="text-[18px] font-bold font-headline mb-2 uppercase tracking-wide" style={{ color: "#D72483" }}>
                 {t.useCases[useCase.slug]?.title ?? useCase.title}
