@@ -12,6 +12,12 @@
 
 @layer base {
   :root {
+    /* ── Z-index scale — single source of truth for overlay stacking ── */
+    --z-base:     50;  /* dialogs, modals (Radix default)               */
+    --z-menu:    100;  /* floating menus (language picker, dropdowns)   */
+    --z-tutorial: 110; /* guided tutorial overlays — sits above menu    */
+    --z-toast:   130;  /* toast notifications — always on top           */
+
     --background: 0 0% 7.5%;
     --foreground: 30 5% 89%;
 
@@ -225,12 +231,29 @@ html.light .text-rose-400:not(.dark-surface *)   { color: #9f1239 !important; } 
 html.light .text-yellow-300:not(.dark-surface *) { color: #a16207 !important; } /* yellow-700 */
 html.light .text-yellow-400:not(.dark-surface *) { color: #854d0e !important; } /* yellow-800 */
 
-/* ── Buttons with colored bg always keep white text ── */
-html.light [class*="bg-emerald-5"] .text-white,
-html.light [class*="bg-red-5"] .text-white,
-html.light [class*="bg-amber-5"] .text-white,
-html.light [class*="bg-violet-6"] .text-white,
-html.light [class*="bg-blue-5"] .text-white    { color: white !important; }
+/* ── Buttons with colored bg always keep white text ──
+   Covers both same-element (no space) and descendant (space) combos,
+   so active buttons like bg-violet-600 text-white survive the broad
+   .text-white → dark override above. */
+html.light [class*="bg-violet-5"].text-white,  html.light [class*="bg-violet-5"] .text-white,
+html.light [class*="bg-violet-6"].text-white,  html.light [class*="bg-violet-6"] .text-white,
+html.light [class*="bg-violet-7"].text-white,  html.light [class*="bg-violet-7"] .text-white,
+html.light [class*="bg-purple-5"].text-white,  html.light [class*="bg-purple-5"] .text-white,
+html.light [class*="bg-purple-6"].text-white,  html.light [class*="bg-purple-6"] .text-white,
+html.light [class*="bg-blue-5"].text-white,    html.light [class*="bg-blue-5"] .text-white,
+html.light [class*="bg-blue-6"].text-white,    html.light [class*="bg-blue-6"] .text-white,
+html.light [class*="bg-indigo-5"].text-white,  html.light [class*="bg-indigo-5"] .text-white,
+html.light [class*="bg-indigo-6"].text-white,  html.light [class*="bg-indigo-6"] .text-white,
+html.light [class*="bg-red-5"].text-white,     html.light [class*="bg-red-5"] .text-white,
+html.light [class*="bg-red-6"].text-white,     html.light [class*="bg-red-6"] .text-white,
+html.light [class*="bg-emerald-5"].text-white, html.light [class*="bg-emerald-5"] .text-white,
+html.light [class*="bg-emerald-6"].text-white, html.light [class*="bg-emerald-6"] .text-white,
+html.light [class*="bg-green-5"].text-white,   html.light [class*="bg-green-5"] .text-white,
+html.light [class*="bg-green-6"].text-white,   html.light [class*="bg-green-6"] .text-white,
+html.light [class*="bg-amber-5"].text-white,   html.light [class*="bg-amber-5"] .text-white,
+html.light [class*="bg-amber-6"].text-white,   html.light [class*="bg-amber-6"] .text-white,
+html.light [class*="bg-orange-5"].text-white,  html.light [class*="bg-orange-5"] .text-white,
+html.light [class*="bg-orange-6"].text-white,  html.light [class*="bg-orange-6"] .text-white { color: white !important; }
 
 /* ── White/opacity borders → dark equivalents ── */
 html.light .border-white\/10:not(.dark-surface *) { border-color: rgba(0,0,0,0.10) !important; }
@@ -391,6 +414,7 @@ html.light .circular-img {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  z-index: 10;
 }
 
 .banner-bg {
@@ -493,7 +517,6 @@ html.light .circular-img {
 
 .circular-wrapper {
   position: absolute;
-  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -506,18 +529,6 @@ html.light .circular-img {
   display: block;
   mix-blend-mode: screen;
   opacity: 0.85;
-  mask-image: radial-gradient(
-    ellipse 82% 88% at 52% 48%,
-    black 30%,
-    rgba(0,0,0,0.8) 58%,
-    transparent 84%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 82% 88% at 52% 48%,
-    black 30%,
-    rgba(0,0,0,0.8) 58%,
-    transparent 84%
-  );
 }
 
 .cta-overlay {

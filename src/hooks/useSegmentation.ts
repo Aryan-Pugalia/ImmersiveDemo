@@ -35,7 +35,12 @@ export function useSegmentation() {
       if (fnError) throw new Error(fnError.message);
       if (data?.error) throw new Error(data.error);
 
-      setResult(data as SegmentationResult);
+      const parsed = data as SegmentationResult;
+      if (!Array.isArray(parsed?.regions)) {
+        setError("Unexpected response from AI analysis. Please try again.");
+        return;
+      }
+      setResult(parsed);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Analysis failed");
     } finally {

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -100,6 +101,8 @@ const WF_STAGES: { id: WfStage; label: string; Icon: React.ComponentType<{size?:
 
 function WorkflowStepper({ current }: { current: WfStage }) {
   const idx = WF_STAGES.findIndex(s => s.id === current);
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   const NOTES: Record<WfStage,string> = {
     annotate:  "Fill in all segment transcripts and translations, then Submit.",
     ai_verify: "Our AI model is cross-checking timestamps and translation quality.",
@@ -119,20 +122,20 @@ function WorkflowStepper({ current }: { current: WfStage }) {
                 <div className="flex flex-col items-center flex-1">
                   <div className="w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300"
                     style={{
-                      borderColor: isDone||isCurrent ? "hsl(var(--primary))" : "hsl(0,0%,22%)",
+                      borderColor: isDone||isCurrent ? "hsl(var(--primary))" : isLight ? "rgba(0,0,0,0.2)" : "hsl(0,0%,28%)",
                       background:  isCurrent ? "hsl(var(--primary)/0.15)" : isDone ? "hsl(var(--primary)/0.85)" : "transparent",
-                      color:       isCurrent ? "hsl(var(--primary))"       : isDone ? "#fff"                     : "hsl(0,0%,50%)",
+                      color:       isCurrent ? "hsl(var(--primary))"       : isDone ? "#fff"                     : isLight ? "rgba(0,0,0,0.45)" : "hsl(0,0%,55%)",
                     }}>
                     <Icon size={15}/>
                   </div>
                   <span className="mt-1.5 text-[11px] font-semibold whitespace-nowrap"
-                    style={{ color: isCurrent?"hsl(var(--primary))":isDone?"hsl(0,0%,85%)":"hsl(0,0%,50%)" }}>
+                    style={{ color: isCurrent?"hsl(var(--primary))":isDone ? "hsl(var(--foreground))" : isLight ? "rgba(0,0,0,0.45)" : "hsl(0,0%,55%)" }}>
                     {s.label}
                   </span>
                 </div>
                 {i < WF_STAGES.length-1 && (
                   <div className="h-px flex-1 mx-1 -translate-y-3.5 transition-all duration-500"
-                    style={{ background: i<idx?"hsl(var(--primary))":"hsl(0,0%,20%)" }}/>
+                    style={{ background: i<idx?"hsl(var(--primary))": isLight ? "rgba(0,0,0,0.12)" : "hsl(0,0%,20%)" }}/>
                 )}
               </React.Fragment>
             );
@@ -688,12 +691,12 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
                         <td className="px-3 py-2 min-w-[130px]" onClick={e=>e.stopPropagation()}>
                           {readOnly ? <span className="text-foreground/70">{seg.sourceText}</span>
                             : <textarea value={seg.sourceText} rows={2} onChange={e=>updateSeg(seg.id,{sourceText:e.target.value})}
-                                className="w-full bg-transparent text-foreground/80 text-xs resize-none focus:outline-none placeholder-foreground/20" placeholder="Source text…"/>}
+                                className="w-full bg-transparent text-foreground/80 text-sm resize-none focus:outline-none placeholder-foreground/20" placeholder="Source text…"/>}
                         </td>
                         <td className="px-3 py-2 min-w-[130px]" onClick={e=>e.stopPropagation()}>
                           {readOnly ? <span className="text-foreground/70">{seg.englishText}</span>
                             : <textarea value={seg.englishText} rows={2} onChange={e=>updateSeg(seg.id,{englishText:e.target.value})}
-                                className="w-full bg-transparent text-foreground/80 text-xs resize-none focus:outline-none placeholder-foreground/20" placeholder="English translation…"/>}
+                                className="w-full bg-transparent text-foreground/80 text-sm resize-none focus:outline-none placeholder-foreground/20" placeholder="English translation…"/>}
                         </td>
                         <td className="px-3 py-2" onClick={e=>e.stopPropagation()}>
                           {readOnly ? <span className={`text-xs ${seg.audioIssue!=="NONE"?"text-amber-400":"text-foreground/30"}`}>{seg.audioIssue}</span>
@@ -736,7 +739,11 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
               <div className="flex flex-col gap-2">
                 <div className="text-xs text-foreground/40 font-bold uppercase tracking-widest pb-1 border-b border-border">{task.languageLabel} Transcript</div>
                 {segs.map(seg=>{ const col=SPEAKER_COLORS[seg.speaker]??"#94a3b8"; return (
-                  <div key={seg.id} onClick={()=>{setSelectedId(seg.id);seekToMs(seg.startMs);}}
+                  <div key={seg.id}
+                    role="button" tabIndex={0}
+                    aria-label={`Transcript segment ${seg.speaker} at ${msToTC(seg.startMs)}`}
+                    onClick={()=>{setSelectedId(seg.id);seekToMs(seg.startMs);}}
+                    onKeyDown={e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setSelectedId(seg.id); seekToMs(seg.startMs); } }}
                     className={`rounded-xl border transition-colors cursor-pointer ${seg.id===selectedId?"border-primary bg-primary/5":"border-border bg-[hsl(var(--md-surface-container-low))]"}`}>
                     <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border">
                       <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{color:col,background:col+"22"}}>{seg.speaker}</span>
@@ -745,7 +752,7 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
                     <div className="px-3 py-2">
                       <textarea value={seg.sourceText} rows={2} readOnly={readOnly}
                         onChange={e=>updateSeg(seg.id,{sourceText:e.target.value})} onClick={e=>e.stopPropagation()}
-                        className="w-full bg-transparent text-sm text-foreground/80 resize-none focus:outline-none placeholder-foreground/20"
+                        className="w-full bg-transparent text-base text-foreground/80 resize-none focus:outline-none placeholder-foreground/20"
                         placeholder={`Transcribe ${task.languageLabel}…`}/>
                     </div>
                   </div>
@@ -757,7 +764,11 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
               <div className="flex flex-col gap-2">
                 <div className="text-xs text-foreground/40 font-bold uppercase tracking-widest pb-1 border-b border-border">English Translation</div>
                 {segs.map(seg=>{ const col=SPEAKER_COLORS[seg.speaker]??"#94a3b8"; return (
-                  <div key={seg.id} onClick={()=>{setSelectedId(seg.id);seekToMs(seg.startMs);}}
+                  <div key={seg.id}
+                    role="button" tabIndex={0}
+                    aria-label={`Translation segment ${seg.speaker} at ${msToTC(seg.startMs)}`}
+                    onClick={()=>{setSelectedId(seg.id);seekToMs(seg.startMs);}}
+                    onKeyDown={e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setSelectedId(seg.id); seekToMs(seg.startMs); } }}
                     className={`rounded-xl border transition-colors cursor-pointer ${seg.id===selectedId?"border-primary bg-primary/5":"border-border bg-[hsl(var(--md-surface-container-low))]"}`}>
                     <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border">
                       <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{color:col,background:col+"22"}}>{seg.speaker}</span>
@@ -766,7 +777,7 @@ function Workspace({ task, onBack }: { task:Task; onBack:()=>void }) {
                     <div className="px-3 py-2">
                       <textarea value={seg.englishText} rows={2} readOnly={readOnly}
                         onChange={e=>updateSeg(seg.id,{englishText:e.target.value})} onClick={e=>e.stopPropagation()}
-                        className="w-full bg-transparent text-sm text-foreground/80 resize-none focus:outline-none placeholder-foreground/20"
+                        className="w-full bg-transparent text-base text-foreground/80 resize-none focus:outline-none placeholder-foreground/20"
                         placeholder="English translation…"/>
                     </div>
                   </div>

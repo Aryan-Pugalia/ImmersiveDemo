@@ -275,7 +275,8 @@ function RadioGroup<T extends string>({
 
 export default function DriverMonitoring() {
   const navigate = useNavigate();
-  const { isDark } = useTheme();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const [stage, setStage] = useState<Stage>(1);
   const [selectedClipIdx, setSelectedClipIdx] = useState(0);

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCases, FILTERS, FilterLabel } from "@/data/useCases";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 import { LanguagePicker } from "@/components/LanguagePicker";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -20,6 +21,8 @@ const FILTER_ICONS: Record<string, string> = {
 const UseCaseSelection = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<FilterLabel>("All");
@@ -115,13 +118,14 @@ const UseCaseSelection = () => {
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-all duration-200"
-                style={{
-                  background: isActive ? "#9071f0" : "transparent",
-                  borderColor: isActive ? "#9071f0" : "rgba(144,113,240,0.25)",
-                  color: isActive ? "#fff" : "rgba(255,255,255,0.45)",
-                  boxShadow: isActive ? "0 0 16px rgba(144,113,240,0.35)" : "none",
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-all duration-200 ${
+                  isActive
+                    ? "bg-violet-600 text-white border-violet-600"
+                    : isDark
+                      ? "bg-transparent text-white/60 border-violet-400/25 hover:text-white/90 hover:border-violet-400/50"
+                      : "bg-transparent text-gray-700 border-violet-400/50 hover:text-gray-900 hover:border-violet-600/70"
+                }`}
+                style={isActive ? { boxShadow: "0 0 16px rgba(144,113,240,0.35)" } : undefined}
               >
                 <span
                   className="material-symbols-outlined"
@@ -131,11 +135,13 @@ const UseCaseSelection = () => {
                 </span>
                 {filter}
                 <span
-                  className="text-xs font-mono px-1.5 py-0.5 rounded-full ml-0.5"
-                  style={{
-                    background: isActive ? "rgba(255,255,255,0.2)" : "rgba(144,113,240,0.15)",
-                    color: isActive ? "#fff" : "rgba(144,113,240,0.8)",
-                  }}
+                  className={`text-xs font-mono px-1.5 py-0.5 rounded-full ml-0.5 ${
+                    isActive
+                      ? "bg-white/20 text-white"
+                      : isDark
+                        ? "bg-violet-500/15 text-violet-300"
+                        : "bg-violet-100 text-violet-700"
+                  }`}
                 >
                   {count}
                 </span>

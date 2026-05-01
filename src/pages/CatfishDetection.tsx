@@ -22,6 +22,7 @@ import {
   Check, ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/context/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -452,11 +453,11 @@ function Stage2({ profile, annotation, onComplete }: {
     <div className="space-y-1.5">
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium text-foreground/80">{label}</span>
-        <span className="text-sm font-bold tabular-nums" style={{ color: active ? riskHue(score) : "rgba(255,255,255,0.25)" }}>
+        <span className="text-sm font-bold tabular-nums" style={{ color: active ? riskHue(score) : isLight ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.25)" }}>
           {active ? `${score}/100` : "—"}
         </span>
       </div>
-      <div className="h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+      <div className="h-3 rounded-full overflow-hidden" style={{ background: isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)" }}>
         <div className="h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: active ? `${score}%` : "0%", background: riskHue(score) }} />
       </div>
@@ -776,6 +777,8 @@ function Stage4({ profile, qaAction, onReset }: {
 
 export default function CatfishDetection() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   const [profileIdx, setProfileIdx] = useState(0);
   const [stage,      setStage]      = useState<Stage>(1);

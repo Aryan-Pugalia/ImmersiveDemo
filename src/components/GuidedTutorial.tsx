@@ -177,10 +177,10 @@ export default function GuidedTutorial({
     <>
       {spotlightRect ? (
         <>
-          <div className="fixed z-[100] bg-black/65" style={{ top: 0, left: 0, right: 0, height: Math.max(0, spotlightRect.top) }} />
-          <div className="fixed z-[100] bg-black/65" style={{ top: spotlightRect.top + spotlightRect.height, left: 0, right: 0, bottom: 0 }} />
-          <div className="fixed z-[100] bg-black/65" style={{ top: spotlightRect.top, left: 0, width: Math.max(0, spotlightRect.left), height: spotlightRect.height }} />
-          <div className="fixed z-[100] bg-black/65" style={{ top: spotlightRect.top, left: spotlightRect.left + spotlightRect.width, right: 0, height: spotlightRect.height }} />
+          <div className="fixed z-[110] bg-black/65" style={{ top: 0, left: 0, right: 0, height: Math.max(0, spotlightRect.top) }} />
+          <div className="fixed z-[110] bg-black/65" style={{ top: spotlightRect.top + spotlightRect.height, left: 0, right: 0, bottom: 0 }} />
+          <div className="fixed z-[110] bg-black/65" style={{ top: spotlightRect.top, left: 0, width: Math.max(0, spotlightRect.left), height: spotlightRect.height }} />
+          <div className="fixed z-[110] bg-black/65" style={{ top: spotlightRect.top, left: spotlightRect.left + spotlightRect.width, right: 0, height: spotlightRect.height }} />
         </>
       ) : (
         <div className="fixed inset-0 z-[100] bg-black/65" />
@@ -188,7 +188,7 @@ export default function GuidedTutorial({
 
       {spotlightRect && (
         <div
-          className="fixed z-[101] rounded-lg border-2 border-primary animate-pulse pointer-events-none"
+          className="fixed z-[111] rounded-lg border-2 border-primary animate-pulse pointer-events-none"
           style={{
             top: spotlightRect.top,
             left: spotlightRect.left,
@@ -200,7 +200,7 @@ export default function GuidedTutorial({
       )}
 
       <div
-        className="fixed z-[103] animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+        className="fixed z-[113] animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
         style={getTooltipStyle()}
       >
         <div className="bg-card border border-border rounded-xl p-4 shadow-xl">

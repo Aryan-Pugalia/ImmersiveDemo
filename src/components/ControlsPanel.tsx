@@ -43,7 +43,7 @@ function confidenceBg(v: number) {
 }
 
 function severityLabel(region: SegmentedRegion) {
-  const name = region.name.toLowerCase();
+  const name = (region.name ?? "").toLowerCase();
   if (
     name.includes("tumor") ||
     name.includes("mass") ||
@@ -97,13 +97,16 @@ export function ControlsPanel({
     ? annotations.map((ann) => {
         let bestIoU = 0;
         let bestRegion: SegmentedRegion | null = null;
-        regions.forEach((r) => {
-          const iou = computeOverlap(ann.bounds, r.bounds);
-          if (iou > bestIoU) {
-            bestIoU = iou;
-            bestRegion = r;
-          }
-        });
+        if (ann.bounds) {
+          regions.forEach((r) => {
+            if (!r.bounds) return;
+            const iou = computeOverlap(ann.bounds, r.bounds);
+            if (iou > bestIoU) {
+              bestIoU = iou;
+              bestRegion = r;
+            }
+          });
+        }
         return { annotation: ann, bestRegion, iou: bestIoU };
       })
     : [];

@@ -79,7 +79,7 @@ export function LanguagePicker({ variant = "pill" }: Props) {
       {/* Dropdown panel */}
       {open && (
         <div
-          className="absolute right-0 top-full mt-1.5 rounded-xl border border-border/30 bg-[hsl(0,0%,8%)] shadow-2xl overflow-hidden z-[200] min-w-[120px]"
+          className="absolute right-0 top-full mt-1.5 rounded-xl border border-border shadow-2xl overflow-hidden z-[100] min-w-[120px] bg-card"
           style={{ direction: "ltr" }}
         >
           {OPTIONS.map(o => (
@@ -89,7 +89,7 @@ export function LanguagePicker({ variant = "pill" }: Props) {
               className={`group w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-bold font-body transition-colors hover:bg-primary/10 text-left ${
                 language === o.code
                   ? "text-primary bg-primary/5"
-                  : "text-foreground/60 hover:text-foreground"
+                  : "text-foreground/80 hover:text-foreground"
               }`}
             >
               <FlagImg flagCode={o.flagCode} name={o.name} />

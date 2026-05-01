@@ -71,6 +71,8 @@ const STEP_LABELS = ["Annotate", "AI Verify", "QA Review", "Delivered"] as const
 
 // ─── Shared: Progress Stepper ─────────────────────────────────────────────────
 function ProgressStepper({ stage, color }: { stage: Stage; color: string }) {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
   return (
     <div className="flex items-center justify-center py-5">
       {STEP_LABELS.map((label, i) => {
@@ -82,19 +84,19 @@ function ProgressStepper({ stage, color }: { stage: Stage; color: string }) {
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all"
                 style={{
                   background: done ? color : current ? `${color}20` : "var(--s4)",
-                  borderColor: done || current ? color : "rgba(255,255,255,0.1)",
-                  color: done ? "#fff" : current ? color : "rgba(255,255,255,0.3)",
+                  borderColor: done || current ? color : isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.1)",
+                  color: done ? "#fff" : current ? color : isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.3)",
                 }}>
                 {done ? <Check size={16} /> : n}
               </div>
               <span className="mt-1 text-xs font-semibold whitespace-nowrap"
-                style={{ color: current ? color : done ? "var(--foreground)" : "rgba(255,255,255,0.3)" }}>
+                style={{ color: current ? color : done ? "var(--foreground)" : isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.3)" }}>
                 {label}
               </span>
             </div>
             {i < STEP_LABELS.length - 1 && (
               <div className="w-14 h-0.5 mx-1 mb-5 transition-all"
-                style={{ background: stage > n ? color : "rgba(255,255,255,0.1)" }} />
+                style={{ background: stage > n ? color : isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)" }} />
             )}
           </div>
         );

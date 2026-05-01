@@ -21,6 +21,7 @@ import {
   Check, Play, Pause, Target, Activity, Gamepad2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/context/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -547,7 +548,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
               ? <Pause size={13} className="text-foreground/70"/>
               : <Play  size={13} className="text-foreground/70 ml-0.5"/>}
           </button>
-          <div className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer" style={{ background: "rgba(255,255,255,0.1)" }}
+          <div className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer" style={{ background: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)" }}
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const p = (e.clientX - rect.left) / rect.width;
@@ -809,11 +810,11 @@ function Stage2({
     <div className="space-y-1">
       <div className="flex justify-between items-center">
         <span className="text-xs font-medium text-foreground/70">{label}</span>
-        <span className="text-xs font-bold tabular-nums" style={{ color: active ? riskHue(score) : "rgba(255,255,255,0.2)" }}>
+        <span className="text-xs font-bold tabular-nums" style={{ color: active ? riskHue(score) : isLight ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.2)" }}>
           {active ? `${score}/100` : "—"}
         </span>
       </div>
-      <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+      <div className="h-2.5 rounded-full overflow-hidden" style={{ background: isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)" }}>
         <div className="h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: active ? `${score}%` : "0%", background: riskHue(score) }}/>
       </div>
@@ -1201,6 +1202,8 @@ function Stage4({
 
 export default function CheatingOrSkill() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   const [clipIdx,     setClipIdx]     = useState(0);
   const [stage,       setStage]       = useState<Stage>(1);

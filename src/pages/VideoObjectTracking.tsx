@@ -115,10 +115,28 @@ function VideoControls({
     if (videoRef.current) videoRef.current.currentTime = ratio * duration;
   };
 
+  const seekByKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!videoRef.current) return;
+    const step = e.shiftKey ? 10 : 1;
+    if (e.key === "ArrowRight") { e.preventDefault(); videoRef.current.currentTime = Math.min(duration, currentTime + step); }
+    if (e.key === "ArrowLeft")  { e.preventDefault(); videoRef.current.currentTime = Math.max(0, currentTime - step); }
+  };
+
   return (
     <div className="flex flex-col gap-2 px-1">
       {/* Scrubber */}
-      <div className="relative h-2 rounded-full cursor-pointer" style={{ background: "var(--s6)" }} onClick={seek}>
+      <div
+        role="slider"
+        tabIndex={0}
+        aria-label="Video timeline"
+        aria-valuenow={Math.round(currentTime)}
+        aria-valuemin={0}
+        aria-valuemax={Math.round(duration)}
+        className="relative h-2 rounded-full cursor-pointer"
+        style={{ background: "var(--s6)" }}
+        onClick={seek}
+        onKeyDown={seekByKey}
+      >
         <div className="absolute top-0 left-0 h-full rounded-full" style={{ width: `${pct}%`, background: ACCENT }} />
         <div className="absolute top-1/2 w-4 h-4 rounded-full border-2 border-white shadow-lg"
           style={{ left: `${pct}%`, transform: "translate(-50%,-50%)", background: ACCENT }} />
