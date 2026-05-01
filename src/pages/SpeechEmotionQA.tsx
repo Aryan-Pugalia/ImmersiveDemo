@@ -1240,7 +1240,7 @@ export default function SpeechEmotionQA() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#0a0a0f]" : "bg-gray-50"}`}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="dark-surface sticky top-0 z-20 border-b border-white/14">
+      <header className="dark-surface sticky top-0 z-20 bg-[hsl(0,0%,5%)] border-b border-white/14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
           <button
             onClick={() => navigate("/use-cases")}
