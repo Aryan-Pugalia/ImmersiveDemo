@@ -895,10 +895,10 @@ const PhysicsReasoning = () => {
         {/* Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Steps Correct", value: `${correctCount} / ${STEPS.length}`, sub: `${pctCorrect.toFixed(0)}% accuracy`, color: "text-emerald-400" },
-            { label: "Human–AI Agreement", value: `${STEPS.length - disagreements} / ${STEPS.length}`, sub: `${disagreements} disagreement${disagreements !== 1 ? "s" : ""}`, color: "text-blue-400" },
-            { label: "Avg AI Confidence", value: `${(avgConf * 100).toFixed(1)}%`, sub: "across all steps", color: "text-teal-400" },
-            { label: "Review Status", value: status === "approved_for_training" ? "Approved" : "Partial", sub: "pipeline decision", color: "text-amber-400" },
+            { label: pr.labelStepsCorrect, value: `${correctCount} / ${STEPS.length}`, sub: `${pctCorrect.toFixed(0)}% accuracy`, color: "text-emerald-400" },
+            { label: pr.labelHumanAiAgreement, value: `${STEPS.length - disagreements} / ${STEPS.length}`, sub: `${disagreements} disagreement${disagreements !== 1 ? "s" : ""}`, color: "text-blue-400" },
+            { label: pr.labelAvgAiConfidence, value: `${(avgConf * 100).toFixed(1)}%`, sub: "across all steps", color: "text-teal-400" },
+            { label: "Review Status", value: status === "approved_for_training" ? pr.labelCorrect : pr.labelPartialLabel, sub: "pipeline decision", color: "text-amber-400" },
           ].map((m) => (
             <div key={m.label} className="rounded-xl border border-border/20 bg-card p-4 text-center">
               <div className={`text-2xl font-black ${m.color}`}>{m.value}</div>
@@ -910,7 +910,7 @@ const PhysicsReasoning = () => {
 
         {/* Per-step summary */}
         <div className="rounded-xl border border-border/20 bg-card p-5">
-          <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-4">Step-by-Step Summary</div>
+          <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-4">{pr.labelStepByStep}</div>
           <div className="space-y-1">
             {STEPS.map((s, i) => {
               const ai = AI_VERIFICATIONS[i];
@@ -936,7 +936,7 @@ const PhysicsReasoning = () => {
         {/* Export */}
         <div className="rounded-xl border border-border/20 bg-card p-5">
           <div className="flex items-center justify-between mb-4">
-            <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest">Client Data Export Preview</div>
+            <div className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{pr.labelExportPreview}</div>
             <div className="flex gap-1">
               {(["json", "csv"] as const).map((tab) => (
                 <button key={tab} onClick={() => setExportTab(tab)}
@@ -952,7 +952,7 @@ const PhysicsReasoning = () => {
           </pre>
           <div className="flex justify-end mt-3">
             <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-border/30 text-xs font-bold text-foreground/60 hover:text-foreground hover:border-border/60 transition">
-              <Download size={13} /> Export to Client
+              <Download size={13} /> {pr.buttonExportToClient}
             </button>
           </div>
         </div>
@@ -991,7 +991,7 @@ const PhysicsReasoning = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button onClick={reset}
               className={`flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border transition ${isLight ? "border-black/15 hover:border-black/30" : "border-white/10 hover:border-white/25"}`}>
-              <RefreshCw size={13} /> Reset Demo
+              <RefreshCw size={13} /> {pr.buttonResetDemo}
             </button>
             <span className="text-sm px-3 py-1 rounded-full font-semibold border"
               style={{ background: "rgba(13,148,136,0.15)", color: ACCENT_LIGHT, borderColor: `${ACCENT}50` }}>
@@ -1003,7 +1003,7 @@ const PhysicsReasoning = () => {
         {/* Stage stepper */}
         <div className={`px-4 pb-3 ${isLight ? "border-t border-gray-100" : "border-t border-border/10"}`}>
           <div className="flex items-start gap-0 max-w-5xl mx-auto pt-2">
-            {STAGE_LABELS.map((label, i) => {
+            {pr.stageLabels.map((label, i) => {
               const n = (i + 1) as Stage;
               const active = n === stage;
               const done = n < stage;
@@ -1020,7 +1020,7 @@ const PhysicsReasoning = () => {
                       {label}
                     </span>
                   </div>
-                  {i < STAGE_LABELS.length - 1 && (
+                  {i < pr.stageLabels.length - 1 && (
                     <div className="flex-1 h-px mx-1 mt-[-10px] transition-all"
                       style={{ background: done ? "rgba(34,197,94,0.4)" : isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)" }} />
                   )}
