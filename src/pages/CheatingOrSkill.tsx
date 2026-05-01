@@ -371,30 +371,20 @@ function getPosition(progress: number, clip: Clip): { x: number; y: number } {
 function ReplayViewer({ clip }: { clip: Clip }) {
   const [progress, setProgress] = useState(0);
   const [playing,  setPlaying]  = useState(false);
-  const rafRef      = useRef<number | null>(null);
-  const startRef    = useRef<number>(0);
-  const pausedRef   = useRef<number>(0);
-  const videoRef    = useRef<HTMLVideoElement>(null);
+  const rafRef    = useRef<number | null>(null);
+  const startRef  = useRef<number>(0);
+  const pausedRef = useRef<number>(0);
   const DURATION_MS = clip.duration * 1000;
 
-  // reset when clip changes
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setProgress(0);
     setPlaying(false);
     pausedRef.current = 0;
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
   }, [clip.id]);
 
   useEffect(() => {
-    if (!playing) {
-      videoRef.current?.pause();
-      return;
-    }
-    videoRef.current?.play().catch(() => {});
+    if (!playing) return;
     startRef.current = performance.now() - pausedRef.current * DURATION_MS;
     const tick = (now: number) => {
       const p = Math.min((now - startRef.current) / DURATION_MS, 1);
@@ -404,7 +394,6 @@ function ReplayViewer({ clip }: { clip: Clip }) {
       } else {
         setPlaying(false);
         pausedRef.current = 0;
-        videoRef.current?.pause();
       }
     };
     rafRef.current = requestAnimationFrame(tick);
@@ -417,11 +406,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
       pausedRef.current = progress;
       setPlaying(false);
     } else {
-      if (progress >= 1) {
-        pausedRef.current = 0;
-        setProgress(0);
-        if (videoRef.current) videoRef.current.currentTime = 0;
-      }
+      if (progress >= 1) { pausedRef.current = 0; setProgress(0); }
       setPlaying(true);
     }
   };
@@ -448,78 +433,144 @@ function ReplayViewer({ clip }: { clip: Clip }) {
         </span>
       </div>
 
-      {/* Video + Telemetry Overlay */}
-      <div className="relative bg-black" style={{ aspectRatio: "4/3" }}>
-        {/* Actual gameplay footage */}
-        <video
-          ref={videoRef}
-          src="/videos/cs-game-cheating.mp4"
-          className="absolute inset-0 w-full h-full object-cover"
-          muted
-          playsInline
-          preload="auto"
-        />
+      {/* Replay Map */}
+      <div className="relative">
+        <svg viewBox="0 0 400 300" className="w-full" style={{ background: "#050b14" }}>
+          <defs>
+            <pattern id="cgrid-fine" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.022)" strokeWidth="0.5"/>
+            </pattern>
+            <pattern id="cgrid-coarse" width="80" height="80" patternUnits="userSpaceOnUse">
+              <path d="M 80 0 L 0 0 0 80" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+            </pattern>
+            <linearGradient id="coverGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(90,120,170,0.28)"/>
+              <stop offset="100%" stopColor="rgba(50,70,110,0.14)"/>
+            </linearGradient>
+            <filter id="xhairGlow" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
 
-        {/* Dark scrim so telemetry stays legible over the video */}
-        <div className="absolute inset-0" style={{ background: "rgba(4,8,16,0.40)" }} />
+          {/* Floor grids */}
+          <rect width="400" height="300" fill="url(#cgrid-fine)"/>
+          <rect width="400" height="300" fill="url(#cgrid-coarse)"/>
 
-        {/* Telemetry SVG overlay — same coordinate space as clip data */}
-        <svg viewBox="0 0 400 300" className="absolute inset-0 w-full h-full" style={{ background: "transparent" }}>
+          {/* Zone labels burned into floor */}
+          <text x="44"  y="278" fill="rgba(255,255,255,0.05)" fontSize="26" fontFamily="monospace" fontWeight="bold">A</text>
+          <text x="334" y="278" fill="rgba(255,255,255,0.05)" fontSize="26" fontFamily="monospace" fontWeight="bold">B</text>
+          <text x="180" y="168" fill="rgba(255,255,255,0.04)" fontSize="20" fontFamily="monospace" fontWeight="bold">MID</text>
 
-          {/* Suspicious zones */}
+          {/* Cover blocks with depth */}
+          {[
+            { x:78,  y:38,  w:82,  h:122, label:"COVER A" },
+            { x:238, y:58,  w:124, h:82,  label:"COVER B" },
+            { x:138, y:158, w:124, h:82,  label:"CENTER"  },
+            { x:28,  y:218, w:62,  h:62,  label:""        },
+            { x:308, y:198, w:72,  h:82,  label:""        },
+          ].map((r, i) => (
+            <g key={i}>
+              <rect x={r.x+3} y={r.y+3} width={r.w} height={r.h} rx="3" fill="rgba(0,0,0,0.35)"/>
+              <rect x={r.x}   y={r.y}   width={r.w} height={r.h} rx="3"
+                fill="url(#coverGrad)" stroke="rgba(100,140,200,0.28)" strokeWidth="1"/>
+              <rect x={r.x} y={r.y} width={r.w} height="2" rx="1" fill="rgba(160,190,230,0.18)"/>
+              {r.label && (
+                <text x={r.x+r.w/2} y={r.y+r.h/2+3} textAnchor="middle"
+                  fill="rgba(160,195,235,0.16)" fontSize="7" fontFamily="monospace" fontWeight="bold">{r.label}</text>
+              )}
+            </g>
+          ))}
+
+          {/* Suspicious zones — always visible */}
           {clip.suspiciousZones.map((z, i) => (
             <g key={i}>
               <rect x={z.x} y={z.y} width={z.w} height={z.h} rx="4"
-                fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.65)" strokeWidth="1.5" strokeDasharray="5,3"/>
-              <rect x={z.x} y={z.y + z.h + 2} width={z.label.length * 5 + 8} height="12" rx="2" fill="rgba(0,0,0,0.65)"/>
-              <text x={z.x + 4} y={z.y + z.h + 11} fill="rgba(239,68,68,0.9)" fontSize="7" fontFamily="monospace" fontWeight="bold">{z.label}</text>
+                fill="rgba(239,68,68,0.07)" stroke="rgba(239,68,68,0.42)" strokeWidth="1" strokeDasharray="5,3"/>
+              {/* Corner brackets */}
+              <polyline points={`${z.x},${z.y+9} ${z.x},${z.y} ${z.x+9},${z.y}`}         fill="none" stroke="rgba(239,68,68,0.65)" strokeWidth="1.5"/>
+              <polyline points={`${z.x+z.w-9},${z.y} ${z.x+z.w},${z.y} ${z.x+z.w},${z.y+9}`}   fill="none" stroke="rgba(239,68,68,0.65)" strokeWidth="1.5"/>
+              <polyline points={`${z.x},${z.y+z.h-9} ${z.x},${z.y+z.h} ${z.x+9},${z.y+z.h}`}   fill="none" stroke="rgba(239,68,68,0.65)" strokeWidth="1.5"/>
+              <polyline points={`${z.x+z.w-9},${z.y+z.h} ${z.x+z.w},${z.y+z.h} ${z.x+z.w},${z.y+z.h-9}`} fill="none" stroke="rgba(239,68,68,0.65)" strokeWidth="1.5"/>
+              <rect x={z.x+2} y={z.y+z.h+3} width={z.label.length*4.8+8} height="11" rx="2" fill="rgba(0,0,0,0.72)"/>
+              <text x={z.x+6} y={z.y+z.h+11} fill="rgba(239,68,68,0.85)" fontSize="6.5" fontFamily="monospace" fontWeight="bold">{z.label}</text>
             </g>
           ))}
 
-          {/* Trajectory paths */}
-          {clip.trajectoryPaths.map((p, i) => (
-            <path key={i} d={p.d} fill="none" stroke={p.color} strokeWidth="2.5"
-              opacity="0.80" strokeLinecap="round" strokeLinejoin="round"/>
-          ))}
+          {/* Trajectory paths — each segment draws in progressively */}
+          {clip.trajectoryPaths.map((p, i) => {
+            const segStart = i === 0 ? 0 : (clip.killEvents[i - 1]?.t ?? 0);
+            const segEnd   = clip.killEvents[i]?.t ?? 1;
+            const frac = Math.max(0, Math.min(1, (progress - segStart) / Math.max(segEnd - segStart, 0.001)));
+            if (frac <= 0) return null;
+            return (
+              <g key={i}>
+                {/* Soft glow behind the line */}
+                <path d={p.d} fill="none" stroke={p.color} strokeWidth="7"
+                  opacity={0.10 * frac} strokeLinecap="round"
+                  pathLength="1" strokeDasharray="1" strokeDashoffset={1 - frac}/>
+                {/* Main line */}
+                <path d={p.d} fill="none" stroke={p.color} strokeWidth="2"
+                  opacity={0.80 * frac} strokeLinecap="round" strokeLinejoin="round"
+                  pathLength="1" strokeDasharray="1" strokeDashoffset={1 - frac}/>
+              </g>
+            );
+          })}
 
-          {/* Kill events — appear as progress passes their t */}
+          {/* Kill events */}
           {visibleKills.map((k, i) => (
             <g key={i}>
-              <circle cx={k.x} cy={k.y} r="14" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.4">
-                <animate attributeName="r" values="14;22;14" dur="2s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
+              <circle cx={k.x} cy={k.y} r="12" fill="none" stroke="#ef4444" strokeWidth="1.2" opacity="0.32">
+                <animate attributeName="r"       values="12;22;12" dur="2.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.32;0;0.32" dur="2.5s" repeatCount="indefinite"/>
               </circle>
-              <circle cx={k.x} cy={k.y} r="5" fill="#ef4444"/>
-              <rect x={k.x + 9} y={k.y - 15} width={k.label.length * 5 + 6} height="12" rx="2" fill="rgba(0,0,0,0.70)" stroke="rgba(239,68,68,0.5)" strokeWidth="1"/>
-              <text x={k.x + 12} y={k.y - 7} fill="#f87171" fontSize="7.5" fontFamily="monospace" fontWeight="bold">{k.label}</text>
+              <circle cx={k.x} cy={k.y} r="4.5" fill="#ef4444"/>
+              <circle cx={k.x} cy={k.y} r="2"   fill="white"/>
+              <rect x={k.x+8} y={k.y-14} width={k.label.length*4.8+7} height="11" rx="2.5"
+                fill="rgba(10,5,5,0.78)" stroke="rgba(239,68,68,0.42)" strokeWidth="1"/>
+              <text x={k.x+11} y={k.y-6} fill="#f87171" fontSize="7" fontFamily="monospace" fontWeight="bold">{k.label}</text>
             </g>
           ))}
 
-          {/* Moving crosshair */}
-          {progress > 0 && (
+          {/* Gap-style crosshair (CS2 / Valorant style) */}
+          {progress > 0 && (() => {
+            const g = 5, a = 10;
+            return (
+              <g filter="url(#xhairGlow)">
+                <circle cx={pos.x} cy={pos.y} r="15" fill="none" stroke="rgba(100,210,255,0.18)" strokeWidth="1"/>
+                <line x1={pos.x-(g+a)} y1={pos.y}     x2={pos.x-g}     y2={pos.y}     stroke="#64d2ff" strokeWidth="1.8" opacity="0.92"/>
+                <line x1={pos.x+g}     y1={pos.y}     x2={pos.x+(g+a)} y2={pos.y}     stroke="#64d2ff" strokeWidth="1.8" opacity="0.92"/>
+                <line x1={pos.x}       y1={pos.y-(g+a)} x2={pos.x}     y2={pos.y-g}   stroke="#64d2ff" strokeWidth="1.8" opacity="0.92"/>
+                <line x1={pos.x}       y1={pos.y+g}   x2={pos.x}       y2={pos.y+(g+a)} stroke="#64d2ff" strokeWidth="1.8" opacity="0.92"/>
+                <circle cx={pos.x} cy={pos.y} r="1.5" fill="#64d2ff" opacity="0.85"/>
+              </g>
+            );
+          })()}
+
+          {/* START marker (before playback) */}
+          {progress === 0 && (
             <g>
-              <circle cx={pos.x} cy={pos.y} r="18" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
-              <line x1={pos.x - 12} y1={pos.y} x2={pos.x - 5} y2={pos.y} stroke="white" strokeWidth="2" opacity="0.95"/>
-              <line x1={pos.x + 5}  y1={pos.y} x2={pos.x + 12} y2={pos.y} stroke="white" strokeWidth="2" opacity="0.95"/>
-              <line x1={pos.x} y1={pos.y - 12} x2={pos.x} y2={pos.y - 5} stroke="white" strokeWidth="2" opacity="0.95"/>
-              <line x1={pos.x} y1={pos.y + 5}  x2={pos.x} y2={pos.y + 12} stroke="white" strokeWidth="2" opacity="0.95"/>
-              <circle cx={pos.x} cy={pos.y} r="2.5" fill="rgba(255,255,255,0.9)"/>
+              <circle cx="195" cy="148" r="5" fill="#8b5cf6" opacity="0.75"/>
+              <circle cx="195" cy="148" r="2.5" fill="white"/>
+              <text x="204" y="145" fill="rgba(139,92,246,0.65)" fontSize="7" fontFamily="monospace" fontWeight="bold">START</text>
             </g>
           )}
 
-          {/* HUD labels */}
-          <rect x="6" y="5" width="80" height="13" rx="2" fill="rgba(0,0,0,0.60)"/>
-          <text x="10" y="14.5" fill="rgba(255,255,255,0.50)" fontSize="7" fontFamily="monospace">TELEMETRY OVERLAY</text>
-          <rect x="308" y="5" width="86" height="13" rx="2" fill="rgba(0,0,0,0.60)"/>
-          <text x="312" y="14.5" fill="rgba(255,255,255,0.50)" fontSize="7" fontFamily="monospace">{timeStr}</text>
+          {/* HUD top bar */}
+          <rect x="0" y="0" width="400" height="18" fill="rgba(0,0,0,0.58)"/>
+          <text x="7"   y="12" fill="rgba(255,255,255,0.30)" fontSize="6.5" fontFamily="monospace">TELEMETRY REPLAY · MAP ALPHA</text>
+          <text x="393" y="12" textAnchor="end" fill="rgba(255,255,255,0.30)" fontSize="6.5" fontFamily="monospace">{timeStr}</text>
+          {/* Playback progress line */}
+          <rect x="0" y="17" width="400" height="1.5" fill="rgba(255,255,255,0.05)"/>
+          <rect x="0" y="17" width={400 * progress} height="1.5" fill="rgba(100,210,255,0.55)"/>
         </svg>
 
         {/* Play overlay */}
         {!playing && progress === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center cursor-pointer" onClick={toggle}>
-            <div className="w-16 h-16 rounded-full flex items-center justify-center border border-violet-400/40 backdrop-blur-sm shadow-lg"
-              style={{ background: "rgba(109,40,217,0.82)" }}>
-              <Play size={28} className="text-white ml-1" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/15 cursor-pointer" onClick={toggle}>
+            <div className="w-14 h-14 rounded-full flex items-center justify-center border border-violet-400/30 backdrop-blur-sm"
+              style={{ background: "rgba(109,40,217,0.75)" }}>
+              <Play size={24} className="text-white ml-1" />
             </div>
           </div>
         )}
@@ -534,7 +585,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
               ? <Pause size={13} className="text-foreground/70"/>
               : <Play  size={13} className="text-foreground/70 ml-0.5"/>}
           </button>
-          <div className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer" style={{ background: "rgba(255,255,255,0.12)" }}
+          <div className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer" style={{ background: "rgba(255,255,255,0.10)" }}
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const p = (e.clientX - rect.left) / rect.width;
