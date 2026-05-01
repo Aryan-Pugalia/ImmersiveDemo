@@ -544,8 +544,7 @@ export default function ConversationalContextQA() {
                     : "bg-transparent text-white/50 border-white/15 hover:text-white/90 hover:border-white/30 hover:bg-white/5"
                 }`}>
                 <span style={{ fontSize: "13px", lineHeight: 1 }}>{LANG_FLAG[s.language] ?? "🌐"}</span>
-                <span className="hidden sm:inline">{s.id.replace("voice_session_", "S-")}</span>
-                <span className="hidden md:inline text-[10px] opacity-70">· {s.language.split(" ")[0]}</span>
+                <span className="hidden sm:inline">{s.language.split(" ")[0]}</span>
               </button>
             ))}
           </div>
