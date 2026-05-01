@@ -78,6 +78,10 @@ export const en = {
       title: "Automotive DMS Video Annotation",
       description: "Review driver-facing IR clips flagged by a Driver Monitoring System. Validate distraction events, label driver gaze and hand position, QA the AI call, and export structured annotation packets for ADAS model training.",
     },
+    "audio-quality-qa": {
+      title: "Audio Quality & Signal Integrity QA",
+      description: "7-dimension audio quality annotation — background noise, signal clarity, clipping, echo, dropouts and more. AI verification, QA adjudication, and structured JSON export for pre-training data pipelines.",
+    },
   } as Record<string, { title: string; description: string }>,
 
   // ── Capabilities marquee ──────────────────────────────────────────────────

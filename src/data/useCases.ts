@@ -157,6 +157,17 @@ export const useCases: UseCase[] = [
     filters: ["Text / Doc", "Image"],
   },
   {
+    id: "18",
+    slug: "audio-quality-qa",
+    title: "Audio Quality & Signal Integrity QA",
+    description: "7-dimension audio quality annotation — background noise, signal clarity, clipping, echo, dropouts and more. AI verification, QA adjudication, and structured JSON export for pre-training data pipelines.",
+    icon: "graphic_eq",
+    idTag: "AUD-402",
+    categoryTag: "Audio / Speech",
+    secondaryTag: "Pre-Training QA",
+    filters: ["Audio"],
+  },
+  {
     id: "17",
     slug: "driver-monitoring",
     title: "Automotive DMS Video Annotation",
