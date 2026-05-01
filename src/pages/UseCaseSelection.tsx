@@ -7,15 +7,13 @@ import { LanguagePicker } from "@/components/LanguagePicker";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const FILTER_ICONS: Record<string, string> = {
-  "All":           "apps",
-  "RLHF":          "thumb_up",
-  "Automotive":    "directions_car",
-  "Medical":       "radiology",
-  "Audio / Speech":"mic",
-  "Document AI":   "description",
-  "Trust & Safety":"policy",
-  "Video":         "movie",
-  "Reasoning":     "calculate",
+  "All":       "apps",
+  "Image":     "image",
+  "Video":     "movie",
+  "Audio":     "mic",
+  "Text":      "article",
+  "3D / LiDAR":"view_in_ar",
+  "Document":  "description",
 };
 
 const UseCaseSelection = () => {
@@ -100,7 +98,7 @@ const UseCaseSelection = () => {
         {/* Heading */}
         <div className="flex flex-col items-center mb-8">
           <div className="inline-block">
-            <h1 className="text-4xl md:text-6xl font-headline font-bold text-foreground tracking-tight text-center">
+            <h1 className="text-2xl md:text-3xl font-headline font-bold text-foreground tracking-tight text-center">
               {t.useCasesPage.heading}
             </h1>
             <div className="gradient-underline mx-auto w-24"></div>

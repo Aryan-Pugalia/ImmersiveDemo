@@ -12,14 +12,12 @@ export interface UseCase {
 
 export const FILTERS = [
   "All",
-  "RLHF",
-  "Automotive",
-  "Medical",
-  "Audio / Speech",
-  "Document AI",
-  "Trust & Safety",
+  "Image",
   "Video",
-  "Reasoning",
+  "Audio",
+  "Text",
+  "3D / LiDAR",
+  "Document",
 ] as const;
 
 export type FilterLabel = typeof FILTERS[number];
@@ -34,7 +32,7 @@ export const useCases: UseCase[] = [
     idTag: "LID-001",
     categoryTag: "3D / Point Cloud",
     secondaryTag: "Autonomous",
-    filters: ["Automotive"],
+    filters: ["3D / LiDAR"],
   },
   {
     id: "6",
@@ -45,7 +43,7 @@ export const useCases: UseCase[] = [
     idTag: "MED-001",
     categoryTag: "Medical Imaging",
     secondaryTag: "AI-Assisted",
-    filters: ["Medical"],
+    filters: ["Image"],
   },
   {
     id: "10",
@@ -56,7 +54,7 @@ export const useCases: UseCase[] = [
     idTag: "AUD-401",
     categoryTag: "Speech / NLP",
     secondaryTag: "Multilingual",
-    filters: ["Audio / Speech"],
+    filters: ["Audio"],
   },
   {
     id: "9",
@@ -67,7 +65,7 @@ export const useCases: UseCase[] = [
     idTag: "VID-301",
     categoryTag: "RLHF / Video GenAI",
     secondaryTag: "Multimodal",
-    filters: ["RLHF", "Video"],
+    filters: ["Video"],
   },
   {
     id: "8",
@@ -78,7 +76,7 @@ export const useCases: UseCase[] = [
     idTag: "IMG-201",
     categoryTag: "RLHF / GenAI",
     secondaryTag: "Preference",
-    filters: ["RLHF"],
+    filters: ["Image"],
   },
   {
     id: "12",
@@ -89,7 +87,7 @@ export const useCases: UseCase[] = [
     idTag: "GAM-118",
     categoryTag: "Gaming / T&S",
     secondaryTag: "GenAI + Human QA",
-    filters: ["Trust & Safety", "Video"],
+    filters: ["Video"],
   },
   {
     id: "11",
@@ -100,7 +98,7 @@ export const useCases: UseCase[] = [
     idTag: "T&S-501",
     categoryTag: "Content Moderation",
     secondaryTag: "Impersonation + Redaction",
-    filters: ["Trust & Safety"],
+    filters: ["Image", "Text"],
   },
   {
     id: "14",
@@ -111,7 +109,7 @@ export const useCases: UseCase[] = [
     idTag: "IM-001",
     categoryTag: "Digitization · Search · Enterprise AI",
     secondaryTag: "Governance",
-    filters: ["Document AI"],
+    filters: ["Document", "Text"],
   },
   {
     id: "13",
@@ -122,7 +120,7 @@ export const useCases: UseCase[] = [
     idTag: "VID-601",
     categoryTag: "Video Annotation / Object Tracking",
     secondaryTag: "Gaming AI",
-    filters: ["Video", "Trust & Safety"],
+    filters: ["Video"],
   },
   {
     id: "15",
@@ -134,7 +132,7 @@ export const useCases: UseCase[] = [
     idTag: "STEM-001",
     categoryTag: "Reasoning Verification · RLHF",
     secondaryTag: "STEM / Calculus",
-    filters: ["RLHF", "Reasoning"],
+    filters: ["Text"],
   },
   {
     id: "16",
@@ -146,7 +144,7 @@ export const useCases: UseCase[] = [
     idTag: "PHYS-001",
     categoryTag: "Reasoning Verification · RLHF",
     secondaryTag: "STEM / Physics",
-    filters: ["RLHF", "Reasoning"],
+    filters: ["Text"],
   },
   {
     id: "7",
@@ -157,7 +155,7 @@ export const useCases: UseCase[] = [
     idTag: "DOC-101",
     categoryTag: "Document AI",
     secondaryTag: "IDP",
-    filters: ["Document AI"],
+    filters: ["Document", "Image"],
   },
   {
     id: "17",
@@ -168,7 +166,7 @@ export const useCases: UseCase[] = [
     idTag: "DMS-001",
     categoryTag: "Automotive / ADAS",
     secondaryTag: "Video · DMS",
-    filters: ["Automotive", "Video"],
+    filters: ["Video"],
   },
 ];
 
