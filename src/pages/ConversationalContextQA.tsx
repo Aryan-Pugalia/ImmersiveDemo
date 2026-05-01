@@ -406,7 +406,7 @@ export default function ConversationalContextQA() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [stage,       setStage]       = useState<Stage>("ingest");
+  const [stage,       setStage]       = useState<Stage>("annotate");
   const [sessionIdx,  setSessionIdx]  = useState(0);
   const [annotations, setAnnotations] = useState<Record<string, HumanAnnotation>>({});
   const [qaMap,       setQaMap]       = useState<Record<string, QAEntry>>({});
@@ -525,9 +525,6 @@ export default function ConversationalContextQA() {
             <div>
               <span className="text-sm font-bold text-white font-headline">
                 TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
-              </span>
-              <span className="ml-3 text-xs font-mono px-2 py-0.5 rounded-full border border-violet-500/30 text-violet-400 bg-violet-500/10">
-                AUD-405
               </span>
             </div>
           </div>
