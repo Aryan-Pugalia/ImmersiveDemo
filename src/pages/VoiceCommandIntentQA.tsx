@@ -55,10 +55,10 @@ interface QAEntry {
 const SAMPLES: VoiceCommandSample[] = [
   {
     id:                      "vc_cmd_118",
-    spokenCommand:           "Take me to the nearest charging station but avoid highways",
+    spokenCommand:           "Emmène-moi à la station de recharge la plus proche en évitant les autoroutes",
     systemInterpretedIntent: "Route to nearest EV charging station",
     systemAction:            "Navigation initiated — fastest route via highway selected. Avoid-highways preference not applied.",
-    language:                "English (US)",
+    language:                "French (FR)",
     vehicleContext:          "Driving",
     systemInvoked:           "Navigation",
     audioSrc:                "/queues/French/Audio.mp3",
@@ -67,10 +67,10 @@ const SAMPLES: VoiceCommandSample[] = [
   },
   {
     id:                      "vc_cmd_241",
-    spokenCommand:           "Set cabin temperature to 72 degrees and turn off the rear defogger",
-    systemInterpretedIntent: "Set climate target temperature to 72°F",
-    systemAction:            "Climate zone set to 72°F. Rear defogger state unchanged.",
-    language:                "English (US)",
+    spokenCommand:           "Pon la temperatura de la cabina a 22 grados y apaga el desempañador trasero",
+    systemInterpretedIntent: "Set climate target temperature to 22°C",
+    systemAction:            "Climate zone set to 22°C. Rear defogger state unchanged.",
+    language:                "Spanish (ES)",
     vehicleContext:          "Parked",
     systemInvoked:           "Climate / Vehicle Control",
     audioSrc:                "/queues/Spanish/Audio.mp3",
@@ -85,7 +85,7 @@ const SAMPLES: VoiceCommandSample[] = [
     language:                "English (US)",
     vehicleContext:          "Driving",
     systemInvoked:           "Communication",
-    audioSrc:                "/queues/French/Audio.mp3",
+    audioSrc:                "/queues/Hindi/Audio.mp3",
     duration:                "0:08",
     recordedAt:              "2025-04-17",
   },
@@ -154,6 +154,12 @@ const SAMPLE_BARS: Record<string, number[]> = {
   vc_cmd_118: generateBars(118),
   vc_cmd_241: generateBars(241),
   vc_cmd_307: generateBars(307),
+};
+
+const LANG_FLAG: Record<string, string> = {
+  "French (FR)":  "🇫🇷",
+  "Spanish (ES)": "🇪🇸",
+  "English (US)": "🇺🇸",
 };
 
 // ─── Pipeline stages ─────────────────────────────────────────────────────────
@@ -523,16 +529,20 @@ export default function VoiceCommandIntentQA() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1 hidden sm:block">Switch Sample:</span>
             {SAMPLES.map((s, i) => (
               <button key={s.id}
                 onClick={() => { setSampleIdx(i); setStage("ingest"); }}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${
+                title={`${s.id.replace("vc_cmd_", "VC-")} · ${s.language}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
                   sampleIdx === i
-                    ? "bg-violet-600 text-white border-violet-500"
-                    : "bg-transparent text-white/50 border-white/15 hover:text-white/90 hover:border-white/30"
+                    ? "bg-violet-600 text-white border-violet-500 shadow-lg shadow-violet-500/20"
+                    : "bg-transparent text-white/50 border-white/15 hover:text-white/90 hover:border-white/30 hover:bg-white/5"
                 }`}>
-                {s.id.replace("vc_cmd_", "VC-")}
+                <span style={{ fontSize: "13px", lineHeight: 1 }}>{LANG_FLAG[s.language] ?? "🌐"}</span>
+                <span className="hidden sm:inline">{s.id.replace("vc_cmd_", "VC-")}</span>
+                <span className="hidden md:inline text-[10px] opacity-70">· {s.language.split(" ")[0]}</span>
               </button>
             ))}
           </div>
