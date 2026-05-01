@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, ChevronRight, Play, Pause, SkipBack, SkipForward,
   Check, RefreshCw, Car, Eye, Hand, Download, AlertTriangle,
-  ShieldCheck, XCircle, CheckCircle, ChevronDown,
+  ShieldCheck, XCircle, CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -180,7 +180,7 @@ function ClipCard({
       {/* Video thumbnail */}
       <div
         className="rounded-lg overflow-hidden mb-3 aspect-video relative"
-        style={{ background: "#0d0d1a" }}
+        style={{ background: dark ? "#0d0d1a" : "#1e293b" }}
       >
         <video
           src={clip.src}
@@ -222,7 +222,7 @@ function ClipCard({
   );
 }
 
-function RadioGroup<T extends string>({
+function CheckboxGroup<T extends string>({
   label, icon, options, value, onChange, dark,
 }: {
   label: string;
@@ -241,31 +241,40 @@ function RadioGroup<T extends string>({
         </span>
       </div>
       <div className="flex flex-col gap-1.5">
-        {options.map(opt => (
-          <button
-            key={String(opt.value)}
-            onClick={() => onChange(opt.value)}
-            className="flex items-center gap-2.5 text-sm px-3 py-2 rounded-lg border transition-all text-left"
-            style={{
-              background: value === opt.value
-                ? dark ? "rgba(124,58,237,0.15)" : "rgba(124,58,237,0.08)"
-                : "transparent",
-              borderColor: value === opt.value ? opt.color ?? ACCENT : dark ? "#2d2d44" : "#e2e8f0",
-              color: dark ? "#e2e8f0" : "#1e293b",
-            }}
-          >
-            <span
-              className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-              style={{ borderColor: value === opt.value ? opt.color ?? ACCENT : dark ? "#4b5563" : "#9ca3af" }}
+        {options.map(opt => {
+          const checked = value === opt.value;
+          const activeColor = opt.color ?? ACCENT;
+          return (
+            <button
+              key={String(opt.value)}
+              onClick={() => onChange(opt.value)}
+              className="flex items-center gap-2.5 text-sm px-3 py-2 rounded-lg border transition-all text-left"
+              style={{
+                background: checked
+                  ? dark ? "rgba(124,58,237,0.15)" : "rgba(124,58,237,0.08)"
+                  : "transparent",
+                borderColor: checked ? activeColor : dark ? "#2d2d44" : "#e2e8f0",
+                color: dark ? "#e2e8f0" : "#1e293b",
+              }}
             >
-              {value === opt.value && (
-                <span className="w-2 h-2 rounded-full block"
-                  style={{ background: opt.color ?? ACCENT }} />
-              )}
-            </span>
-            {opt.label}
-          </button>
-        ))}
+              {/* Checkbox square */}
+              <span
+                className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border-2 transition-all"
+                style={{
+                  borderColor: checked ? activeColor : dark ? "#4b5563" : "#9ca3af",
+                  background: checked ? activeColor : "transparent",
+                }}
+              >
+                {checked && (
+                  <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                    <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -533,7 +542,7 @@ export default function DriverMonitoring() {
           <span style={{ color: textMuted }}>{clip.flagReason}</span>
         </div>
 
-        <RadioGroup
+        <CheckboxGroup
           label="Event Validation"
           icon={<ShieldCheck size={14} />}
           options={EVENT_OPTIONS}
@@ -542,7 +551,7 @@ export default function DriverMonitoring() {
           dark={isDark}
         />
 
-        <RadioGroup
+        <CheckboxGroup
           label="Driver Gaze"
           icon={<Eye size={14} />}
           options={GAZE_OPTIONS}
@@ -551,7 +560,7 @@ export default function DriverMonitoring() {
           dark={isDark}
         />
 
-        <RadioGroup
+        <CheckboxGroup
           label="Hands / Phone"
           icon={<Hand size={14} />}
           options={HANDS_OPTIONS}
@@ -1026,7 +1035,7 @@ export default function DriverMonitoring() {
             <ArrowLeft size={16} />
             Back
           </button>
-          <span style={{ color: isDark ? "#374151" : "#d1d5db" }}>|</span>
+          <span style={{ color: isDark ? "#374151" : "#cbd5e1" }}>|</span>
           <div className="flex items-center gap-2">
             <Car size={18} style={{ color: ACCENT }} />
             <span className="font-semibold text-sm" style={{ color: textPrimary }}>
