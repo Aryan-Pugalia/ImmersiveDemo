@@ -178,6 +178,17 @@ export const useCases: UseCase[] = [
     secondaryTag: "Emotion · CX · Safety",
     filters: ["Audio"],
   },
+  {
+    id: "20",
+    slug: "voice-command-intent-qa",
+    title: "Voice Command Intent Understanding QA",
+    description: "Human reviewers evaluate whether in-vehicle voice commands are correctly interpreted and fulfilled. AI assists verification, while human QA ensures safe, accurate intent understanding for infotainment and navigation systems.",
+    icon: "record_voice_over",
+    idTag: "AUD-404",
+    categoryTag: "Audio / Automotive",
+    secondaryTag: "Intent · Infotainment",
+    filters: ["Audio"],
+  },
 ];
 
 export function getUseCaseBySlug(slug: string): UseCase | undefined {
