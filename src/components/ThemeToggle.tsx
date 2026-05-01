@@ -4,10 +4,6 @@ import { useTheme } from "@/context/ThemeContext";
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 
-  // When running inside the outer homepage nav (iframe), theme is controlled
-  // centrally by the parent's sun/moon button — hide the inner toggle.
-  if (window.self !== window.top) return null;
-
   return (
     <button
       onClick={toggleTheme}
