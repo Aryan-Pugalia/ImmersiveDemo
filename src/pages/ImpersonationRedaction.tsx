@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Policy categories (13 categories with definitions) ──────────────────────
 
@@ -285,17 +286,18 @@ export function diffDecisions(annotatorLabel: ProfileLabel | null, aiRec: string
 
 // ─── Progress stepper ─────────────────────────────────────────────────────────
 
-const STEPS = [
-  { n: 1, label: "Annotate"  },
-  { n: 2, label: "AI Review" },
-  { n: 3, label: "Human QA"  },
-  { n: 4, label: "Delivered" },
-] as const;
-
 function ProgressStepper({ stage }: { stage: Stage }) {
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
+  const stepsWithLabels = [
+    { n: 1, label: ir.stageAnnotate  },
+    { n: 2, label: ir.stageAiReview },
+    { n: 3, label: ir.stageHumanQa  },
+    { n: 4, label: ir.stageDelivered },
+  ] as const;
   return (
     <div className="flex items-center justify-center py-4">
-      {STEPS.map((step, i) => {
+      {stepsWithLabels.map((step, i) => {
         const done = stage > step.n, current = stage === step.n;
         return (
           <div key={step.n} className="flex items-center">
@@ -311,7 +313,7 @@ function ProgressStepper({ stage }: { stage: Stage }) {
                 current ? "text-violet-400" : done ? "text-foreground/60" : "text-foreground/30"
               }`}>{step.label}</span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < stepsWithLabels.length - 1 && (
               <div className={`w-16 h-0.5 mx-1 mb-6 transition-all duration-500 ${stage > step.n ? "bg-violet-600" : "bg-white/10"}`} />
             )}
           </div>
@@ -363,6 +365,8 @@ function BioEditor({
   onAutoMark:       (types: string[]) => void;
   locked:           boolean;
 }) {
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
   const bioRef = useRef<HTMLDivElement>(null);
   const [pending, setPending] = useState("");
 
@@ -394,11 +398,11 @@ function BioEditor({
       <div className="flex gap-2 flex-wrap">
         <button disabled={locked} onClick={() => onAutoMark(["email", "phone"])}
           className="px-3 py-2 rounded-lg border border-amber-700/50 text-amber-400 text-sm font-semibold hover:bg-amber-950/40 transition disabled:opacity-40 disabled:cursor-not-allowed">
-          🔍 Auto-mark phone/email
+          {ir.autoMarkPhoneEmail}
         </button>
         <button disabled={locked} onClick={() => onAutoMark(["handle", "link"])}
           className="px-3 py-2 rounded-lg border border-blue-700/50 text-blue-400 text-sm font-semibold hover:bg-blue-950/40 transition disabled:opacity-40 disabled:cursor-not-allowed">
-          🔗 Auto-mark handles/links
+          {ir.autoMarkHandlesLinks}
         </button>
       </div>
 
@@ -626,9 +630,11 @@ function ProfileCard({ profile, compact = false }: { profile: MockProfile; compa
 function ProfileSelector({ selected, onChange }: { selected: number; onChange: (i: number) => void }) {
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
   return (
     <div className="rounded-2xl border border-border p-3 mb-4" style={{ background: "var(--s4)" }}>
-      <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2.5">Select Profile to Review</p>
+      <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2.5">{ir.selectProfile}</p>
       <div className="grid grid-cols-3 gap-2">
         {PROFILES.map((p, i) => (
           <button key={p.profile_id} onClick={() => onChange(i)}
@@ -672,6 +678,8 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
 }) {
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
   const [profileLabel,     setProfileLabel]     = useState<ProfileLabel | null>(null);
   const [riskFlags,        setRiskFlags]         = useState<Set<string>>(new Set());
   const [selectedCats,     setSelectedCats]      = useState<Set<string>>(new Set());
@@ -719,23 +727,23 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
         }`}>
           <span className="text-2xl">✏️</span>
           <div>
-            <div className={`text-base font-bold ${isLight ? "text-violet-950" : "text-violet-300"}`}>You are the Human Annotator</div>
-            <div className={`text-sm ${isLight ? "text-violet-800" : "text-violet-400/80"}`}>Review this profile and submit your assessment</div>
+            <div className={`text-base font-bold ${isLight ? "text-violet-950" : "text-violet-300"}`}>{ir.youAreAnnotator}</div>
+            <div className={`text-sm ${isLight ? "text-violet-800" : "text-violet-400/80"}`}>{ir.reviewProfile}</div>
           </div>
         </div>
 
         {/* 1 · Profile label */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-base font-semibold text-foreground mb-3">1 · Profile Label <span className="text-red-400">*</span></p>
+          <p className="text-base font-semibold text-foreground mb-3">{ir.labelProfileLabel} <span className="text-red-400">*</span></p>
           <div className="grid grid-cols-3 gap-2">
             {([
-              { val: "genuine"       as ProfileLabel, label: "Likely Genuine",  act: "bg-emerald-500 border-emerald-500 text-white",
+              { val: "genuine"       as ProfileLabel, label: ir.likelyGenuine,  act: "bg-emerald-500 border-emerald-500 text-white",
                 idleLight: "bg-emerald-100 border-emerald-600 text-emerald-900 hover:bg-emerald-200",
                 idleDark:  "bg-emerald-950/30 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/40" },
-              { val: "impersonation" as ProfileLabel, label: "Impersonation",   act: "bg-red-500 border-red-500 text-white",
+              { val: "impersonation" as ProfileLabel, label: ir.impersonation,  act: "bg-red-500 border-red-500 text-white",
                 idleLight: "bg-red-100 border-red-600 text-red-900 hover:bg-red-200",
                 idleDark:  "bg-red-950/30 border-red-700/50 text-red-400 hover:bg-red-900/40" },
-              { val: "unsure"        as ProfileLabel, label: "Unsure",          act: "bg-amber-500 border-amber-500 text-white",
+              { val: "unsure"        as ProfileLabel, label: ir.unsure,         act: "bg-amber-500 border-amber-500 text-white",
                 idleLight: "bg-amber-100 border-amber-600 text-amber-900 hover:bg-amber-200",
                 idleDark:  "bg-amber-950/30 border-amber-700/50 text-amber-400 hover:bg-amber-900/40" },
             ] as const).map(o => (
@@ -751,9 +759,11 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
 
         {/* 2 · Risk flags */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-base font-semibold text-foreground mb-3">2 · Risk Flags</p>
+          <p className="text-base font-semibold text-foreground mb-3">{ir.riskFlags}</p>
           <div className="space-y-2">
-            {RISK_FLAGS.map(f => (
+            {RISK_FLAGS.map(f => {
+              const riskLabel = f.id === "sensitive_pii" ? ir.sensitivePii : f.id === "policy_violation" ? ir.policyViolation : ir.suspiciousContact;
+              return (
               <button key={f.id} onClick={() => toggleFlag(f.id)}
                 className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border text-sm text-left transition-all ${
                   riskFlags.has(f.id)
@@ -766,16 +776,16 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
                 }`}>
                   {riskFlags.has(f.id) && <Check size={10} className="text-white" />}
                 </div>
-                {f.label}
+                {riskLabel}
               </button>
-            ))}
+            );})}
           </div>
         </div>
 
         {/* 3 · Policy categories — compact 2-col grid with tooltips */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-base font-semibold text-foreground mb-1">3 · Policy Categories</p>
-          <p className="text-xs text-foreground/35 mb-2.5">Hover a chip for its definition · select all that apply</p>
+          <p className="text-base font-semibold text-foreground mb-1">{ir.policyCategories}</p>
+          <p className="text-xs text-foreground/35 mb-2.5">{ir.policyCategoriesHint}</p>
           <div className="grid grid-cols-2 gap-1.5">
             {POLICY_CATEGORIES.map(cat => (
               <button key={cat.id} onClick={() => toggleCat(cat.id)}
@@ -796,7 +806,7 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
 
         {/* 4 · Bio redaction */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-base font-semibold text-foreground mb-3">4 · Bio Redaction Tool</p>
+          <p className="text-base font-semibold text-foreground mb-3">{ir.bioRedactionTool}</p>
           <BioEditor
             bioText={profile.bio_text}
             detectedTokens={detectedTokens}
@@ -812,24 +822,24 @@ function Step1({ profile, detectedTokens, selectedProfileIdx, onProfileChange, o
 
         {/* 5 · Confidence + notes */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-base font-semibold text-foreground mb-3">5 · Confidence &amp; Notes</p>
+          <p className="text-base font-semibold text-foreground mb-3">{ir.confidenceNotes}</p>
           <div className="flex justify-between mb-1">
-            <span className="text-sm text-foreground/50">Confidence</span>
+            <span className="text-sm text-foreground/50">{ir.confidence}</span>
             <span className="text-sm font-bold text-violet-400">{confidence}%</span>
           </div>
           <input type="range" min={0} max={100} value={confidence}
             onChange={e => setConfidence(Number(e.target.value))}
             className="w-full accent-violet-600 mb-3" />
-          <textarea placeholder="Optional notes…" value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+          <textarea placeholder={ir.notesPlaceholder} value={notes} onChange={e => setNotes(e.target.value)} rows={2}
             className="w-full bg-transparent border border-white/10 rounded-xl px-3 py-2 text-sm text-foreground/70 placeholder:text-foreground/25 focus:outline-none focus:border-violet-500/50 resize-none" />
         </div>
 
         <Button disabled={!canSubmit}
           onClick={() => onSubmit({ profileLabel, riskFlags, selectedCategories: selectedCats, redactedIds, manualRedactions, confidence, notes })}
           className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
-          Submit Annotation →
+          {ir.submitAnnotation}
         </Button>
-        {!canSubmit && <p className="text-sm text-foreground/40 text-center">Select a profile label and at least one risk flag or category</p>}
+        {!canSubmit && <p className="text-sm text-foreground/40 text-center">{ir.requirementSelectLabel}</p>}
       </div>
     </div>
   );
@@ -845,6 +855,8 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
 }) {
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
   const [phase, setPhase] = useState(0);
   const ai = profile.ai_result;
 
@@ -881,7 +893,7 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
           style={{ background: "rgba(37,99,235,0.12)" }}>
           <Brain size={24} className="text-blue-400 flex-shrink-0" />
           <div className="flex-1">
-            <div className={`text-base font-bold ${isLight ? "text-blue-700" : "text-blue-300"}`}>AI-Assisted Review</div>
+            <div className={`text-base font-bold ${isLight ? "text-blue-700" : "text-blue-300"}`}>{ir.aiAssistedReview}</div>
             <div className={`text-sm ${isLight ? "text-blue-600" : "text-blue-400/80"}`}>Deterministic simulation · no real model</div>
           </div>
           {phase >= 4 && <span className="text-sm px-2 py-0.5 rounded-full font-semibold border border-blue-600/40 text-blue-300" style={{ background: "rgba(37,99,235,0.25)" }}>Complete</span>}
@@ -906,7 +918,7 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
         {phase >= 4 && (
           <>
             <div className="rounded-2xl border border-amber-700/40 p-4" style={{ background: "rgba(217,119,6,0.12)" }}>
-              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">AI Recommendation</p>
+              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">{ir.aiRecommendation}</p>
               <div className="flex items-center gap-3 mb-3">
                 <div className={`text-2xl font-black ${isLight ? "text-amber-600" : "text-amber-400"}`}>{ai.recommendation}</div>
                 <div className="text-base text-foreground/50">Confidence: <span className={`font-bold ${isLight ? "text-amber-700" : "text-amber-300"}`}>{ai.confidence}%</span></div>
@@ -922,7 +934,7 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
             </div>
 
             <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">Redaction Comparison</p>
+              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">{ir.redactionComparison}</p>
               <div className="space-y-2 text-sm">
                 {agrees > 0 && <div className="flex items-center gap-2 text-emerald-400"><Check size={13} />{agrees} redaction{agrees > 1 ? "s" : ""} match AI suggestion</div>}
                 {onlyAI > 0 && <div className="flex items-center gap-2 text-amber-400"><AlertTriangle size={13} />AI suggests {onlyAI} additional you didn't mark</div>}
@@ -931,7 +943,7 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
             </div>
 
             <div className="rounded-xl border border-white/10 p-3" style={{ background: "var(--s2)" }}>
-              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-2">Annotator vs AI</p>
+              <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-2">{ir.annotatorVsAi}</p>
               <div className="flex gap-2">
                 <div className={`flex-1 text-center py-2.5 rounded-xl border text-sm font-bold ${
                   diff.agrees
@@ -950,7 +962,7 @@ function Step2({ profile, annotation, detectedTokens, onComplete }: {
             </div>
 
             <Button onClick={onComplete} className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
-              Send to Human QA →
+              {ir.sendToHumanQa}
             </Button>
           </>
         )}
@@ -981,6 +993,8 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
 
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
   const [finalLabel,          setFinalLabel]         = useState<FinalLabel | null>(null);
   const [activeRedactionIds,  setActiveRedactionIds] = useState<Set<string>>(new Set(annotation.redactedIds));
   const [qaReason,            setQaReason]           = useState<QAReason | null>(null);
@@ -1001,14 +1015,14 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
         style={{ background: "rgba(79,70,229,0.12)" }}>
         <Shield size={24} className="text-indigo-400 flex-shrink-0" />
         <div>
-          <div className={`text-base font-bold ${isLight ? "text-indigo-700" : "text-indigo-300"}`}>Human QA Review — TP</div>
-          <div className={`text-sm ${isLight ? "text-indigo-600" : "text-indigo-400/80"}`}>You are a senior QA reviewer. Review both decisions and make the final call.</div>
+          <div className={`text-base font-bold ${isLight ? "text-indigo-700" : "text-indigo-300"}`}>{ir.humanQaReview}</div>
+          <div className={`text-sm ${isLight ? "text-indigo-600" : "text-indigo-400/80"}`}>{ir.qaDescription}</div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">👤 Annotator Result</p>
+          <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">{ir.annotatorResult}</p>
           <div className={`text-base font-black mb-2 ${annotation.profileLabel === "genuine" ? "text-emerald-400" : annotation.profileLabel === "impersonation" ? "text-red-400" : "text-amber-400"}`}>
             {annotation.profileLabel === "genuine" ? "✓ Likely Genuine" : annotation.profileLabel === "impersonation" ? "✗ Likely Impersonation" : "? Unsure"}
           </div>
@@ -1040,7 +1054,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
         </div>
 
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">🤖 AI Result</p>
+          <p className="text-sm font-bold text-foreground/35 uppercase tracking-wider mb-3">{ir.aiResult}</p>
           <div className={`text-base font-black mb-1 ${isLight ? "text-amber-600" : "text-amber-400"}`}>⚠ {ai.recommendation}</div>
           <div className="text-sm text-foreground/50 space-y-1 mb-3">
             <div>Confidence: <strong className="text-foreground/70">{ai.confidence}%</strong></div>
@@ -1061,7 +1075,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
 
       <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-base font-semibold text-foreground">Redacted Bio Preview</p>
+          <p className="text-base font-semibold text-foreground">{ir.redactedBioPreview}</p>
           <button onClick={() => setShowPreview(v => !v)} className="flex items-center gap-1.5 text-sm text-foreground/50 hover:text-foreground/70 transition">
             {showPreview ? <EyeOff size={14} /> : <Eye size={14} />}{showPreview ? "Hide" : "Show"}
           </button>
@@ -1074,12 +1088,12 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
       </div>
 
       <div className="rounded-2xl border border-white/10 p-5" style={{ background: "var(--s4)" }}>
-        <p className="text-base font-bold text-foreground mb-4">Final QA Decision</p>
+        <p className="text-base font-bold text-foreground mb-4">{ir.finalQaDecision}</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {([
-            { val: "approve"  as FinalLabel, icon: "✓", label: "Approve",  sub: "Profile passes review", idle: "border-emerald-700/50 text-emerald-400",  idleBg: "rgba(5,150,105,0.12)",  act: "border-emerald-500 bg-emerald-500 text-white" },
-            { val: "reject"   as FinalLabel, icon: "✕", label: "Reject",   sub: "Remove from platform",  idle: "border-red-700/50 text-red-400",           idleBg: "rgba(220,38,38,0.12)", act: "border-red-500 bg-red-500 text-white" },
-            { val: "escalate" as FinalLabel, icon: "⚠", label: "Escalate", sub: "Senior review required",idle: "border-amber-700/50 text-amber-400",       idleBg: "rgba(217,119,6,0.12)", act: "border-amber-500 bg-amber-500 text-white" },
+            { val: "approve"  as FinalLabel, icon: "✓", label: ir.approve,   sub: "Profile passes review", idle: "border-emerald-700/50 text-emerald-400",  idleBg: "rgba(5,150,105,0.12)",  act: "border-emerald-500 bg-emerald-500 text-white" },
+            { val: "reject"   as FinalLabel, icon: "✕", label: ir.reject,    sub: "Remove from platform",  idle: "border-red-700/50 text-red-400",           idleBg: "rgba(220,38,38,0.12)", act: "border-red-500 bg-red-500 text-white" },
+            { val: "escalate" as FinalLabel, icon: "⚠", label: ir.escalate,  sub: "Senior review required",idle: "border-amber-700/50 text-amber-400",       idleBg: "rgba(217,119,6,0.12)", act: "border-amber-500 bg-amber-500 text-white" },
           ] as const).map(o => (
             <button key={o.val} onClick={() => setFinalLabel(o.val)}
               className={`p-3 rounded-xl border-2 text-left transition-all ${finalLabel === o.val ? o.act : o.idle}`}
@@ -1091,7 +1105,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
           ))}
         </div>
 
-        <p className="text-sm font-semibold text-foreground/50 mb-2">QA Reason (select if overriding AI):</p>
+        <p className="text-sm font-semibold text-foreground/50 mb-2">{ir.qaReason}:</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {QA_REASONS.map(r => (
             <button key={r.id} onClick={() => setQaReason(qaReason === r.id ? null : r.id)}
@@ -1109,7 +1123,7 @@ function Step3({ profile, annotation, detectedTokens, onSubmit }: {
         <Button disabled={!finalLabel}
           onClick={() => finalLabel && onSubmit({ finalLabel, activeRedactionIds, qaReason, qaNotes })}
           className="w-full h-12 text-base font-semibold bg-violet-600 hover:bg-violet-700">
-          Finalize QA →
+          {ir.finalizeQa}
         </Button>
       </div>
     </div>
@@ -1126,6 +1140,8 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
   onReset:        () => void;
 }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const ir = t.pages.impersonationRedaction;
   const [showJson, setShowJson] = useState(false);
 
   const allTokens       = [...detectedTokens, ...annotation.manualRedactions];
@@ -1170,13 +1186,13 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
   return (
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
       <div className="inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-1.5 rounded-full" style={{ background: "var(--s8)" }}>
-        📬 Step 4: Final Decision Delivered
+        {ir.step4Delivered}
       </div>
 
       <div className={`w-full rounded-2xl border-2 p-6 text-center ${cfg.ring}`} style={{ background: cfg.bg }}>
         <div className="text-5xl mb-3">{cfg.icon}</div>
         <div className={`text-2xl font-black mb-2 ${cfg.head}`}>Profile {cfg.label}</div>
-        <p className="text-base text-foreground/60">Final decision: <strong className="text-foreground/80">{qa.finalLabel}</strong></p>
+        <p className="text-base text-foreground/60">{ir.finalDecision}: <strong className="text-foreground/80">{qa.finalLabel}</strong></p>
         {qa.qaNotes && <p className="text-sm text-foreground/40 mt-2 italic">"{qa.qaNotes}"</p>}
       </div>
 
@@ -1204,7 +1220,7 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
 
       <div className="w-full rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-base font-semibold text-foreground flex items-center gap-2"><FileText size={15} /> Decision Packet</p>
+          <p className="text-base font-semibold text-foreground flex items-center gap-2"><FileText size={15} /> {ir.decisionPacket}</p>
           <button onClick={() => setShowJson(v => !v)}
             className="flex items-center gap-1.5 text-sm text-foreground/50 hover:text-foreground/70 transition">
             {showJson ? <EyeOff size={13} /> : <Eye size={13} />}{showJson ? "Hide JSON" : "View JSON"}
@@ -1236,10 +1252,10 @@ function Step4({ profile, annotation, qa, detectedTokens, onReset }: {
 
       <div className="flex gap-3 w-full">
         <Button variant="outline" onClick={onReset} className="flex-1 gap-2 h-12 border-white/15 text-foreground/80 hover:bg-white/5">
-          <RotateCcw size={15} /> Try Another Profile
+          <RotateCcw size={15} /> {ir.tryAnotherProfile}
         </Button>
         <Button onClick={() => navigate("/use-cases")} className="flex-1 bg-violet-600 hover:bg-violet-700 gap-2 h-12">
-          <ArrowLeft size={15} /> Back to DataStudio
+          <ArrowLeft size={15} /> {ir.backToDatastudio}
         </Button>
       </div>
     </div>
