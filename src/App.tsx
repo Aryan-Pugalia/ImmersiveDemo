@@ -22,13 +22,13 @@ import AudioAnnotation from "./pages/AudioAnnotation.tsx";
 import AudioAnnotationTest from "./pages/AudioAnnotationTest.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import ImpersonationRedaction from "./pages/ImpersonationRedaction.tsx";
-import CheatingOrSkill from "./pages/CheatingOrSkill.tsx";
 import VideoObjectTracking from "./pages/VideoObjectTracking.tsx";
 import IntelligentArchives from "./pages/IntelligentArchives.tsx";
 import STEMReasoning from "./pages/STEMReasoning.tsx";
 import PhysicsReasoning from "./pages/PhysicsReasoning.tsx";
 import DriverMonitoring from "./pages/DriverMonitoring.tsx";
 import AudioQualityQA from "./pages/AudioQualityQA.tsx";
+import SpeechEmotionQA from "./pages/SpeechEmotionQA.tsx";
 
 const queryClient = new QueryClient();
 
@@ -54,13 +54,13 @@ const App = () => (
           </Route>
           <Route path="/use-cases/audio-annotation" element={<AudioAnnotationTest />} />
           <Route path="/use-cases/dating-trust-safety" element={<ImpersonationRedaction />} />
-          <Route path="/use-cases/cheating-or-skill" element={<CheatingOrSkill />} />
           <Route path="/use-cases/video-object-tracking" element={<VideoObjectTracking />} />
           <Route path="/use-cases/intelligent-archives" element={<IntelligentArchives />} />
           <Route path="/use-cases/stem-reasoning" element={<STEMReasoning />} />
           <Route path="/use-cases/physics-reasoning" element={<PhysicsReasoning />} />
           <Route path="/use-cases/driver-monitoring" element={<DriverMonitoring />} />
           <Route path="/use-cases/audio-quality-qa" element={<AudioQualityQA />} />
+          <Route path="/use-cases/speech-emotion-qa" element={<SpeechEmotionQA />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />
           <Route path="/qa-report/:useCaseId" element={<QAReport />} />

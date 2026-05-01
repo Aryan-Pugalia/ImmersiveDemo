@@ -78,17 +78,6 @@ export const useCases: UseCase[] = [
     filters: ["Image"],
   },
   {
-    id: "12",
-    slug: "cheating-or-skill",
-    title: "Cheating or Skill Review",
-    description: "Label gameplay clips as skill or cheating, watch AI flag anomalies, then QA-override the call. Human-in-the-loop Gaming Trust & Safety at scale.",
-    icon: "sports_esports",
-    idTag: "GAM-118",
-    categoryTag: "Gaming / T&S",
-    secondaryTag: "GenAI + Human QA",
-    filters: ["Video"],
-  },
-  {
     id: "11",
     slug: "dating-trust-safety",
     title: "Digital Identity Protection & Policy Enforcement",
@@ -177,6 +166,17 @@ export const useCases: UseCase[] = [
     categoryTag: "Automotive / ADAS",
     secondaryTag: "Video · DMS",
     filters: ["Video"],
+  },
+  {
+    id: "19",
+    slug: "speech-emotion-qa",
+    title: "Speech Emotion & Tone Reasoning QA",
+    description: "4-stage emotion annotation pipeline — classify primary emotion, tone attributes, intensity, and escalation risk. AI verification with per-dimension confidence scores, human QA adjudication, and structured JSON export for CX intelligence and safety models.",
+    icon: "psychology",
+    idTag: "AUD-403",
+    categoryTag: "Audio / Speech",
+    secondaryTag: "Emotion · CX · Safety",
+    filters: ["Audio"],
   },
 ];
 
