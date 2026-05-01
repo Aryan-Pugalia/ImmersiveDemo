@@ -72,7 +72,7 @@ const SAMPLES: AudioSample[] = [
     sampleRate: "16 kHz",
     channels: "Mono",
     bitDepth: "16-bit",
-    language: "English (US)",
+    language: "French (FR)",
     domain: "Call Center",
     source: "Telephony capture",
     snr: "14.2 dB",
@@ -620,9 +620,9 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                       ["Duration", sample.duration],
                       ["Source",   sample.source],
                     ].map(([label, val]) => (
-                      <div key={label} className="flex justify-between gap-2">
-                        <span className={`text-[10px] uppercase tracking-wide ${isDark ? "text-white/30" : "text-gray-400"}`}>{label}</span>
-                        <span className={`text-[11px] font-mono text-right ${isDark ? "text-white/70" : "text-gray-700"}`}>{val}</span>
+                      <div key={label} className="flex justify-between gap-2 min-w-0">
+                        <span className={`text-[10px] uppercase tracking-wide shrink-0 ${isDark ? "text-white/30" : "text-gray-400"}`}>{label}</span>
+                        <span className={`text-[11px] font-mono text-right truncate ${isDark ? "text-white/70" : "text-gray-700"}`}>{val}</span>
                       </div>
                     ))}
                   </div>
