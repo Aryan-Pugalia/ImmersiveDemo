@@ -68,18 +68,24 @@ const UseCaseSelection = () => {
               <span className="material-symbols-outlined text-foreground/70 text-xl">person</span>
             </button>
             {profileOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border/30 bg-[var(--s4)] shadow-xl p-4 z-50">
+              <div className={`absolute right-0 mt-2 w-56 rounded-lg border shadow-xl p-4 z-50 ${
+                isDark
+                  ? "bg-[var(--s4)] border-white/15"
+                  : "bg-white border-gray-200 shadow-lg"
+              }`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                    <span className="material-symbols-outlined text-foreground/70 text-2xl">person</span>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDark ? "bg-white/10" : "bg-gray-100"
+                  }`}>
+                    <span className={`material-symbols-outlined text-2xl ${isDark ? "text-white/70" : "text-gray-500"}`}>person</span>
                   </div>
                   <div>
-                    <p className="text-sm font-headline font-bold text-foreground">Alex Johnson</p>
-                    <p className="text-sm font-body text-foreground/50">Annotator</p>
+                    <p className={`text-sm font-headline font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Alex Johnson</p>
+                    <p className={`text-sm font-body ${isDark ? "text-white/55" : "text-gray-500"}`}>Annotator</p>
                   </div>
                 </div>
-                <div className="border-t border-border/20 pt-2">
-                  <span className="text-sm font-body uppercase tracking-[0.2em] text-foreground/30">{t.useCasesPage.role}</span>
+                <div className={`border-t pt-2 ${isDark ? "border-white/15" : "border-gray-200"}`}>
+                  <span className={`text-sm font-body uppercase tracking-[0.2em] ${isDark ? "text-white/45" : "text-gray-400"}`}>{t.useCasesPage.role}</span>
                   <span className="block text-sm font-body text-primary mt-0.5">{t.useCasesPage.roleValue}</span>
                 </div>
               </div>
