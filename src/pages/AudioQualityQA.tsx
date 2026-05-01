@@ -12,6 +12,7 @@ type Stage = "ingest" | "annotate" | "ai-verify" | "qa" | "export";
 interface AudioSample {
   id: string;
   filename: string;
+  audioSrc: string;
   duration: string;
   sampleRate: string;
   channels: string;
@@ -66,6 +67,7 @@ const SAMPLES: AudioSample[] = [
   {
     id: "aud_qa_014",
     filename: "call_center_en_014.wav",
+    audioSrc: "/queues/French/Audio.mp3",
     duration: "0:42",
     sampleRate: "16 kHz",
     channels: "Mono",
@@ -79,6 +81,7 @@ const SAMPLES: AudioSample[] = [
   {
     id: "aud_qa_031",
     filename: "field_interview_es_031.wav",
+    audioSrc: "/queues/Spanish/Audio.mp3",
     duration: "1:17",
     sampleRate: "44.1 kHz",
     channels: "Stereo",
@@ -222,40 +225,59 @@ function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean 
 
 interface WaveformPlayerProps {
   sampleId: string;
+  audioSrc: string;
   isDark: boolean;
 }
 
-function WaveformPlayer({ sampleId, isDark }: WaveformPlayerProps) {
+function WaveformPlayer({ sampleId, audioSrc, isDark }: WaveformPlayerProps) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0); // 0–1
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const rafRef   = useRef<number | null>(null);
   const bars = SAMPLE_BARS[sampleId] ?? SAMPLE_BARS["aud_qa_014"];
 
+  // Load real audio when src changes
   useEffect(() => {
+    audioRef.current?.pause();
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setPlaying(false);
     setProgress(0);
-  }, [sampleId]);
 
-  const toggle = useCallback(() => {
-    if (playing) {
-      clearInterval(intervalRef.current!);
-      setPlaying(false);
-    } else {
-      setPlaying(true);
-      intervalRef.current = setInterval(() => {
-        setProgress(p => {
-          if (p >= 1) {
-            clearInterval(intervalRef.current!);
-            setPlaying(false);
-            return 0;
-          }
-          return p + 1 / (WAVEFORM_BARS * 4);
-        });
-      }, 80);
+    const audio = new Audio(audioSrc);
+    audio.addEventListener("ended", () => { setPlaying(false); setProgress(1); });
+    audioRef.current = audio;
+    return () => { audio.pause(); };
+  }, [audioSrc]);
+
+  // rAF loop to drive progress while playing
+  useEffect(() => {
+    if (!playing) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      return;
     }
+    const tick = () => {
+      const a = audioRef.current;
+      if (a && a.duration) setProgress(a.currentTime / a.duration);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [playing]);
 
-  useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
+  // cleanup on unmount
+  useEffect(() => () => { audioRef.current?.pause(); if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+  const toggle = useCallback(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (playing) {
+      a.pause();
+      setPlaying(false);
+    } else {
+      a.play().catch(() => {});
+      setPlaying(true);
+    }
+  }, [playing]);
 
   const playheadX = Math.round(progress * WAVEFORM_BARS);
 
@@ -601,7 +623,7 @@ export default function AudioQualityQA() {
                   </div>
                 ))}
               </div>
-              <WaveformPlayer sampleId={sample.id} isDark={isDark} />
+              <WaveformPlayer sampleId={sample.id} audioSrc={sample.audioSrc} isDark={isDark} />
             </div>
 
             {/* SNR indicator */}
