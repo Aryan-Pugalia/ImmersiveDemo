@@ -7,7 +7,7 @@ import { useTheme } from "@/context/ThemeContext";
 type DimensionRating = "acceptable" | "degraded" | "unusable";
 type OverallRating   = "good" | "fair" | "poor";
 type SuitabilityLabel = "suitable" | "preprocessing" | "reject";
-type Stage = "ingest" | "annotate" | "ai-verify" | "qa" | "export";
+type Stage = "annotate" | "ai-verify" | "qa" | "export";
 
 interface AudioSample {
   id: string;
@@ -171,20 +171,18 @@ const SAMPLE_BARS: Record<string, number[]> = {
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
 const STAGE_LABELS: Record<Stage, string> = {
-  "ingest":    "Ingest",
   "annotate":  "Annotate",
   "ai-verify": "AI Verify",
   "qa":        "QA Adjudication",
   "export":    "Export",
 };
 const STAGE_ICONS: Record<Stage, string> = {
-  "ingest":    "upload_file",
   "annotate":  "edit_note",
   "ai-verify": "smart_toy",
   "qa":        "rule",
   "export":    "download",
 };
-const STAGES: Stage[] = ["ingest", "annotate", "ai-verify", "qa", "export"];
+const STAGES: Stage[] = ["annotate", "ai-verify", "qa", "export"];
 
 function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean }) {
   const currentIdx = STAGES.indexOf(current);
@@ -397,7 +395,7 @@ export default function AudioQualityQA() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const [stage, setStage]         = useState<Stage>("ingest");
+  const [stage, setStage]         = useState<Stage>("annotate");
   const [sampleIdx, setSampleIdx] = useState(0);
 
   // Per-sample annotation state
@@ -570,7 +568,7 @@ export default function AudioQualityQA() {
             {SAMPLES.map((s, i) => (
               <button
                 key={s.id}
-                onClick={() => { setSampleIdx(i); setStage("ingest"); }}
+                onClick={() => { setSampleIdx(i); setStage("annotate"); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${
                   sampleIdx === i
                     ? "bg-violet-600 text-white border-violet-500"
@@ -592,81 +590,66 @@ export default function AudioQualityQA() {
             Audio Quality &amp; Signal Integrity QA
           </h1>
           <p className={`text-sm ${isDark ? "text-white/50" : "text-gray-500"}`}>
-            7-dimension annotation → AI verification → QA adjudication → JSON export
+Annotate while listening → AI verification → QA adjudication → JSON export
           </p>
         </div>
 
         <PipelineStepper current={stage} isDark={isDark} />
 
-        {/* ═══ STAGE 1 — INGEST ════════════════════════════════════════════ */}
-        {stage === "ingest" && (
-          <div className="space-y-6">
-            <div className={cardCls}>
-              {sectionTitle("upload_file", "Audio Sample Ingestion")}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                {[
-                  ["File",        sample.filename],
-                  ["Sample ID",   sample.id],
-                  ["Duration",    sample.duration],
-                  ["Sample Rate", sample.sampleRate],
-                  ["Channels",    sample.channels],
-                  ["Bit Depth",   sample.bitDepth],
-                  ["Language",    sample.language],
-                  ["Domain",      sample.domain],
-                  ["Source",      sample.source],
-                  ["Est. SNR",    sample.snr],
-                  ["Recorded",    sample.recordedAt],
-                ].map(([label, val]) => (
-                  <div key={label}>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest block mb-0.5 ${isDark ? "text-white/30" : "text-gray-400"}`}>{label}</span>
-                    <span className={`text-sm font-mono ${isDark ? "text-white/80" : "text-gray-700"}`}>{val}</span>
-                  </div>
-                ))}
-              </div>
-              <WaveformPlayer sampleId={sample.id} audioSrc={sample.audioSrc} isDark={isDark} />
-            </div>
-
-            {/* SNR indicator */}
-            <div className={cardCls}>
-              {sectionTitle("monitoring", "Signal Quality Overview")}
-              <div className="space-y-3">
-                {[
-                  { label: "Estimated SNR",    value: parseFloat(sample.snr) / 30,       display: sample.snr,    color: parseFloat(sample.snr) > 12 ? "bg-emerald-500" : "bg-amber-500" },
-                  { label: "Pre-scan Pass Rate", value: 0.85,                             display: "85%",          color: "bg-emerald-500" },
-                  { label: "Silence Ratio",    value: sample.id === "aud_qa_014" ? 0.08 : 0.18, display: sample.id === "aud_qa_014" ? "8%" : "18%", color: "bg-violet-500" },
-                ].map(row => (
-                  <div key={row.label}>
-                    <div className="flex justify-between mb-1">
-                      <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>{row.label}</span>
-                      <span className={`text-xs font-mono ${isDark ? "text-white/60" : "text-gray-600"}`}>{row.display}</span>
-                    </div>
-                    <div className={`h-2 rounded-full ${isDark ? "bg-white/10" : "bg-gray-100"}`}>
-                      <div className={`h-full rounded-full ${row.color}`} style={{ width: `${Math.min(1, row.value) * 100}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                onClick={() => setStage("annotate")}
-                className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
-              >
-                Begin Annotation
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_forward</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ═══ STAGE 2 — ANNOTATE ══════════════════════════════════════════ */}
+        {/* ═══ STAGE 1 — ANNOTATE (with inline audio player) ══════════════ */}
         {stage === "annotate" && (
           <div className="space-y-6">
+
+            {/* ── Sticky audio + metadata bar ── */}
+            <div className={`rounded-2xl border p-4 ${isDark ? "bg-white/3 border-white/10" : "bg-white border-gray-200 shadow-sm"}`}>
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Player */}
+                <div className="flex-1 min-w-0">
+                  {sectionTitle("graphic_eq", "Audio Sample")}
+                  <WaveformPlayer sampleId={sample.id} audioSrc={sample.audioSrc} isDark={isDark} />
+                </div>
+                {/* Compact metadata */}
+                <div className={`shrink-0 md:w-56 rounded-xl p-3 border ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Sample Info</p>
+                  <div className="space-y-2">
+                    {[
+                      ["ID",       sample.id],
+                      ["Language", sample.language],
+                      ["Domain",   sample.domain],
+                      ["Est. SNR", sample.snr],
+                      ["Duration", sample.duration],
+                      ["Source",   sample.source],
+                    ].map(([label, val]) => (
+                      <div key={label} className="flex justify-between gap-2">
+                        <span className={`text-[10px] uppercase tracking-wide ${isDark ? "text-white/30" : "text-gray-400"}`}>{label}</span>
+                        <span className={`text-[11px] font-mono text-right ${isDark ? "text-white/70" : "text-gray-700"}`}>{val}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Signal quality mini-bars */}
+                  <div className={`mt-3 pt-3 border-t space-y-1.5 ${isDark ? "border-white/10" : "border-gray-200"}`}>
+                    {[
+                      { label: "SNR",     value: parseFloat(sample.snr) / 30, color: parseFloat(sample.snr) > 12 ? "bg-emerald-500" : "bg-amber-500" },
+                      { label: "Silence", value: sample.id === "aud_qa_014" ? 0.08 : 0.18, color: "bg-violet-500" },
+                    ].map(row => (
+                      <div key={row.label}>
+                        <div className="flex justify-between mb-0.5">
+                          <span className={`text-[9px] uppercase tracking-wide ${isDark ? "text-white/30" : "text-gray-400"}`}>{row.label}</span>
+                        </div>
+                        <div className={`h-1 rounded-full ${isDark ? "bg-white/10" : "bg-gray-200"}`}>
+                          <div className={`h-full rounded-full ${row.color}`} style={{ width: `${Math.min(1, row.value) * 100}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className={cardCls}>
               {sectionTitle("edit_note", "7-Dimension Quality Annotation")}
               <p className={`text-xs mb-5 ${isDark ? "text-white/40" : "text-gray-400"}`}>
-                Rate each dimension then set Overall Rating and Suitability to submit.
+                Play the audio above, then rate each dimension. Set Overall Rating and Suitability to submit.
               </p>
 
               <div className="space-y-5">
@@ -792,7 +775,7 @@ export default function AudioQualityQA() {
 
             <div className="flex justify-between">
               <button
-                onClick={() => setStage("ingest")}
+                onClick={() => navigate("/use-cases")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${
                   isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"
                 }`}
@@ -1070,7 +1053,7 @@ export default function AudioQualityQA() {
                     Download JSON
                   </button>
                   <button
-                    onClick={() => { setSampleIdx(i => (i + 1) % SAMPLES.length); setStage("ingest"); }}
+                    onClick={() => { setSampleIdx(i => (i + 1) % SAMPLES.length); setStage("annotate"); }}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${
                       isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"
                     }`}
