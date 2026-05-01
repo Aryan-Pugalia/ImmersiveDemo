@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
 const ACCENT      = "#C8102E";
@@ -67,12 +68,13 @@ const OTHER_USE_CASES = [
   { title: "Insurance Claims Processing",   desc: "Label claim types, coverage codes, and damage assessments at scale",   Icon: Shield        },
 ];
 
-const STEP_LABELS = ["Annotate", "AI Verify", "QA Review", "Delivered"] as const;
-
 // ─── Shared: Progress Stepper ─────────────────────────────────────────────────
 function ProgressStepper({ stage, color }: { stage: Stage; color: string }) {
   const { theme } = useTheme();
+  const { t } = useLanguage();
+  const ia = t.pages.intelligentArchives;
   const isLight = theme === 'light';
+  const STEP_LABELS = [ia.stageAnnotate, ia.stageAiVerify, ia.stageQaReview, ia.stageDelivered] as const;
   return (
     <div className="flex items-center justify-center py-5">
       {STEP_LABELS.map((label, i) => {
@@ -149,6 +151,8 @@ const AI_CLASS = { docType: "Contract", department: "Legal", priority: "High", y
 const AI_CONF  = { docType: 97, department: 94, priority: 61, year: 99 }; // priority is uncertain
 
 function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => void; onBack: () => void }) {
+  const { t } = useLanguage();
+  const ia = t.pages.intelligentArchives;
   const [ann, setAnn]   = useState<ClassificationState>(BLANK_CLASS);
   const [qaChoice, setQaChoice] = useState<"approve" | "override" | null>(null);
   const [override, setOverride] = useState<Partial<ClassificationState>>({});
@@ -186,7 +190,7 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
           <select value={ann[key]} onChange={e => setAnn(p => ({ ...p, [key]: e.target.value }))}
             className="w-full px-3 py-2 rounded-lg border text-sm font-semibold appearance-none cursor-pointer"
             style={{ background: "var(--s4)", borderColor: ann[key] ? `${color}60` : "var(--border)", color: ann[key] ? color : "var(--foreground)", outline: "none" }}>
-            <option value="">Select…</option>
+            <option value="">{ia.selectDropdown}</option>
             {opts.map(o => <option key={o} value={o}>{o}</option>)}
           </select>
           <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
@@ -198,22 +202,22 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border" style={{ background: `${color}18`, borderColor: `${color}40` }}>
           <FileText size={20} style={{ color }} className="flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold" style={{ color }}>Document Classification</div>
+            <div className="text-sm font-bold" style={{ color }}>{ia.workflowClassification}</div>
             <div className="text-xs opacity-70" style={{ color }}>Assign labels to this document</div>
           </div>
         </div>
         <div className="rounded-2xl border border-border p-4 space-y-3" style={{ background: "var(--s4)" }}>
-          {field("Document Type", "docType", DOC_TYPES)}
-          {field("Department", "department", DEPARTMENTS)}
-          {field("Priority", "priority", PRIORITIES)}
-          {field("Year", "year", YEARS)}
+          {field(ia.documentType, "docType", DOC_TYPES)}
+          {field(ia.department, "department", DEPARTMENTS)}
+          {field(ia.priority, "priority", PRIORITIES)}
+          {field(ia.year, "year", YEARS)}
         </div>
         <Button disabled={!complete} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: complete ? color : undefined }}>
-          Submit for AI Verification →
+          {ia.submitForAi}
         </Button>
-        {!complete && <p className="text-xs text-center text-foreground/35">Complete all fields to continue</p>}
+        {!complete && <p className="text-xs text-center text-foreground/35">{ia.requireAllFields}</p>}
       </>} />
     );
   }
@@ -231,8 +235,8 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30" style={{ background: "rgba(37,99,235,0.12)" }}>
           <Eye size={20} className="text-blue-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-blue-300">AI Verification</div>
-            <div className="text-xs text-blue-400/70">Confidence scores per field</div>
+            <div className="text-sm font-bold text-blue-300">{ia.aiVerification}</div>
+            <div className="text-xs text-blue-400/70">{ia.confidenceScores}</div>
           </div>
         </div>
         <div className="rounded-2xl border border-border p-4 space-y-3" style={{ background: "var(--s4)" }}>
@@ -255,13 +259,13 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
                   <span className="font-semibold" style={{ color: match ? "#22c55e" : "#f59e0b" }}>{r.ai}</span>
                   {low && <AlertTriangle size={11} className="text-amber-400 ml-auto" />}
                 </div>
-                {low && <p className="text-xs text-amber-400/70 mt-1">Low confidence — flagged for QA review</p>}
+                {low && <p className="text-xs text-amber-400/70 mt-1">{ia.lowConfidenceFlagged}</p>}
               </div>
             );
           })}
         </div>
         <Button onClick={onNext} className="w-full h-11 font-semibold" style={{ background: color }}>
-          Send to QA Review →
+          {ia.sendToQa}
         </Button>
       </>} />
     );
@@ -274,12 +278,12 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30" style={{ background: "rgba(79,70,229,0.12)" }}>
           <CheckCircle2 size={20} className="text-indigo-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-indigo-300">QA Review</div>
-            <div className="text-xs text-indigo-400/70">Approve or override the classification</div>
+            <div className="text-sm font-bold text-indigo-300">{ia.qaReviewTitle}</div>
+            <div className="text-xs text-indigo-400/70">{ia.approveOrOverride}</div>
           </div>
         </div>
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">Proposed Classification</p>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">{ia.proposedClassification}</p>
           {[
             { label: "Type",       value: ann.docType    },
             { label: "Dept",       value: ann.department },
@@ -297,27 +301,27 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
           <p className="text-xs text-amber-400/70 mt-3">⚠ Priority confidence was 61% — review recommended</p>
         </div>
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">QA Decision</p>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-3">{ia.qaDecision}</p>
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => setQaChoice("approve")}
               className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition"
               style={{ borderColor: qaChoice === "approve" ? "#22c55e" : "#22c55e40", background: qaChoice === "approve" ? "rgba(34,197,94,0.15)" : "transparent", color: "#22c55e" }}>
-              <CheckCircle2 size={15} /> Approve
+              <CheckCircle2 size={15} /> {ia.approve}
             </button>
             <button onClick={() => setQaChoice("override")}
               className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition"
               style={{ borderColor: qaChoice === "override" ? "#f59e0b" : "#f59e0b40", background: qaChoice === "override" ? "rgba(245,158,11,0.15)" : "transparent", color: "#f59e0b" }}>
-              <XCircle size={15} /> Override
+              <XCircle size={15} /> {ia.override}
             </button>
           </div>
           {qaChoice === "override" && (
             <div className="mt-3">
-              <label className="text-xs text-foreground/40 block mb-1">Override Priority</label>
+              <label className="text-xs text-foreground/40 block mb-1">{ia.overridePriority}</label>
               <div className="relative">
                 <select value={override.priority ?? ""} onChange={e => setOverride(p => ({ ...p, priority: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg border text-sm font-semibold appearance-none"
                   style={{ background: "var(--s6)", borderColor: "#f59e0b60", color: "#f59e0b", outline: "none" }}>
-                  <option value="">Select…</option>
+                  <option value="">{ia.selectDropdown}</option>
                   {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
                 <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
@@ -328,7 +332,7 @@ function ClassificationFlow({ stage, onNext, onBack }: { stage: Stage; onNext: (
         <Button disabled={!qaChoice || (qaChoice === "override" && !override.priority)} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: qaChoice ? color : undefined }}>
-          Approve &amp; Deliver →
+          {ia.approveAndDeliver}
         </Button>
       </>} />
     );
@@ -377,6 +381,8 @@ type FieldId = typeof EXTRACTABLE_FIELDS[number]["id"];
 const AI_SUGGESTED: FieldId[] = ["juris"]; // AI finds one the annotator might miss
 
 function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => void; onBack: () => void }) {
+  const { t } = useLanguage();
+  const ia = t.pages.intelligentArchives;
   const [labeled, setLabeled]   = useState<Map<FieldId, string>>(new Map());
   const [selected, setSelected] = useState<FieldId | null>(null);
   const [fieldType, setFieldType] = useState("");
@@ -437,13 +443,13 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border" style={{ background: `${color}18`, borderColor: `${color}40` }}>
           <ScanLine size={20} style={{ color }} className="flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold" style={{ color }}>Field Extraction</div>
-            <div className="text-xs opacity-70" style={{ color }}>Click a value in the document to label it</div>
+            <div className="text-sm font-bold" style={{ color }}>{ia.fieldExtraction}</div>
+            <div className="text-xs opacity-70" style={{ color }}>{ia.clickValueHint}</div>
           </div>
         </div>
         {selected && (
           <div className="rounded-2xl border p-4 space-y-3" style={{ borderColor: `${color}50`, background: `${color}0d` }}>
-            <p className="text-xs font-bold uppercase tracking-wider" style={{ color }}>Label Selected Field</p>
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color }}>{ia.labelSelectedField}</p>
             <p className="text-sm font-mono font-bold text-foreground/80 px-2 py-1.5 rounded" style={{ background: `${color}15` }}>
               {EXTRACTABLE_FIELDS.find(f => f.id === selected)?.label}
             </p>
@@ -451,7 +457,7 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
               <select value={fieldType} onChange={e => setFieldType(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border text-sm font-semibold appearance-none"
                 style={{ background: "var(--s4)", borderColor: `${color}60`, color: fieldType ? color : "var(--foreground)", outline: "none" }}>
-                <option value="">Select field type…</option>
+                <option value="">{ia.selectFieldType}</option>
                 {FIELD_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
               <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
@@ -459,14 +465,14 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
             <button onClick={assign} disabled={!fieldType}
               className="w-full py-1.5 rounded-lg text-sm font-bold transition disabled:opacity-40"
               style={{ background: `${color}25`, color }}>
-              Assign Label ✓
+              {ia.assignLabel}
             </button>
           </div>
         )}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Labelled Fields ({labeled.size})</p>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">{ia.labelledFields} ({labeled.size})</p>
           {labeled.size === 0
-            ? <p className="text-xs text-foreground/30 italic">No fields labelled yet</p>
+            ? <p className="text-xs text-foreground/30 italic">{ia.noFieldsLabelled}</p>
             : <div className="space-y-1.5">
                 {[...labeled.entries()].map(([id, type]) => {
                   const f = EXTRACTABLE_FIELDS.find(x => x.id === id)!;
@@ -485,9 +491,9 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
         <Button disabled={labeled.size < 3} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: labeled.size >= 3 ? color : undefined }}>
-          Submit for AI Verification →
+          {ia.submitForAi}
         </Button>
-        {labeled.size < 3 && <p className="text-xs text-center text-foreground/35">Label at least 3 fields to continue</p>}
+        {labeled.size < 3 && <p className="text-xs text-center text-foreground/35">{ia.requireLabel3}</p>}
       </>} />
     );
   }
@@ -500,7 +506,7 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30" style={{ background: "rgba(37,99,235,0.12)" }}>
           <Eye size={20} className="text-blue-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-blue-300">AI Field Validation</div>
+            <div className="text-sm font-bold text-blue-300">{ia.aiFieldValidation}</div>
             <div className="text-xs text-blue-400/70">{labeled.size} confirmed · {missed.length} suggested</div>
           </div>
         </div>
@@ -538,7 +544,7 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
           </div>
         </div>
         <Button onClick={onNext} className="w-full h-11 font-semibold" style={{ background: color }}>
-          Send to QA Review →
+          {ia.sendToQa}
         </Button>
       </>} />
     );
@@ -555,8 +561,8 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30" style={{ background: "rgba(79,70,229,0.12)" }}>
           <CheckCircle2 size={20} className="text-indigo-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-indigo-300">QA Field Review</div>
-            <div className="text-xs text-indigo-400/70">Approve or flag individual fields</div>
+            <div className="text-sm font-bold text-indigo-300">{ia.qaReviewTitle}</div>
+            <div className="text-xs text-indigo-400/70">{ia.approveOrOverride}</div>
           </div>
         </div>
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
@@ -583,7 +589,7 @@ function ExtractionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () =>
         <Button disabled={qaApproved.size === 0} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: qaApproved.size > 0 ? color : undefined }}>
-          Approve &amp; Deliver ({qaApproved.size}/{allFields.length}) →
+          {ia.approveAndDeliver} ({qaApproved.size}/{allFields.length}) →
         </Button>
       </>} />
     );
@@ -645,6 +651,8 @@ const PII_TOKEN_IDS = PII_TOKENS.filter(t => t.piiType).map(t => t.id);
 const AI_MISSED_PII: string[] = ["t18", "t19"]; // AI catches contact person details
 
 function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => void; onBack: () => void }) {
+  const { t } = useLanguage();
+  const ia = t.pages.intelligentArchives;
   const [redacted, setRedacted]   = useState<Map<string, string>>(new Map()); // id → piiType
   const [selToken, setSelToken]   = useState<string | null>(null);
   const [piiType, setPiiType]     = useState("");
@@ -703,13 +711,13 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border" style={{ background: `${color}18`, borderColor: `${color}40` }}>
           <Lock size={20} style={{ color }} className="flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold" style={{ color }}>PII Redaction</div>
-            <div className="text-xs opacity-70" style={{ color }}>Click PII values in the document</div>
+            <div className="text-sm font-bold" style={{ color }}>{ia.piiRedaction}</div>
+            <div className="text-xs opacity-70" style={{ color }}>{ia.clickPiiHint}</div>
           </div>
         </div>
         {selToken && (
           <div className="rounded-2xl border p-4 space-y-3" style={{ borderColor: `${color}50`, background: `${color}0d` }}>
-            <p className="text-xs font-bold uppercase tracking-wider" style={{ color }}>Classify PII</p>
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color }}>{ia.classifyPii}</p>
             <p className="text-sm font-mono font-bold text-foreground/80 px-2 py-1.5 rounded truncate" style={{ background: `${color}15` }}>
               {PII_TOKENS.find(t => t.id === selToken)?.text}
             </p>
@@ -717,7 +725,7 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
               <select value={piiType} onChange={e => setPiiType(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border text-sm font-semibold appearance-none"
                 style={{ background: "var(--s4)", borderColor: `${color}60`, color: piiType ? color : "var(--foreground)", outline: "none" }}>
-                <option value="">PII type…</option>
+                <option value="">{ia.classifyPii}…</option>
                 {PII_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
               <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
@@ -725,16 +733,16 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
             <button onClick={assignPII} disabled={!piiType}
               className="w-full py-1.5 rounded-lg text-sm font-bold disabled:opacity-40"
               style={{ background: `${color}25`, color }}>
-              Redact ████
+              {ia.redactButton}
             </button>
           </div>
         )}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">
-            Redacted ({redacted.size} / {PII_TOKEN_IDS.length})
+            {ia.redactedItems} ({redacted.size} / {PII_TOKEN_IDS.length})
           </p>
           {redacted.size === 0
-            ? <p className="text-xs text-foreground/30 italic">No items redacted yet</p>
+            ? <p className="text-xs text-foreground/30 italic">{ia.noItemsRedacted}</p>
             : <div className="space-y-1">
                 {[...redacted.entries()].map(([id, type]) => (
                   <div key={id} className="flex items-center justify-between text-xs">
@@ -750,9 +758,9 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
         <Button disabled={redacted.size < 3} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: redacted.size >= 3 ? color : undefined }}>
-          Submit for AI Review →
+          {ia.submitForAi}
         </Button>
-        {redacted.size < 3 && <p className="text-xs text-center text-foreground/35">Redact at least 3 items to continue</p>}
+        {redacted.size < 3 && <p className="text-xs text-center text-foreground/35">{ia.requireRedact3}</p>}
       </>} />
     );
   }
@@ -765,7 +773,7 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30" style={{ background: "rgba(37,99,235,0.12)" }}>
           <Eye size={20} className="text-blue-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-blue-300">AI PII Scan</div>
+            <div className="text-sm font-bold text-blue-300">{ia.aiPiiScan}</div>
             <div className="text-xs text-blue-400/70">{redacted.size} redacted · {missed.length} flagged</div>
           </div>
         </div>
@@ -788,7 +796,7 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
           </div>
         )}
         <Button onClick={onNext} className="w-full h-11 font-semibold" style={{ background: color }}>
-          Send to QA Review →
+          {ia.sendToQa}
         </Button>
       </>} />
     );
@@ -802,12 +810,12 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30" style={{ background: "rgba(79,70,229,0.12)" }}>
           <CheckCircle2 size={20} className="text-indigo-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-indigo-300">QA Redaction Review</div>
+            <div className="text-sm font-bold text-indigo-300">{ia.qaReviewTitle}</div>
             <div className="text-xs text-indigo-400/70">Confirm coverage before delivery</div>
           </div>
         </div>
         <div className="rounded-2xl border border-violet-700/40 p-4" style={{ background: "rgba(109,40,217,0.12)" }}>
-          <p className="text-xs font-bold text-violet-400/60 uppercase tracking-wider mb-2">PII Coverage</p>
+          <p className="text-xs font-bold text-violet-400/60 uppercase tracking-wider mb-2">{ia.piiCoverage}</p>
           <div className="text-3xl font-black text-violet-300 mb-2">{coverage}%</div>
           <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "var(--s6)" }}>
             <div className="h-full rounded-full" style={{ width: `${coverage}%`, background: "linear-gradient(90deg,#f59e0b,#10b981)" }} />
@@ -818,7 +826,7 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
           </div>
         </div>
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Compliance Check</p>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">{ia.complianceCheck}</p>
           {[
             { label: "GDPR Article 17",  pass: true  },
             { label: "HIPAA Safe Harbor", pass: true  },
@@ -827,7 +835,7 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
             <div key={c.label} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
               <span className="text-xs text-foreground/60">{c.label}</span>
               <span className="text-xs font-bold" style={{ color: c.pass ? "#22c55e" : "#ef4444" }}>
-                {c.pass ? "✓ Pass" : "✕ Fail"}
+                {c.pass ? ia.labelPass : ia.labelFail}
               </span>
             </div>
           ))}
@@ -836,18 +844,18 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
           <button onClick={() => setQaApproved(false)}
             className="flex-1 py-2 rounded-xl border text-sm font-bold transition"
             style={{ borderColor: !qaApproved ? "#ef444460" : "var(--border)", color: !qaApproved ? "#ef4444" : "var(--foreground)", background: !qaApproved ? "rgba(239,68,68,0.1)" : "transparent" }}>
-            Request Fix
+            {ia.requestFix}
           </button>
           <button onClick={() => setQaApproved(true)}
             className="flex-1 py-2 rounded-xl border text-sm font-bold transition"
             style={{ borderColor: qaApproved ? "#22c55e60" : "var(--border)", color: qaApproved ? "#22c55e" : "var(--foreground)", background: qaApproved ? "rgba(34,197,94,0.1)" : "transparent" }}>
-            Approve ✓
+            {ia.approve} ✓
           </button>
         </div>
         <Button disabled={!qaApproved} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: qaApproved ? color : undefined }}>
-          Deliver Redacted Document →
+          {ia.deliverRedacted}
         </Button>
       </>} />
     );
@@ -869,25 +877,27 @@ function RedactionFlow({ stage, onNext, onBack }: { stage: Stage; onNext: () => 
 function DeliveredView({ color, onBack, onReset, children }: {
   color: string; onBack: () => void; onReset: () => void; children: React.ReactNode;
 }) {
+  const { t } = useLanguage();
+  const ia = t.pages.intelligentArchives;
   return (
     <div className="flex flex-col gap-4 items-center max-w-2xl mx-auto w-full">
       <div className="inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-1.5 rounded-full"
         style={{ background: "var(--s8)" }}>
-        📦 Delivered to Client
+        {ia.deliveredToClient}
       </div>
       <div className="w-full rounded-2xl border-2 border-emerald-700/50 p-5 text-center"
         style={{ background: "rgba(5,150,105,0.10)" }}>
         <div className="text-4xl mb-2">✅</div>
-        <div className="text-xl font-black text-emerald-400 mb-1">Task Complete</div>
-        <p className="text-sm text-foreground/60">QA approved · Delivered in structured format</p>
+        <div className="text-xl font-black text-emerald-400 mb-1">{ia.taskComplete}</div>
+        <p className="text-sm text-foreground/60">{ia.qaApprovedDelivered}</p>
       </div>
       <div className="w-full space-y-3">{children}</div>
       <div className="flex gap-3 w-full mt-2">
         <Button variant="outline" onClick={onReset} className="flex-1 h-10 gap-2 border-white/15 text-foreground/70">
-          <RotateCcw size={14} /> Try Again
+          <RotateCcw size={14} /> {ia.tryAgain}
         </Button>
         <Button onClick={onBack} className="flex-1 h-10 gap-2" style={{ background: color }}>
-          <ArrowLeft size={14} /> Back to Use Cases
+          <ArrowLeft size={14} /> {ia.backToUseCases}
         </Button>
       </div>
     </div>
@@ -896,6 +906,8 @@ function DeliveredView({ color, onBack, onReset, children }: {
 
 // ─── Landing page ─────────────────────────────────────────────────────────────
 function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
+  const { t } = useLanguage();
+  const ia = t.pages.intelligentArchives;
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       {/* Hero */}
@@ -904,10 +916,9 @@ function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
           style={{ background: ACCENT_SOFT, color: ACCENT, border: `1px solid ${ACCENT_MID}` }}>
           IM-001 · Digitization · Search · Enterprise AI
         </div>
-        <h1 className="text-3xl font-black text-foreground mb-3">Enterprise Document Intelligence Platform</h1>
+        <h1 className="text-3xl font-black text-foreground mb-3">{ia.pageTitle}</h1>
         <p className="text-base text-foreground/55 max-w-2xl mx-auto">
-          From physical records to AI-ready enterprise knowledge. Each workflow follows a
-          human-annotation → AI verification → QA review → delivery pipeline.
+          {ia.pageDescription}
         </p>
       </div>
 
@@ -915,6 +926,9 @@ function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
       <div className="grid grid-cols-3 gap-5">
         {SUB_CASES.map(sc => {
           const col = SUB_COLOR[sc.id];
+          const subTitle = sc.id === "classification" ? ia.workflowClassification
+            : sc.id === "extraction" ? ia.workflowExtraction
+            : ia.workflowRedaction;
           return (
             <button key={sc.id} onClick={() => onSelect(sc.id)}
               className="text-left rounded-2xl border p-6 transition-all hover:scale-[1.02] hover:shadow-lg group"
@@ -927,10 +941,10 @@ function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
                 style={{ background: `${col}20`, color: col }}>
                 {sc.tag}
               </div>
-              <h3 className="text-base font-bold text-foreground mb-2 leading-snug">{sc.title}</h3>
+              <h3 className="text-base font-bold text-foreground mb-2 leading-snug">{subTitle}</h3>
               <p className="text-sm text-foreground/55 leading-relaxed mb-5">{sc.description}</p>
               <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color: col }}>
-                Start Demo <ChevronRight size={15} className="transition-transform group-hover:translate-x-1" />
+                {ia.startDemo} <ChevronRight size={15} className="transition-transform group-hover:translate-x-1" />
               </div>
             </button>
           );
@@ -982,7 +996,9 @@ function LandingView({ onSelect }: { onSelect: (s: SubCase) => void }) {
 export default function IntelligentArchives() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { t }     = useLanguage();
   const isLight   = theme === "light";
+  const ia        = t.pages.intelligentArchives;
   const [view,  setView]  = useState<"landing" | SubCase>("landing");
   const [stage, setStage] = useState<Stage>(1);
 
@@ -991,7 +1007,10 @@ export default function IntelligentArchives() {
   const next    = () => setStage(s => Math.min(s + 1, 4) as Stage);
 
   const subColor = view !== "landing" ? SUB_COLOR[view] : ACCENT;
-  const subTitle = SUB_CASES.find(s => s.id === view)?.title ?? "Enterprise Document Intelligence Platform";
+  const subTitle = view === "classification" ? ia.workflowClassification
+    : view === "extraction" ? ia.workflowExtraction
+    : view === "redaction" ? ia.workflowRedaction
+    : ia.pageTitle;
 
   return (
     <div className="min-h-screen" style={{ background: "var(--s0)" }}>
@@ -1009,7 +1028,7 @@ export default function IntelligentArchives() {
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
             <span className="text-sm text-foreground/70 truncate">
-              {view === "landing" ? "Enterprise Document Intelligence Platform" : subTitle}
+              {view === "landing" ? ia.pageTitle : subTitle}
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">

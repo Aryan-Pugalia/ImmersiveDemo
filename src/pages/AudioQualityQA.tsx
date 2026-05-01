@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -104,12 +105,6 @@ const DIMENSIONS: { key: DimensionKey; label: string; icon: string; description:
   { key: "dropouts",             label: "Dropouts",             icon: "signal_disconnected",description: "Packet loss, mutes, or sudden silence gaps" },
 ];
 
-const DIMENSION_RATING_LABELS: Record<DimensionRating, string> = {
-  acceptable: "Acceptable",
-  degraded:   "Degraded",
-  unusable:   "Unusable",
-};
-
 const AI_RESULTS: Record<string, AIResult[]> = {
   aud_qa_014: [
     { dimension: "background_noise",    prediction: "degraded",    confidence: 0.88, justification: "Detected broadband hum at 60 Hz consistent with power line interference.", agreement: false },
@@ -170,12 +165,6 @@ const SAMPLE_BARS: Record<string, number[]> = {
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
-const STAGE_LABELS: Record<Stage, string> = {
-  "annotate":  "Annotate",
-  "ai-verify": "AI Verify",
-  "qa":        "QA Adjudication",
-  "export":    "Export",
-};
 const STAGE_ICONS: Record<Stage, string> = {
   "annotate":  "edit_note",
   "ai-verify": "smart_toy",
@@ -184,7 +173,7 @@ const STAGE_ICONS: Record<Stage, string> = {
 };
 const STAGES: Stage[] = ["annotate", "ai-verify", "qa", "export"];
 
-function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean }) {
+function PipelineStepper({ current, isDark, stageLabels }: { current: Stage; isDark: boolean; stageLabels: Record<Stage, string> }) {
   const currentIdx = STAGES.indexOf(current);
   return (
     <div className="flex items-center gap-0 mb-10 overflow-x-auto pb-1">
@@ -208,7 +197,7 @@ function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean 
                 }
               </div>
               <span className={`text-[10px] mt-1 font-bold uppercase tracking-wide whitespace-nowrap ${active ? "text-violet-400" : isDark ? "text-white/40" : "text-gray-400"}`}>
-                {STAGE_LABELS[s]}
+                {stageLabels[s]}
               </span>
             </div>
             {i < STAGES.length - 1 && (
@@ -346,9 +335,9 @@ const RATING_COLORS_LIGHT: Record<DimensionRating, { active: string; badge: stri
 };
 
 function RatingPill({
-  value, selected, onClick, isDark, size = "sm",
+  value, label, selected, onClick, isDark, size = "sm",
 }: {
-  value: DimensionRating; selected: boolean; onClick: () => void; isDark: boolean; size?: "sm" | "xs";
+  value: DimensionRating; label: string; selected: boolean; onClick: () => void; isDark: boolean; size?: "sm" | "xs";
 }) {
   const colors = isDark ? RATING_COLORS[value] : RATING_COLORS_LIGHT[value];
   const cls = selected ? colors.active : isDark
@@ -361,16 +350,16 @@ function RatingPill({
         size === "xs" ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs"
       } ${cls}`}
     >
-      {DIMENSION_RATING_LABELS[value]}
+      {label}
     </button>
   );
 }
 
-function RatingBadge({ value, isDark }: { value: DimensionRating; isDark: boolean }) {
+function RatingBadge({ value, label, isDark }: { value: DimensionRating; label: string; isDark: boolean }) {
   const colors = isDark ? RATING_COLORS[value] : RATING_COLORS_LIGHT[value];
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${colors.badge}`}>
-      {DIMENSION_RATING_LABELS[value]}
+      {label}
     </span>
   );
 }
@@ -394,6 +383,32 @@ export default function AudioQualityQA() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useLanguage();
+  const aq = t.pages.audioQualityQa;
+
+  // ── Translated constants (depend on t) ────────────────────────────────────
+  const STAGE_LABELS: Record<Stage, string> = {
+    "annotate":  aq.stageAnnotate,
+    "ai-verify": aq.stageAiVerify,
+    "qa":        aq.stageQa,
+    "export":    aq.stageExport,
+  };
+
+  const DIMENSIONS_T: { key: DimensionKey; label: string; icon: string; description: string }[] = [
+    { key: "background_noise",     label: aq.dimBackgroundNoise,       icon: "noise_aware",        description: aq.dimBackgroundNoiseDesc },
+    { key: "signal_clarity",       label: aq.dimSignalClarity,         icon: "graphic_eq",         description: aq.dimSignalClarityDesc },
+    { key: "volume_consistency",   label: aq.dimVolumeConsistency,     icon: "volume_up",          description: aq.dimVolumeConsistencyDesc },
+    { key: "crosstalk",            label: aq.dimCrosstalk,             icon: "people",             description: aq.dimCrosstalkDesc },
+    { key: "distortion_clipping",  label: aq.dimDistortionClipping,    icon: "equalizer",          description: aq.dimDistortionClippingDesc },
+    { key: "echo_reverb",          label: aq.dimEchoReverb,            icon: "surround_sound",     description: aq.dimEchoReverbDesc },
+    { key: "dropouts",             label: aq.dimDropouts,              icon: "signal_disconnected", description: aq.dimDropoutsDesc },
+  ];
+
+  const RATING_LABELS: Record<DimensionRating, string> = {
+    acceptable: aq.ratingAcceptable,
+    degraded:   aq.ratingDegraded,
+    unusable:   aq.ratingUnusable,
+  };
 
   const [stage, setStage]         = useState<Stage>("annotate");
   const [sampleIdx, setSampleIdx] = useState(0);
@@ -463,7 +478,7 @@ export default function AudioQualityQA() {
   }
 
   const canSubmitAnnotation =
-    DIMENSIONS.every(d => annotation.dimensions[d.key].rating !== null) &&
+    DIMENSIONS_T.every(d => annotation.dimensions[d.key].rating !== null) &&
     annotation.overallRating !== null &&
     annotation.suitability !== null;
 
@@ -497,7 +512,7 @@ export default function AudioQualityQA() {
 
   function buildExportPacket() {
     const finalDims: Record<string, string> = {};
-    DIMENSIONS.forEach(d => {
+    DIMENSIONS_T.forEach(d => {
       const qa = qaEntries.find(q => q.dimension === d.key);
       if (!qa) return;
       if (qa.decision === "accept_human") finalDims[d.key] = annotation.dimensions[d.key].rating ?? "";
@@ -587,14 +602,14 @@ export default function AudioQualityQA() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-6">
           <h1 className={`text-2xl font-bold font-headline tracking-tight mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-            Audio Quality &amp; Signal Integrity QA
+            {aq.pageTitle}
           </h1>
           <p className={`text-sm ${isDark ? "text-white/50" : "text-gray-500"}`}>
-Annotate while listening → AI verification → QA adjudication → JSON export
+            {aq.pageSubtitle}
           </p>
         </div>
 
-        <PipelineStepper current={stage} isDark={isDark} />
+        <PipelineStepper current={stage} isDark={isDark} stageLabels={STAGE_LABELS} />
 
         {/* ═══ STAGE 1 — ANNOTATE (with inline audio player) ══════════════ */}
         {stage === "annotate" && (
@@ -605,12 +620,12 @@ Annotate while listening → AI verification → QA adjudication → JSON export
               <div className="flex flex-col md:flex-row gap-4">
                 {/* Player */}
                 <div className="flex-1 min-w-0">
-                  {sectionTitle("graphic_eq", "Audio Sample")}
+                  {sectionTitle("graphic_eq", aq.audioSampleLabel)}
                   <WaveformPlayer sampleId={sample.id} audioSrc={sample.audioSrc} isDark={isDark} />
                 </div>
                 {/* Compact metadata */}
                 <div className={`shrink-0 md:w-56 rounded-xl p-3 border ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
-                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Sample Info</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{aq.sampleInfo}</p>
                   <div className="space-y-2">
                     {[
                       ["ID",       sample.id],
@@ -647,13 +662,13 @@ Annotate while listening → AI verification → QA adjudication → JSON export
             </div>
 
             <div className={cardCls}>
-              {sectionTitle("edit_note", "7-Dimension Quality Annotation")}
+              {sectionTitle("edit_note", aq.dimensionAnnotation)}
               <p className={`text-xs mb-5 ${isDark ? "text-white/40" : "text-gray-400"}`}>
-                Play the audio above, then rate each dimension. Set Overall Rating and Suitability to submit.
+                {aq.dimensionHint}
               </p>
 
               <div className="space-y-5">
-                {DIMENSIONS.map(dim => {
+                {DIMENSIONS_T.map(dim => {
                   const dimAnn = annotation.dimensions[dim.key];
                   return (
                     <div key={dim.key} className={`rounded-xl p-4 border transition-all ${
@@ -680,6 +695,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                             <RatingPill
                               key={r}
                               value={r}
+                              label={RATING_LABELS[r]}
                               selected={dimAnn.rating === r}
                               onClick={() => setDimRating(dim.key, r)}
                               isDark={isDark}
@@ -690,7 +706,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                       </div>
                       <input
                         type="text"
-                        placeholder="Optional notes for this dimension…"
+                        placeholder={aq.dimNotesPlaceholder}
                         value={dimAnn.notes}
                         onChange={e => setDimNotes(dim.key, e.target.value)}
                         className={`w-full text-xs rounded-lg border px-3 py-2 outline-none focus:ring-1 focus:ring-violet-500 transition-colors ${
@@ -707,10 +723,10 @@ Annotate while listening → AI verification → QA adjudication → JSON export
 
             {/* Overall Rating + Suitability */}
             <div className={cardCls}>
-              {sectionTitle("star", "Overall Rating & Suitability")}
+              {sectionTitle("star", aq.overallRatingSection)}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-400"}`}>Overall Quality Rating</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-400"}`}>{aq.overallRatingLabel}</p>
                   <div className="flex gap-2 flex-wrap">
                     {(["good", "fair", "poor"] as OverallRating[]).map(r => (
                       <button
@@ -731,12 +747,12 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                   </div>
                 </div>
                 <div>
-                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-400"}`}>Training Suitability</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-400"}`}>{aq.suitabilityLabel}</p>
                   <div className="flex gap-2 flex-wrap">
                     {([
-                      { val: "suitable" as const,      label: "Suitable",       icon: "check_circle"   },
-                      { val: "preprocessing" as const, label: "Needs Preproc.", icon: "build"          },
-                      { val: "reject" as const,        label: "Reject",         icon: "cancel"         },
+                      { val: "suitable" as const,      label: aq.suitableSuitable,      icon: "check_circle" },
+                      { val: "preprocessing" as const, label: aq.suitablePreprocessing, icon: "build"        },
+                      { val: "reject" as const,        label: aq.suitableReject,        icon: "cancel"       },
                     ]).map(({ val, label, icon }) => (
                       <button
                         key={val}
@@ -758,10 +774,10 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                 </div>
               </div>
               <div className="mt-5">
-                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/40" : "text-gray-400"}`}>General Notes</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/40" : "text-gray-400"}`}>{aq.generalNotes}</p>
                 <textarea
                   rows={3}
-                  placeholder="Overall observations, context, or recommendations…"
+                  placeholder={aq.generalNotesPlaceholder}
                   value={annotation.generalNotes}
                   onChange={e => setGeneralNotes(e.target.value)}
                   className={`w-full text-sm rounded-lg border px-3 py-2 outline-none focus:ring-1 focus:ring-violet-500 resize-none transition-colors ${
@@ -780,14 +796,14 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                   isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"
                 }`}
               >
-                ← Back
+                {aq.back}
               </button>
               <button
                 disabled={!canSubmitAnnotation}
                 onClick={() => setStage("ai-verify")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
               >
-                Submit to AI Verify
+                {aq.submitToAiVerify}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>smart_toy</span>
               </button>
             </div>
@@ -798,17 +814,17 @@ Annotate while listening → AI verification → QA adjudication → JSON export
         {stage === "ai-verify" && (
           <div className="space-y-6">
             <div className={cardCls}>
-              {sectionTitle("smart_toy", "AI Verification Results")}
+              {sectionTitle("smart_toy", aq.aiVerifyTitle)}
               <p className={`text-xs mb-5 ${isDark ? "text-white/40" : "text-gray-400"}`}>
-                AI model evaluated the audio across all 7 dimensions. Review agreement and proceed to QA adjudication.
+                {aq.aiVerifyHint}
               </p>
 
               {/* Agreement summary */}
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {[
-                  { label: "Agreed",       count: aiResults.filter(r => r.agreement).length,  color: "text-emerald-400" },
-                  { label: "Disagreed",    count: aiResults.filter(r => !r.agreement).length, color: "text-amber-400"   },
-                  { label: "Avg Confidence", count: `${Math.round(aiResults.reduce((a, r) => a + r.confidence, 0) / Math.max(1, aiResults.length) * 100)}%`, color: "text-violet-400" },
+                  { label: aq.agreed,       count: aiResults.filter(r => r.agreement).length,  color: "text-emerald-400" },
+                  { label: aq.disagreed,    count: aiResults.filter(r => !r.agreement).length, color: "text-amber-400"   },
+                  { label: aq.avgConfidence, count: `${Math.round(aiResults.reduce((a, r) => a + r.confidence, 0) / Math.max(1, aiResults.length) * 100)}%`, color: "text-violet-400" },
                 ].map(({ label, count, color }) => (
                   <div key={label} className={`rounded-xl p-3 text-center border ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-gray-50"}`}>
                     <p className={`text-2xl font-bold font-mono ${color}`}>{count}</p>
@@ -818,7 +834,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
               </div>
 
               <div className="space-y-4">
-                {DIMENSIONS.map(dim => {
+                {DIMENSIONS_T.map(dim => {
                   const ai     = aiResults.find(r => r.dimension === dim.key);
                   const human  = annotation.dimensions[dim.key];
                   if (!ai) return null;
@@ -837,14 +853,14 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                               ? isDark ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
                               : isDark ? "bg-amber-500/20 text-amber-400"     : "bg-amber-100 text-amber-700"
                           }`}>
-                            {ai.agreement ? "✓ Agree" : "⚠ Disagree"}
+                            {ai.agreement ? aq.aiAgree : aq.aiDisagree}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>Human:</span>
-                          {human.rating && <RatingBadge value={human.rating} isDark={isDark} />}
+                          {human.rating && <RatingBadge value={human.rating} label={RATING_LABELS[human.rating]} isDark={isDark} />}
                           <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>AI:</span>
-                          <RatingBadge value={ai.prediction} isDark={isDark} />
+                          <RatingBadge value={ai.prediction} label={RATING_LABELS[ai.prediction]} isDark={isDark} />
                         </div>
                       </div>
                       <ConfidenceBar value={ai.confidence} isDark={isDark} />
@@ -862,13 +878,13 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                   isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"
                 }`}
               >
-                ← Back
+                {aq.back}
               </button>
               <button
                 onClick={() => setStage("qa")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
               >
-                Proceed to QA Adjudication
+                {aq.proceedToQa}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>rule</span>
               </button>
             </div>
@@ -879,13 +895,13 @@ Annotate while listening → AI verification → QA adjudication → JSON export
         {stage === "qa" && (
           <div className="space-y-6">
             <div className={cardCls}>
-              {sectionTitle("rule", "QA Adjudication")}
+              {sectionTitle("rule", aq.qaTitle)}
               <p className={`text-xs mb-5 ${isDark ? "text-white/40" : "text-gray-400"}`}>
-                For each dimension, accept the human label, accept AI, or override with your own decision.
+                {aq.qaHint}
               </p>
 
               <div className="space-y-4">
-                {DIMENSIONS.map(dim => {
+                {DIMENSIONS_T.map(dim => {
                   const ai    = aiResults.find(r => r.dimension === dim.key);
                   const human = annotation.dimensions[dim.key];
                   const qa    = qaEntries.find(e => e.dimension === dim.key);
@@ -900,17 +916,17 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>H:</span>
-                          {human.rating && <RatingBadge value={human.rating} isDark={isDark} />}
+                          {human.rating && <RatingBadge value={human.rating} label={RATING_LABELS[human.rating]} isDark={isDark} />}
                           <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>AI:</span>
-                          <RatingBadge value={ai.prediction} isDark={isDark} />
+                          <RatingBadge value={ai.prediction} label={RATING_LABELS[ai.prediction]} isDark={isDark} />
                         </div>
                       </div>
 
                       <div className="flex gap-2 flex-wrap">
                         {([
-                          { val: "accept_human" as const, label: "Accept Human" },
-                          { val: "accept_ai"    as const, label: "Accept AI"    },
-                          { val: "override"     as const, label: "Override"     },
+                          { val: "accept_human" as const, label: aq.acceptHuman },
+                          { val: "accept_ai"    as const, label: aq.acceptAi    },
+                          { val: "override"     as const, label: aq.override     },
                         ]).map(({ val, label }) => (
                           <button
                             key={val}
@@ -932,11 +948,12 @@ Annotate while listening → AI verification → QA adjudication → JSON export
 
                       {qa.decision === "override" && (
                         <div className="mt-3 flex gap-1.5">
-                          <span className={`text-xs self-center mr-1 ${isDark ? "text-white/40" : "text-gray-400"}`}>Override value:</span>
+                          <span className={`text-xs self-center mr-1 ${isDark ? "text-white/40" : "text-gray-400"}`}>{aq.overrideValue}</span>
                           {(["acceptable", "degraded", "unusable"] as DimensionRating[]).map(r => (
                             <RatingPill
                               key={r}
                               value={r}
+                              label={RATING_LABELS[r]}
                               selected={qa.overrideValue === r}
                               onClick={() => setQaOverride(dim.key, r)}
                               isDark={isDark}
@@ -949,13 +966,18 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                       {/* Resolved value preview */}
                       {qa.decision && (qa.decision !== "override" || qa.overrideValue) && (
                         <div className="mt-2 flex items-center gap-1.5">
-                          <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>Final:</span>
+                          <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>{aq.finalValue}</span>
                           <RatingBadge
                             value={
                               qa.decision === "accept_human" ? (human.rating ?? "acceptable")
                               : qa.decision === "accept_ai"  ? ai.prediction
                               : qa.overrideValue!
                             }
+                            label={RATING_LABELS[
+                              qa.decision === "accept_human" ? (human.rating ?? "acceptable")
+                              : qa.decision === "accept_ai"  ? ai.prediction
+                              : qa.overrideValue!
+                            ]}
                             isDark={isDark}
                           />
                         </div>
@@ -973,14 +995,14 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                   isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"
                 }`}
               >
-                ← Back
+                {aq.back}
               </button>
               <button
                 disabled={!canSubmitQA}
                 onClick={() => setStage("export")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
               >
-                Finalize &amp; Export
+                {aq.finalizeExport}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
               </button>
             </div>
@@ -999,10 +1021,10 @@ Annotate while listening → AI verification → QA adjudication → JSON export
               {/* Summary KPIs */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: "Final Status",        val: packet.qa_final_status.replace(/_/g, " "), color: statusColor },
-                  { label: "Human Rating",         val: packet.human_rating ?? "—",               color: isDark ? "text-white" : "text-gray-900" },
-                  { label: "AI Agreement",         val: `${Math.round(packet.ai_verification_score * 100)}%`, color: "text-violet-400" },
-                  { label: "QA Consensus",         val: `${Math.round(packet.qa_consensus_rate * 100)}%`,     color: "text-emerald-400" },
+                  { label: aq.finalStatus,   val: packet.qa_final_status.replace(/_/g, " "), color: statusColor },
+                  { label: aq.humanRating,   val: packet.human_rating ?? "—",               color: isDark ? "text-white" : "text-gray-900" },
+                  { label: aq.aiAgreement,   val: `${Math.round(packet.ai_verification_score * 100)}%`, color: "text-violet-400" },
+                  { label: aq.qaConsensus,   val: `${Math.round(packet.qa_consensus_rate * 100)}%`,     color: "text-emerald-400" },
                 ].map(({ label, val, color }) => (
                   <div key={label} className={`rounded-xl border p-4 text-center ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
                     <p className={`text-lg font-bold font-mono uppercase ${color}`}>{val}</p>
@@ -1013,9 +1035,9 @@ Annotate while listening → AI verification → QA adjudication → JSON export
 
               {/* Dimension summary grid */}
               <div className={cardCls}>
-                {sectionTitle("table_chart", "Dimension Summary")}
+                {sectionTitle("table_chart", aq.dimSummary)}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {DIMENSIONS.map(dim => {
+                  {DIMENSIONS_T.map(dim => {
                     const val = packet.dimensions[dim.key] as DimensionRating;
                     return (
                       <div key={dim.key} className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
@@ -1023,7 +1045,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                           <span className={`material-symbols-outlined ${isDark ? "text-white/30" : "text-gray-400"}`} style={{ fontSize: 14 }}>{dim.icon}</span>
                           <span className={`text-xs font-bold ${isDark ? "text-white/70" : "text-gray-700"}`}>{dim.label}</span>
                         </div>
-                        {val && <RatingBadge value={val} isDark={isDark} />}
+                        {val && <RatingBadge value={val} label={RATING_LABELS[val]} isDark={isDark} />}
                       </div>
                     );
                   })}
@@ -1032,7 +1054,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
 
               {/* JSON export */}
               <div className={cardCls}>
-                {sectionTitle("code", "Export Packet (JSON)")}
+                {sectionTitle("code", aq.exportTitle)}
                 <pre className={`text-xs rounded-xl p-4 overflow-auto leading-relaxed border ${isDark ? "bg-black/40 border-white/10 text-emerald-300" : "bg-gray-50 border-gray-200 text-emerald-700"}`}>
                   {JSON.stringify(packet, null, 2)}
                 </pre>
@@ -1050,7 +1072,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors"
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
-                    Download JSON
+                    {aq.downloadJson}
                   </button>
                   <button
                     onClick={() => { setSampleIdx(i => (i + 1) % SAMPLES.length); setStage("annotate"); }}
@@ -1059,7 +1081,7 @@ Annotate while listening → AI verification → QA adjudication → JSON export
                     }`}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>skip_next</span>
-                    Next Sample
+                    {aq.nextSample}
                   </button>
                 </div>
               </div>

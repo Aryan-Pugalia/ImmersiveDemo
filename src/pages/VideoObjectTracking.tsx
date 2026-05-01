@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,6 +41,7 @@ const VIDEO_SRC = "/videos/cs-game-tracking.mp4";
 
 const ACCENT = "#7c3aed";
 
+// Labels are resolved at render time via t.pages.videoObjectTracking
 const EVENT_TYPES: { id: EventType; label: string; color: string }[] = [
   { id: "partial_occlusion",  label: "Partial Occlusion",  color: "#f59e0b" },
   { id: "full_occlusion",     label: "Full Occlusion",     color: "#f97316" },
@@ -48,13 +50,6 @@ const EVENT_TYPES: { id: EventType; label: string; color: string }[] = [
   { id: "tracking_failure",   label: "Tracking Failure",   color: "#ef4444" },
   { id: "tracking_recovery",  label: "Tracking Recovery",  color: "#a855f7" },
 ];
-
-const STEPS = [
-  { n: 1 as Stage, label: "AI Output"  },
-  { n: 2 as Stage, label: "Annotate"   },
-  { n: 3 as Stage, label: "QA Review"  },
-  { n: 4 as Stage, label: "Delivered"  },
-] as const;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -66,9 +61,17 @@ function fmt(s: number) {
 // ─── Progress Stepper ─────────────────────────────────────────────────────────
 
 function ProgressStepper({ stage }: { stage: Stage }) {
+  const { t } = useLanguage();
+  const vot = t.pages.videoObjectTracking;
+  const steps = [
+    { n: 1 as Stage, label: vot.stageAiOutput  },
+    { n: 2 as Stage, label: vot.stageAnnotate  },
+    { n: 3 as Stage, label: vot.stageQaReview  },
+    { n: 4 as Stage, label: vot.stageDelivered },
+  ] as const;
   return (
     <div className="flex items-center justify-center py-4">
-      {STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const done = stage > step.n, current = stage === step.n;
         return (
           <div key={step.n} className="flex items-center">
@@ -84,7 +87,7 @@ function ProgressStepper({ stage }: { stage: Stage }) {
                 current ? "text-violet-400" : done ? "text-foreground/60" : "text-foreground/30"
               }`}>{step.label}</span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`w-16 h-0.5 mx-1 mb-6 ${stage > step.n ? "bg-violet-600" : "bg-white/10"}`} />
             )}
           </div>
@@ -170,6 +173,8 @@ function Stage1({
   currentTime: number; duration: number; isPlaying: boolean;
   onPlayPause: () => void; onStep: (d: 1 | -1) => void; onNext: () => void;
 }) {
+  const { t } = useLanguage();
+  const vot = t.pages.videoObjectTracking;
   return (
     <div className="flex gap-5 items-start">
       {/* Video */}
@@ -197,13 +202,13 @@ function Stage1({
           style={{ background: "rgba(37,99,235,0.12)" }}>
           <Crosshair size={22} className="text-blue-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-blue-300">AI Tracker — Model Output</div>
+            <div className="text-sm font-bold text-blue-300">{vot.aiTrackerModelOutput}</div>
             <div className="text-xs text-blue-400/70">Tracking overlay baked into video</div>
           </div>
         </div>
 
         <div className="rounded-2xl border border-blue-800/40 p-4" style={{ background: "rgba(37,99,235,0.08)" }}>
-          <p className="text-xs font-bold text-blue-400/60 uppercase tracking-wider mb-2">What you're seeing</p>
+          <p className="text-xs font-bold text-blue-400/60 uppercase tracking-wider mb-2">{vot.whatYouSeeing}</p>
           <p className="text-sm text-foreground/60 leading-relaxed">
             The <strong className="text-foreground/80">green bounding box</strong> is the AI model's live
             tracking output. Watch for moments where it drifts, freezes, or loses the target through obstacles.
@@ -211,7 +216,7 @@ function Stage1({
         </div>
 
         <div className="rounded-2xl border border-border p-4 space-y-2" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider">What to look for</p>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider">{vot.whatToLookFor}</p>
           {[
             { icon: "◑", color: "#f59e0b", label: "Box clips through obstacles" },
             { icon: "✕", color: "#ef4444", label: "Tracker loses the target" },
@@ -225,7 +230,7 @@ function Stage1({
         </div>
 
         <Button onClick={onNext} className="w-full h-11 font-semibold" style={{ background: ACCENT }}>
-          Send to Human Annotator →
+          {vot.sendToAnnotator}
         </Button>
       </div>
     </div>
@@ -245,6 +250,8 @@ function Stage2({
   annotations: Annotation[]; setAnnotations: React.Dispatch<React.SetStateAction<Annotation[]>>;
   onNext: () => void;
 }) {
+  const { t } = useLanguage();
+  const vot = t.pages.videoObjectTracking;
   const [drawing, setDrawing] = useState(false);
   const [startPt, setStartPt] = useState({ x: 0, y: 0 });
   const [liveRect, setLiveRect] = useState<[number,number,number,number] | null>(null);
@@ -303,7 +310,16 @@ function Stage2({
 
   useEffect(() => { syncAndDraw(); }, [syncAndDraw]);
 
-  const evColor = EVENT_TYPES.find(e => e.id === selectedEvent)?.color ?? "#22c55e";
+  const EVENT_TYPES_T = [
+    { id: "partial_occlusion"  as EventType, label: vot.eventPartialOcclusion,  color: "#f59e0b" },
+    { id: "full_occlusion"     as EventType, label: vot.eventFullOcclusion,     color: "#f97316" },
+    { id: "reappearance"       as EventType, label: vot.eventReappearance,      color: "#22c55e" },
+    { id: "re_identification"  as EventType, label: vot.eventReIdentification,  color: "#3b82f6" },
+    { id: "tracking_failure"   as EventType, label: vot.eventTrackingFailure,   color: "#ef4444" },
+    { id: "tracking_recovery"  as EventType, label: vot.eventTrackingRecovery,  color: "#a855f7" },
+  ];
+
+  const evColor = EVENT_TYPES_T.find(e => e.id === selectedEvent)?.color ?? "#22c55e";
 
   return (
     <div className="flex gap-5 items-start">
@@ -324,7 +340,7 @@ function Stage2({
           <div className="absolute top-3 left-3 pointer-events-none">
             <span className="px-2 py-1 rounded text-xs font-bold text-violet-300"
               style={{ background: "rgba(109,40,217,0.80)", border: "1px solid rgba(139,92,246,0.5)" }}>
-              ✏ ANNOTATION MODE — Click &amp; drag to mark problem frames
+              {vot.annotationMode}
             </span>
           </div>
         </div>
@@ -338,16 +354,16 @@ function Stage2({
           style={{ background: "rgba(109,40,217,0.12)" }}>
           <Target size={22} className="text-violet-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-violet-300">Human Annotation</div>
-            <div className="text-xs text-violet-400/70">Draw boxes · label failure events</div>
+            <div className="text-sm font-bold text-violet-300">{vot.humanAnnotation}</div>
+            <div className="text-xs text-violet-400/70">{vot.drawBoxesLabel}</div>
           </div>
         </div>
 
         {/* Event type selector */}
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">Event Type</p>
+          <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider mb-2">{vot.eventType}</p>
           <div className="grid grid-cols-1 gap-1">
-            {EVENT_TYPES.map(ev => (
+            {EVENT_TYPES_T.map(ev => (
               <button key={ev.id} onClick={() => setSelectedEvent(ev.id)}
                 className="px-3 py-1.5 rounded-lg border text-xs font-semibold text-left transition"
                 style={{
@@ -366,20 +382,20 @@ function Stage2({
         <div className="rounded-2xl border border-border p-4" style={{ background: "var(--s4)" }}>
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-bold text-foreground/35 uppercase tracking-wider">
-              Annotations ({annotations.length})
+              {vot.annotations} ({annotations.length})
             </p>
             {annotations.length > 0 && (
               <button onClick={() => setAnnotations([])} className="text-xs text-red-400/70 hover:text-red-400">
-                Clear all
+                {vot.clearAll}
               </button>
             )}
           </div>
           {annotations.length === 0 ? (
-            <p className="text-xs text-foreground/30 italic">Draw boxes on the video to annotate.</p>
+            <p className="text-xs text-foreground/30 italic">{vot.drawBoxesHint}</p>
           ) : (
             <div className="space-y-1.5 max-h-40 overflow-y-auto">
               {annotations.map(a => {
-                const ev = EVENT_TYPES.find(e => e.id === a.eventType);
+                const ev = EVENT_TYPES_T.find(e => e.id === a.eventType);
                 return (
                   <div key={a.id} className="flex items-center gap-2 p-2 rounded-lg border"
                     style={{ borderColor: `${ev?.color}30`, background: `${ev?.color}08` }}>
@@ -398,10 +414,10 @@ function Stage2({
         <Button disabled={annotations.length === 0} onClick={onNext}
           className="w-full h-11 font-semibold disabled:opacity-40"
           style={{ background: annotations.length > 0 ? ACCENT : undefined }}>
-          Submit for QA ({annotations.length}) →
+          {vot.submitForQa}{annotations.length}) →
         </Button>
         {annotations.length === 0 && (
-          <p className="text-xs text-center text-foreground/35">Annotate at least one frame to continue</p>
+          <p className="text-xs text-center text-foreground/35">{vot.annotateAtLeastOne}</p>
         )}
       </div>
     </div>
@@ -420,6 +436,16 @@ function Stage3({
   onPlayPause: () => void; onStep: (d: 1 | -1) => void;
   annotations: Annotation[]; onNext: () => void;
 }) {
+  const { t } = useLanguage();
+  const vot = t.pages.videoObjectTracking;
+  const EVENT_LABEL_MAP: Record<EventType, string> = {
+    partial_occlusion: vot.eventPartialOcclusion,
+    full_occlusion:    vot.eventFullOcclusion,
+    reappearance:      vot.eventReappearance,
+    re_identification: vot.eventReIdentification,
+    tracking_failure:  vot.eventTrackingFailure,
+    tracking_recovery: vot.eventTrackingRecovery,
+  };
   const [showOverlay, setShowOverlay] = useState(true);
   const improvePct = Math.min(99, 60 + annotations.length * 8);
 
@@ -459,16 +485,16 @@ function Stage3({
       <div className="flex-1 min-w-0 flex flex-col gap-3">
         {/* Before / After toggle */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-foreground/50">View:</span>
+          <span className="text-sm text-foreground/50">{vot.view}</span>
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button onClick={() => setShowOverlay(false)}
               className={`px-3 py-1.5 text-sm font-semibold transition ${!showOverlay ? "bg-red-600/80 text-white" : "text-foreground/60 hover:bg-muted/40"}`}>
-              Before (AI)
+              {vot.beforeAi}
             </button>
             <button onClick={() => setShowOverlay(true)}
               className={`px-3 py-1.5 text-sm font-semibold transition ${showOverlay ? "text-white" : "text-foreground/60 hover:bg-muted/40"}`}
               style={{ background: showOverlay ? ACCENT : undefined }}>
-              After (Human)
+              {vot.afterHuman}
             </button>
           </div>
           <span className="text-xs text-foreground/35">
@@ -496,8 +522,8 @@ function Stage3({
           style={{ background: "rgba(79,70,229,0.12)" }}>
           <ShieldAlert size={22} className="text-indigo-400 flex-shrink-0" />
           <div>
-            <div className="text-sm font-bold text-indigo-300">QA Review</div>
-            <div className="text-xs text-indigo-400/70">Compare AI vs human corrections</div>
+            <div className="text-sm font-bold text-indigo-300">{vot.qaReview}</div>
+            <div className="text-xs text-indigo-400/70">{vot.compareAiVsHuman}</div>
           </div>
         </div>
 
@@ -532,7 +558,7 @@ function Stage3({
                 const ev = EVENT_TYPES.find(e => e.id === evId);
                 return (
                   <div key={evId} className="flex items-center justify-between">
-                    <span className="text-sm" style={{ color: ev?.color }}>{ev?.label}</span>
+                    <span className="text-sm" style={{ color: ev?.color }}>{EVENT_LABEL_MAP[evId as EventType] ?? ev?.label}</span>
                     <span className="text-sm font-bold text-foreground/60">{count}</span>
                   </div>
                 );
@@ -542,7 +568,7 @@ function Stage3({
         )}
 
         <Button onClick={onNext} className="w-full h-11 font-semibold" style={{ background: ACCENT }}>
-          Approve &amp; Mark Delivered →
+          {vot.approveMarkDelivered}
         </Button>
       </div>
     </div>
@@ -553,6 +579,8 @@ function Stage3({
 
 function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: () => void }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const vot = t.pages.videoObjectTracking;
   const kpis = [
     { icon: <Target size={18} className="text-cyan-400" />,     label: "Players Re-Identified",     value: "3",  sub: "Correct IDs restored",         bg: "rgba(6,182,212,0.18)" },
     { icon: <Layers size={18} className="text-violet-400" />,   label: "Occlusion Events Labelled", value: `${annotations.length}`, sub: "Across all frames", bg: "rgba(109,40,217,0.18)" },
@@ -564,7 +592,7 @@ function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: 
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
       <div className="inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-1.5 rounded-full"
         style={{ background: "var(--s8)" }}>
-        📦 Step 4: Annotation Dataset Delivered
+        {vot.datasetDelivered}
       </div>
 
       <div className="w-full rounded-2xl border-2 border-emerald-700/50 p-6 text-center"
@@ -601,11 +629,11 @@ function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: 
 
       <div className="flex gap-3 w-full">
         <Button variant="outline" onClick={onReset} className="flex-1 h-11 gap-2 border-white/15 text-foreground/80 hover:bg-white/5">
-          <RotateCcw size={15} /> Try Again
+          <RotateCcw size={15} /> {vot.tryAgain}
         </Button>
         <Button onClick={() => navigate("/use-cases")} className="flex-1 h-11 gap-2"
           style={{ background: ACCENT }}>
-          <ArrowLeft size={15} /> Back to DataStudio
+          <ArrowLeft size={15} /> {vot.backToDatastudio}
         </Button>
       </div>
     </div>
@@ -617,7 +645,9 @@ function Stage4({ annotations, onReset }: { annotations: Annotation[]; onReset: 
 export default function VideoObjectTracking() {
   const navigate   = useNavigate();
   const { theme }  = useTheme();
+  const { t }      = useLanguage();
   const isLight    = theme === "light";
+  const vot        = t.pages.videoObjectTracking;
   const videoRef   = useRef<HTMLVideoElement>(null);
   const canvasRef  = useRef<HTMLCanvasElement>(null);
 
@@ -690,7 +720,7 @@ export default function VideoObjectTracking() {
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={reset}
               className={`flex items-center gap-1.5 text-sm text-foreground/55 hover:text-foreground/80 px-3 py-1.5 rounded-full border transition ${isLight ? "border-black/15 hover:border-black/30" : "border-white/10 hover:border-white/25"}`}>
-              <RefreshCw size={13} /> Reset
+              <RefreshCw size={13} /> {vot.reset}
             </button>
             <span className="text-sm bg-cyan-600/20 text-cyan-600 border border-cyan-600/30 px-3 py-1 rounded-full font-semibold">
               Video Annotation · Live Demo
@@ -703,10 +733,10 @@ export default function VideoObjectTracking() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="text-center mb-4">
           <h1 className="text-2xl font-black text-white">
-            Advanced Multi-Object Tracking <span className="text-cyan-400">& Occlusion Handling</span>
+            {vot.pageTitle} <span className="text-cyan-400">{vot.pageSubtitle}</span>
           </h1>
           <p className="text-sm text-foreground/50 mt-1 max-w-xl mx-auto">
-            AI tracking fails on occlusion. Humans correct. Models improve.
+            {vot.pageHint}
           </p>
         </div>
 
