@@ -99,7 +99,7 @@ const UseCaseSelection = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+      <main className="max-w-7xl mx-auto px-6 py-8 md:py-12">
         {/* Heading */}
         <div className="flex flex-col items-center mb-8">
           <div className="inline-block">
@@ -137,17 +137,19 @@ const UseCaseSelection = () => {
                   {FILTER_ICONS[filter]}
                 </span>
                 {filter}
-                <span
-                  className={`text-xs font-mono px-1.5 py-0.5 rounded-full ml-0.5 ${
-                    isActive
-                      ? "bg-white/20 text-white"
-                      : isDark
-                        ? "bg-violet-500/15 text-violet-300"
-                        : "bg-violet-100 text-violet-700"
-                  }`}
-                >
-                  {count}
-                </span>
+                {filter === "All" && (
+                  <span
+                    className={`text-xs font-mono px-1.5 py-0.5 rounded-full ml-0.5 ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : isDark
+                          ? "bg-violet-500/15 text-violet-300"
+                          : "bg-violet-100 text-violet-700"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
               </button>
             );
           })}
