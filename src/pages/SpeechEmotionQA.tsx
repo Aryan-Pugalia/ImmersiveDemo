@@ -226,7 +226,7 @@ function PipelineStepper({
                 className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${
                   done    ? "bg-indigo-600 border-indigo-600"
                   : active ? "bg-indigo-600/20 border-indigo-500"
-                  : isDark  ? "bg-white/5 border-white/15"
+                  : isDark  ? "bg-white/5 border-white/25"
                   : "bg-gray-100 border-gray-300"
                 }`}
               >
@@ -235,7 +235,7 @@ function PipelineStepper({
                 ) : (
                   <span
                     className={`material-symbols-outlined ${
-                      active ? "text-indigo-400" : isDark ? "text-white/30" : "text-gray-400"
+                      active ? "text-indigo-400" : isDark ? "text-white/55" : "text-gray-500"
                     }`}
                     style={{ fontSize: 16 }}
                   >
@@ -245,7 +245,7 @@ function PipelineStepper({
               </div>
               <span
                 className={`text-[10px] mt-1 font-bold uppercase tracking-wide whitespace-nowrap ${
-                  active ? "text-indigo-400" : isDark ? "text-white/40" : "text-gray-400"
+                  active ? "text-indigo-400" : isDark ? "text-white/65" : "text-gray-500"
                 }`}
               >
                 {stageLabels[s]}
@@ -314,7 +314,7 @@ function WaveformPlayer({
   const playheadX = Math.round(progress * WAVEFORM_BARS);
 
   return (
-    <div className={`rounded-xl p-4 border ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
+    <div className={`rounded-xl p-4 border ${isDark ? "bg-white/[0.06] border-white/18" : "bg-gray-50 border-gray-200"}`}>
       <div className="flex items-center gap-3 mb-3">
         <button
           onClick={toggle}
@@ -343,10 +343,10 @@ function WaveformPlayer({
         </div>
       </div>
       <div className="flex justify-between text-xs font-mono">
-        <span className={isDark ? "text-white/40" : "text-gray-400"}>
+        <span className={isDark ? "text-white/65" : "text-gray-500"}>
           {playing ? "▶ Playing…" : "● Stopped"}
         </span>
-        <span className={isDark ? "text-white/40" : "text-gray-400"}>{Math.round(progress * 100)}%</span>
+        <span className={isDark ? "text-white/65" : "text-gray-500"}>{Math.round(progress * 100)}%</span>
       </div>
     </div>
   );
@@ -360,7 +360,7 @@ function ConfidenceBar({ value, isDark }: { value: number; isDark: boolean }) {
       <div className={`flex-1 h-1.5 rounded-full ${isDark ? "bg-white/10" : "bg-gray-200"}`}>
         <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className={`text-[10px] font-mono w-8 text-right ${isDark ? "text-white/50" : "text-gray-500"}`}>{pct}%</span>
+      <span className={`text-[10px] font-mono w-8 text-right ${isDark ? "text-white/75" : "text-gray-700"}`}>{pct}%</span>
     </div>
   );
 }
@@ -494,22 +494,22 @@ export default function SpeechEmotionQA() {
 
   // ── Card helpers ──────────────────────────────────────────────────────────
 
-  const card = `rounded-2xl border p-6 ${isDark ? "bg-white/3 border-white/8" : "bg-white border-gray-200 shadow-sm"}`;
-  const sectionHead = `text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-400"}`;
+  const card = `rounded-2xl border p-6 ${isDark ? "bg-white/[0.06] border-white/14" : "bg-white border-gray-200 shadow-sm"}`;
+  const sectionHead = `text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/65" : "text-gray-500"}`;
   const pill = (active: boolean) =>
     `px-3 py-1.5 rounded-full border text-xs font-semibold transition-all cursor-pointer select-none ${
       active
         ? "bg-indigo-600 text-white border-indigo-500"
         : isDark
-        ? "bg-transparent text-white/50 border-white/15 hover:border-white/30"
-        : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
+        ? "bg-transparent text-white/75 border-white/25 hover:border-white/30"
+        : "bg-transparent text-gray-700 border-gray-300 hover:border-gray-400"
     }`;
 
   const metaRow = (label: string, value: string) => (
     <div className="flex justify-between items-baseline gap-2 py-1.5 border-b border-dashed last:border-0"
          style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }}>
-      <span className={`text-[11px] font-medium shrink-0 ${isDark ? "text-white/40" : "text-gray-400"}`}>{label}</span>
-      <span className={`text-[11px] font-mono text-right truncate ${isDark ? "text-white/70" : "text-gray-700"}`}>{value}</span>
+      <span className={`text-[11px] font-medium shrink-0 ${isDark ? "text-white/65" : "text-gray-500"}`}>{label}</span>
+      <span className={`text-[11px] font-mono text-right truncate ${isDark ? "text-white/80" : "text-gray-700"}`}>{value}</span>
     </div>
   );
 
@@ -526,7 +526,7 @@ export default function SpeechEmotionQA() {
             className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
               i === sampleIdx
                 ? "bg-indigo-600 border-indigo-500 text-white"
-                : "bg-white/10 border-white/20 text-white/70 hover:bg-white/15"
+                : "bg-white/10 border-white/20 text-white/80 hover:bg-white/15"
             }`}
           >
             {s.id}
@@ -632,8 +632,8 @@ export default function SpeechEmotionQA() {
                   onClick={() => setAnnotation({ emotion: key })}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold transition-all ${
                     active ? colors : isDark
-                      ? "bg-transparent text-white/50 border-white/12 hover:border-white/25"
-                      : "bg-transparent text-gray-500 border-gray-200 hover:border-gray-300"
+                      ? "bg-transparent text-white/75 border-white/22 hover:border-white/25"
+                      : "bg-transparent text-gray-700 border-gray-300 hover:border-gray-400"
                   }`}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{icon}</span>
@@ -646,7 +646,7 @@ export default function SpeechEmotionQA() {
 
         {/* 2 · Tone attributes */}
         <div className={card}>
-          <p className={sectionHead}>2 · {eq.toneAttributesLabel} <span className={`normal-case font-normal ${isDark ? "text-white/30" : "text-gray-400"}`}>({eq.selectAllApply})</span></p>
+          <p className={sectionHead}>2 · {eq.toneAttributesLabel} <span className={`normal-case font-normal ${isDark ? "text-white/55" : "text-gray-500"}`}>({eq.selectAllApply})</span></p>
           <div className="flex flex-wrap gap-2">
             {toneOptions.map(({ key, icon }) => (
               <button
@@ -675,8 +675,8 @@ export default function SpeechEmotionQA() {
                     : level === "medium" ? "bg-amber-500 border-amber-400 text-white"
                     :                     "bg-rose-600 border-rose-500 text-white"
                     : isDark
-                    ? "bg-transparent text-white/50 border-white/15 hover:border-white/30"
-                    : "bg-transparent text-gray-500 border-gray-200 hover:border-gray-300"
+                    ? "bg-transparent text-white/75 border-white/25 hover:border-white/30"
+                    : "bg-transparent text-gray-700 border-gray-300 hover:border-gray-400"
                 }`}
               >
                 {intensityLabel[level]}
@@ -701,11 +701,11 @@ export default function SpeechEmotionQA() {
                     active
                       ? `${bg} ${isDark ? "border-current" : "border-current"}`
                       : isDark
-                      ? "bg-transparent text-white/60 border-white/12 hover:border-white/25"
-                      : "bg-transparent text-gray-600 border-gray-200 hover:border-gray-300"
+                      ? "bg-transparent text-white/75 border-white/22 hover:border-white/35"
+                      : "bg-transparent text-gray-700 border-gray-300 hover:border-gray-400"
                   }`}
                 >
-                  <span className={`material-symbols-outlined ${active ? iconCol : isDark ? "text-white/30" : "text-gray-400"}`} style={{ fontSize: 20 }}>{icon}</span>
+                  <span className={`material-symbols-outlined ${active ? iconCol : isDark ? "text-white/55" : "text-gray-500"}`} style={{ fontSize: 20 }}>{icon}</span>
                   {label}
                 </button>
               );
@@ -723,7 +723,7 @@ export default function SpeechEmotionQA() {
             onChange={e => setAnnotation({ notes: e.target.value })}
             className={`w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
               isDark
-                ? "bg-white/5 border-white/15 text-white placeholder-white/30"
+                ? "bg-white/5 border-white/25 text-white placeholder-white/30"
                 : "bg-white border-gray-200 text-gray-800 placeholder-gray-400"
             }`}
           />
@@ -737,8 +737,8 @@ export default function SpeechEmotionQA() {
             annotationComplete
               ? "bg-indigo-600 hover:bg-indigo-500 text-white"
               : isDark
-              ? "bg-white/5 text-white/25 border border-white/10 cursor-not-allowed"
-              : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+              ? "bg-white/5 text-white/45 border border-white/18 cursor-not-allowed"
+              : "bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed"
           }`}
         >
           {annotationComplete ? eq.submitToAiVerify : eq.completeAllFields}
@@ -771,21 +771,21 @@ export default function SpeechEmotionQA() {
     justification: string,
     agreement: boolean,
   ) => (
-    <div className={`rounded-xl border p-4 space-y-3 ${isDark ? "bg-white/3 border-white/8" : "bg-gray-50 border-gray-200"}`}>
+    <div className={`rounded-xl border p-4 space-y-3 ${isDark ? "bg-white/[0.06] border-white/14" : "bg-gray-50 border-gray-200"}`}>
       <div className="flex items-center gap-2 mb-1">
         <span className={`material-symbols-outlined ${isDark ? "text-indigo-400" : "text-indigo-600"}`} style={{ fontSize: 18 }}>{icon}</span>
         <span className={`text-sm font-bold ${isDark ? "text-white/80" : "text-gray-800"}`}>{dimensionLabel}</span>
         <div className="ml-auto"><AgreementChip agree={agreement} /></div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className={`rounded-lg p-2.5 border ${isDark ? "bg-white/5 border-white/10" : "bg-white border-gray-200"}`}>
-          <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${isDark ? "text-white/30" : "text-gray-400"}`}>
+        <div className={`rounded-lg p-2.5 border ${isDark ? "bg-white/5 border-white/18" : "bg-white border-gray-200"}`}>
+          <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${isDark ? "text-white/55" : "text-gray-500"}`}>
             <span className="material-symbols-outlined align-middle" style={{ fontSize: 11 }}>person</span> {eq.humanLabel}
           </p>
           <p className={`text-sm font-semibold ${isDark ? "text-white/80" : "text-gray-800"}`}>{humanVal}</p>
         </div>
         <div className={`rounded-lg p-2.5 border ${isDark ? "bg-indigo-600/10 border-indigo-500/20" : "bg-indigo-50 border-indigo-200"}`}>
-          <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${isDark ? "text-indigo-400/60" : "text-indigo-500"}`}>
+          <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${isDark ? "text-indigo-300" : "text-indigo-500"}`}>
             <span className="material-symbols-outlined align-middle" style={{ fontSize: 11 }}>smart_toy</span> {eq.aiLabel}
           </p>
           <p className={`text-sm font-semibold ${isDark ? "text-indigo-300" : "text-indigo-700"}`}>{aiVal}</p>
@@ -793,12 +793,12 @@ export default function SpeechEmotionQA() {
       </div>
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/30" : "text-gray-400"}`}>{eq.confidence}</span>
+          <span className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/55" : "text-gray-500"}`}>{eq.confidence}</span>
           <span/>
         </div>
         <ConfidenceBar value={conf} isDark={isDark} />
       </div>
-      <p className={`text-xs leading-relaxed italic ${isDark ? "text-white/40" : "text-gray-500"}`}>
+      <p className={`text-xs leading-relaxed italic ${isDark ? "text-white/70" : "text-gray-600"}`}>
         {justification}
       </p>
     </div>
@@ -815,7 +815,7 @@ export default function SpeechEmotionQA() {
             <span className="material-symbols-outlined text-indigo-400" style={{ fontSize: 18 }}>smart_toy</span>
             <span className={`font-bold text-sm ${isDark ? "text-indigo-300" : "text-indigo-700"}`}>{eq.aiVerifyTitle}</span>
           </div>
-          <p className={`text-xs ${isDark ? "text-white/40" : "text-gray-500"}`}>{eq.aiVerifyHint}</p>
+          <p className={`text-xs ${isDark ? "text-white/65" : "text-gray-700"}`}>{eq.aiVerifyHint}</p>
         </div>
 
         {/* 4 verification rows */}
@@ -898,8 +898,8 @@ export default function SpeechEmotionQA() {
           decision === d
             ? "bg-indigo-600 border-indigo-500 text-white"
             : isDark
-            ? "bg-transparent text-white/50 border-white/15 hover:border-white/30"
-            : "bg-transparent text-gray-500 border-gray-200 hover:border-gray-300"
+            ? "bg-transparent text-white/75 border-white/25 hover:border-white/30"
+            : "bg-transparent text-gray-700 border-gray-300 hover:border-gray-400"
         }`}
       >
         {lbl}
@@ -907,18 +907,18 @@ export default function SpeechEmotionQA() {
     );
 
     return (
-      <div className={`rounded-xl border p-4 space-y-3 ${isDark ? "bg-white/3 border-white/8" : "bg-gray-50 border-gray-200"}`}>
+      <div className={`rounded-xl border p-4 space-y-3 ${isDark ? "bg-white/[0.06] border-white/14" : "bg-gray-50 border-gray-200"}`}>
         <div className="flex items-center gap-2">
           <span className={`material-symbols-outlined ${isDark ? "text-indigo-400" : "text-indigo-600"}`} style={{ fontSize: 18 }}>{icon}</span>
           <span className={`text-sm font-bold ${isDark ? "text-white/80" : "text-gray-800"}`}>{label}</span>
         </div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className={`rounded-lg p-2 border ${isDark ? "bg-white/5 border-white/10" : "bg-white border-gray-200"}`}>
-            <span className={`font-bold ${isDark ? "text-white/30" : "text-gray-400"}`}>{eq.humanLabel}: </span>
-            <span className={isDark ? "text-white/70" : "text-gray-700"}>{humanDisplay}</span>
+          <div className={`rounded-lg p-2 border ${isDark ? "bg-white/5 border-white/18" : "bg-white border-gray-200"}`}>
+            <span className={`font-bold ${isDark ? "text-white/55" : "text-gray-500"}`}>{eq.humanLabel}: </span>
+            <span className={isDark ? "text-white/80" : "text-gray-700"}>{humanDisplay}</span>
           </div>
           <div className={`rounded-lg p-2 border ${isDark ? "bg-indigo-600/10 border-indigo-500/20" : "bg-indigo-50 border-indigo-200"}`}>
-            <span className={`font-bold ${isDark ? "text-indigo-400/60" : "text-indigo-500"}`}>{eq.aiLabel}: </span>
+            <span className={`font-bold ${isDark ? "text-indigo-300" : "text-indigo-500"}`}>{eq.aiLabel}: </span>
             <span className={isDark ? "text-indigo-300" : "text-indigo-700"}>{aiDisplay}</span>
           </div>
         </div>
@@ -928,8 +928,8 @@ export default function SpeechEmotionQA() {
           {optBtn("override", eq.override)}
         </div>
         {decision === "override" && (
-          <div className={`rounded-lg border p-3 ${isDark ? "bg-white/5 border-white/10" : "bg-white border-gray-200"}`}>
-            <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{eq.overrideValue}</p>
+          <div className={`rounded-lg border p-3 ${isDark ? "bg-white/5 border-white/18" : "bg-white border-gray-200"}`}>
+            <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/55" : "text-gray-500"}`}>{eq.overrideValue}</p>
             {overrideSlot}
           </div>
         )}
@@ -942,12 +942,12 @@ export default function SpeechEmotionQA() {
       <div className="space-y-4">{playerPanel}</div>
 
       <div className="space-y-4">
-        <div className={`rounded-xl px-4 py-3 border ${isDark ? "bg-white/3 border-white/8" : "bg-gray-50 border-gray-200"}`}>
+        <div className={`rounded-xl px-4 py-3 border ${isDark ? "bg-white/[0.06] border-white/14" : "bg-gray-50 border-gray-200"}`}>
           <div className="flex items-center gap-2 mb-0.5">
             <span className={`material-symbols-outlined ${isDark ? "text-white/60" : "text-gray-600"}`} style={{ fontSize: 18 }}>rule</span>
             <span className={`font-bold text-sm ${isDark ? "text-white/80" : "text-gray-700"}`}>{eq.qaTitle}</span>
           </div>
-          <p className={`text-xs ${isDark ? "text-white/40" : "text-gray-500"}`}>{eq.qaHint}</p>
+          <p className={`text-xs ${isDark ? "text-white/65" : "text-gray-700"}`}>{eq.qaHint}</p>
         </div>
 
         {/* QA: Primary emotion */}
@@ -966,7 +966,7 @@ export default function SpeechEmotionQA() {
                   className={`px-2 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
                     qaState.emotionOverride === key
                       ? (isDark ? EMOTION_COLOR_DARK[key] : EMOTION_COLOR_LIGHT[key])
-                      : isDark ? "bg-white/3 border-white/10 text-white/50" : "bg-gray-50 border-gray-200 text-gray-500"
+                      : isDark ? "bg-white/[0.06] border-white/18 text-white/75" : "bg-gray-50 border-gray-200 text-gray-700"
                   }`}
                 >
                   {emotionLabel[key]}
@@ -1022,7 +1022,7 @@ export default function SpeechEmotionQA() {
                       ? level === "low"    ? "bg-emerald-600 border-emerald-500 text-white"
                       : level === "medium" ? "bg-amber-500 border-amber-400 text-white"
                       :                     "bg-rose-600 border-rose-500 text-white"
-                      : isDark ? "bg-white/3 border-white/10 text-white/50" : "bg-gray-50 border-gray-200 text-gray-500"
+                      : isDark ? "bg-white/[0.06] border-white/18 text-white/75" : "bg-gray-50 border-gray-200 text-gray-700"
                   }`}
                 >
                   {intensityLabel[level]}
@@ -1051,7 +1051,7 @@ export default function SpeechEmotionQA() {
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold transition-all ${
                       sel
                         ? (isDark ? ESCALATION_BG_DARK[key] : ESCALATION_BG_LIGHT[key]) + " " + iconCol
-                        : isDark ? "bg-white/3 border-white/10 text-white/50" : "bg-gray-50 border-gray-200 text-gray-500"
+                        : isDark ? "bg-white/[0.06] border-white/18 text-white/75" : "bg-gray-50 border-gray-200 text-gray-700"
                     }`}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 15 }}>{icon}</span>
@@ -1073,7 +1073,7 @@ export default function SpeechEmotionQA() {
             onChange={e => setQa({ reviewerNote: e.target.value })}
             className={`w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
               isDark
-                ? "bg-white/5 border-white/15 text-white placeholder-white/30"
+                ? "bg-white/5 border-white/25 text-white placeholder-white/30"
                 : "bg-white border-gray-200 text-gray-800 placeholder-gray-400"
             }`}
           />
@@ -1146,21 +1146,21 @@ export default function SpeechEmotionQA() {
             <p className="text-sm font-bold mt-0.5">{emotionLabel[finalEmotion]}</p>
           </div>
           {/* Intensity */}
-          <div className={`rounded-xl p-3 border text-center ${isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200"}`}>
+          <div className={`rounded-xl p-3 border text-center ${isDark ? "bg-white/5 border-white/18" : "bg-gray-50 border-gray-200"}`}>
             <span className="material-symbols-outlined block mb-1" style={{ fontSize: 24 }}>{finalIntensity === "high" ? "bolt" : finalIntensity === "medium" ? "speed" : "expand_less"}</span>
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/40" : "text-gray-400"}`}>{eq.intensityLabel}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/65" : "text-gray-500"}`}>{eq.intensityLabel}</p>
             <p className={`text-sm font-bold mt-0.5 ${isDark ? "text-white/80" : "text-gray-800"}`}>{intensityLabel[finalIntensity]}</p>
           </div>
           {/* Tone */}
-          <div className={`rounded-xl p-3 border ${isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200"}`}>
+          <div className={`rounded-xl p-3 border ${isDark ? "bg-white/5 border-white/18" : "bg-gray-50 border-gray-200"}`}>
             <span className="material-symbols-outlined block mb-1" style={{ fontSize: 24 }}>record_voice_over</span>
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/40" : "text-gray-400"}`}>{eq.toneAttributesLabel}</p>
-            <p className={`text-xs font-semibold mt-0.5 ${isDark ? "text-white/70" : "text-gray-700"}`}>{finalTones.map(t => toneLabel[t]).join(", ")}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/65" : "text-gray-500"}`}>{eq.toneAttributesLabel}</p>
+            <p className={`text-xs font-semibold mt-0.5 ${isDark ? "text-white/80" : "text-gray-700"}`}>{finalTones.map(t => toneLabel[t]).join(", ")}</p>
           </div>
           {/* Escalation */}
           <div className={`rounded-xl p-3 border ${escalBg}`}>
             <span className={`material-symbols-outlined block mb-1 ${escalIconCol}`} style={{ fontSize: 24 }}>{ESCALATION_ICON[finalEscalation]}</span>
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/40" : "text-gray-400"}`}>{eq.escalationRiskLabel}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/65" : "text-gray-500"}`}>{eq.escalationRiskLabel}</p>
             <p className={`text-sm font-bold mt-0.5 ${escalIconCol}`}>
               {escalationOpts.find(o => o.key === finalEscalation)?.label}
             </p>
@@ -1177,7 +1177,7 @@ export default function SpeechEmotionQA() {
         ].map(({ icon, label, value }) => (
           <div key={label} className={`${card} text-center`}>
             <span className={`material-symbols-outlined mb-1 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} style={{ fontSize: 22 }}>{icon}</span>
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/40" : "text-gray-400"}`}>{label}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${isDark ? "text-white/65" : "text-gray-500"}`}>{label}</p>
             <p className={`text-sm font-bold mt-1 ${isDark ? "text-white/90" : "text-gray-800"}`}>{value}</p>
           </div>
         ))}
@@ -1197,7 +1197,7 @@ export default function SpeechEmotionQA() {
           </button>
         </div>
         <pre className={`rounded-lg p-4 text-xs font-mono overflow-x-auto leading-relaxed border ${
-          isDark ? "bg-black/40 border-white/8 text-emerald-400" : "bg-gray-900 border-gray-700 text-emerald-400"
+          isDark ? "bg-black/40 border-white/14 text-emerald-400" : "bg-gray-900 border-gray-700 text-emerald-400"
         }`}>
           {JSON.stringify(exportJson, null, 2)}
         </pre>
@@ -1213,7 +1213,7 @@ export default function SpeechEmotionQA() {
           }}
           className={`flex-1 py-3 rounded-xl font-bold text-sm border transition-all ${
             isDark
-              ? "bg-white/5 border-white/15 text-white/70 hover:bg-white/10"
+              ? "bg-white/5 border-white/25 text-white/80 hover:bg-white/10"
               : "bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200"
           }`}
         >
@@ -1223,7 +1223,7 @@ export default function SpeechEmotionQA() {
           onClick={() => navigate("/use-cases")}
           className={`px-6 py-3 rounded-xl font-bold text-sm border transition-all ${
             isDark
-              ? "bg-white/5 border-white/15 text-white/70 hover:bg-white/10"
+              ? "bg-white/5 border-white/25 text-white/80 hover:bg-white/10"
               : "bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200"
           }`}
         >
@@ -1240,7 +1240,7 @@ export default function SpeechEmotionQA() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#0a0a0f]" : "bg-gray-50"}`}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="dark-surface sticky top-0 z-20 border-b border-white/8">
+      <header className="dark-surface sticky top-0 z-20 border-b border-white/14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
           <button
             onClick={() => navigate("/use-cases")}
@@ -1255,7 +1255,7 @@ export default function SpeechEmotionQA() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border border-white/20 text-white/70 bg-white/5 hidden sm:block`}>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border border-white/20 text-white/80 bg-white/5 hidden sm:block`}>
               AUD-403
             </span>
             {SAMPLES.map((s, i) => (
@@ -1284,14 +1284,14 @@ export default function SpeechEmotionQA() {
               {eq.domainBadge}
             </span>
             <span className={isDark ? "text-white/20" : "text-gray-300"}>·</span>
-            <span className={`text-xs font-bold uppercase tracking-widest ${isDark ? "text-white/30" : "text-gray-400"}`}>
+            <span className={`text-xs font-bold uppercase tracking-widest ${isDark ? "text-white/55" : "text-gray-500"}`}>
               AUD-403
             </span>
           </div>
           <h1 className={`text-2xl md:text-3xl font-black mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
             {eq.pageTitle}
           </h1>
-          <p className={`text-sm ${isDark ? "text-white/45" : "text-gray-500"}`}>{eq.pageSubtitle}</p>
+          <p className={`text-sm ${isDark ? "text-white/45" : "text-gray-700"}`}>{eq.pageSubtitle}</p>
         </div>
 
         {/* Pipeline stepper */}
