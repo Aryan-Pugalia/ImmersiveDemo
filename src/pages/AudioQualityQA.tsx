@@ -526,7 +526,7 @@ export default function AudioQualityQA() {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-[hsl(0,0%,5%)] border-b border-border/20 w-full">
+      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] border-b border-border/20 w-full">
         <div className="flex justify-between items-center px-6 py-3 h-16">
           <div className="flex items-center gap-4">
             <button
