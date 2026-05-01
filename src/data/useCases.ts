@@ -125,7 +125,7 @@ export const useCases: UseCase[] = [
   {
     id: "16",
     slug: "physics-reasoning",
-    title: "Physics Reasoning Verification & Multistep Solution QA",
+    title: "Physics Reasoning Verification & Multistep Solution",
     description:
       "Expert physics annotators review multistep solutions involving equations, physical laws, and unit analysis. AI flags conceptual errors and unit mismatches; human QA delivers gold-standard training data for physics-capable reasoning models.",
     icon: "science",
@@ -192,7 +192,7 @@ export const useCases: UseCase[] = [
   {
     id: "20",
     slug: "voice-command-intent-qa",
-    title: "Voice Command Intent Understanding QA",
+    title: "Voice Command Intent Understanding",
     description: "Human reviewers evaluate whether in-vehicle voice commands are correctly interpreted and fulfilled. AI assists verification, while human QA ensures safe, accurate intent understanding for infotainment and navigation systems.",
     icon: "record_voice_over",
     idTag: "AUD-404",

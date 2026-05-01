@@ -66,7 +66,7 @@ export const en = {
         "Expert annotators review step-by-step LaTeX calculus solutions, validate mathematical reasoning, and score chain-of-thought correctness. AI verification accelerates review, while human QA ensures gold-standard training and evaluation data for STEM-capable models.",
     },
     "physics-reasoning": {
-      title: "Physics Reasoning Verification & Multistep Solution QA",
+      title: "Physics Reasoning Verification & Multistep Solution",
       description:
         "Expert physics annotators review multistep solutions involving equations, physical laws, and unit analysis. AI flags conceptual errors and unit mismatches; human QA delivers gold-standard training data for physics-capable reasoning models.",
     },

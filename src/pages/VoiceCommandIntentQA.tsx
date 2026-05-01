@@ -554,7 +554,7 @@ export default function VoiceCommandIntentQA() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-6">
           <h1 className={`text-2xl font-bold font-headline tracking-tight mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-            Voice Command Intent Understanding QA
+            Voice Command Intent Understanding
           </h1>
           <p className={`text-sm ${isDark ? "text-white/50" : "text-gray-500"}`}>
             Human-in-the-loop validation of spoken intent and system fulfillment in vehicles
