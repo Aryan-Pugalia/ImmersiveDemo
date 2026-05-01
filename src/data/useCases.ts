@@ -179,6 +179,17 @@ export const useCases: UseCase[] = [
     filters: ["Audio"],
   },
   {
+    id: "21",
+    slug: "conversational-context-qa",
+    title: "Conversational Context Retention QA",
+    description: "Human reviewers assess whether in-vehicle voice assistants preserve conversational context across multiple turns. AI assists verification, while human QA ensures reliable, safe dialogue behavior for infotainment and navigation systems.",
+    icon: "forum",
+    idTag: "AUD-405",
+    categoryTag: "Audio / Automotive",
+    secondaryTag: "Context · IVI",
+    filters: ["Audio"],
+  },
+  {
     id: "20",
     slug: "voice-command-intent-qa",
     title: "Voice Command Intent Understanding QA",

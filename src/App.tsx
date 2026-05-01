@@ -30,6 +30,7 @@ import DriverMonitoring from "./pages/DriverMonitoring.tsx";
 import AudioQualityQA from "./pages/AudioQualityQA.tsx";
 import SpeechEmotionQA from "./pages/SpeechEmotionQA.tsx";
 import VoiceCommandIntentQA from "./pages/VoiceCommandIntentQA.tsx";
+import ConversationalContextQA from "./pages/ConversationalContextQA.tsx";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/use-cases/audio-quality-qa" element={<AudioQualityQA />} />
           <Route path="/use-cases/speech-emotion-qa" element={<SpeechEmotionQA />} />
           <Route path="/use-cases/voice-command-intent-qa" element={<VoiceCommandIntentQA />} />
+          <Route path="/use-cases/conversational-context-qa" element={<ConversationalContextQA />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/use-cases/:useCaseId" element={<UseCaseDetail />} />
           <Route path="/qa-report/:useCaseId" element={<QAReport />} />
