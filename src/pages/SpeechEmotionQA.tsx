@@ -1240,22 +1240,22 @@ export default function SpeechEmotionQA() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#0a0a0f]" : "bg-gray-50"}`}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="dark-surface sticky top-0 z-20 bg-[hsl(0,0%,5%)] border-b border-white/14">
+      <header className={`sticky top-0 z-20 border-b ${isDark ? "bg-[hsl(0,0%,5%)] border-white/14" : "bg-white border-black/10"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
           <button
             onClick={() => navigate("/use-cases")}
-            className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-gray-100"}`}
           >
-            <span className="material-symbols-outlined text-white" style={{ fontSize: 20 }}>arrow_back</span>
+            <span className={`material-symbols-outlined ${isDark ? "text-white" : "text-gray-700"}`} style={{ fontSize: 20 }}>arrow_back</span>
           </button>
 
           <div className="flex items-center gap-2 min-w-0">
-            <span className="material-symbols-outlined text-indigo-400 flex-shrink-0" style={{ fontSize: 20 }}>psychology</span>
-            <span className="text-white font-bold text-sm truncate">{eq.pageTitle}</span>
+            <span className={`material-symbols-outlined flex-shrink-0 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} style={{ fontSize: 20 }}>psychology</span>
+            <span className={`font-bold text-sm truncate ${isDark ? "text-white" : "text-gray-900"}`}>{eq.pageTitle}</span>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border border-white/20 text-white/80 bg-white/5 hidden sm:block`}>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border hidden sm:block ${isDark ? "border-white/20 text-white/75 bg-white/5" : "border-gray-300 text-gray-500 bg-gray-100"}`}>
               AUD-403
             </span>
             {SAMPLES.map((s, i) => (
@@ -1265,7 +1265,9 @@ export default function SpeechEmotionQA() {
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
                   i === sampleIdx
                     ? "bg-indigo-600 border-indigo-500 text-white"
-                    : "border-white/20 text-white/60 hover:bg-white/10"
+                    : isDark
+                    ? "border-white/22 text-white/65 hover:bg-white/10 hover:border-white/35"
+                    : "border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400"
                 }`}
               >
                 {s.id}

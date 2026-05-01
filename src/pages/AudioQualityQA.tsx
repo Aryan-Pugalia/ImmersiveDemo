@@ -561,20 +561,20 @@ export default function AudioQualityQA() {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="dark-surface sticky top-0 z-50 bg-[hsl(0,0%,5%)] border-b border-border/20 w-full">
+      <header className={`sticky top-0 z-50 w-full border-b relative ${isDark ? "bg-[hsl(0,0%,5%)] border-white/14" : "bg-white border-black/10"}`}>
         <div className="flex justify-between items-center px-6 py-3 h-16">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/use-cases")}
-              className="flex items-center justify-center p-2 hover:bg-white/10 rounded-full transition-colors"
+              className={`flex items-center justify-center p-2 rounded-full transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-gray-100"}`}
             >
-              <span className="material-symbols-outlined text-white">arrow_back</span>
+              <span className={`material-symbols-outlined ${isDark ? "text-white" : "text-gray-700"}`}>arrow_back</span>
             </button>
             <div>
-              <span className="text-sm font-bold text-white font-headline">
+              <span className={`text-sm font-bold font-headline ${isDark ? "text-white" : "text-gray-900"}`}>
                 TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
               </span>
-              <span className="ml-3 text-xs font-mono px-2 py-0.5 rounded-full border border-violet-500/30 text-violet-400 bg-violet-500/10">
+              <span className={`ml-3 text-xs font-mono px-2 py-0.5 rounded-full border border-violet-500/30 bg-violet-500/10 ${isDark ? "text-violet-400" : "text-violet-700"}`}>
                 AUD-402
               </span>
             </div>
@@ -587,7 +587,9 @@ export default function AudioQualityQA() {
                 className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${
                   sampleIdx === i
                     ? "bg-violet-600 text-white border-violet-500"
-                    : "bg-transparent text-white/50 border-white/15 hover:text-white/90 hover:border-white/30"
+                    : isDark
+                    ? "bg-transparent text-white/65 border-white/25 hover:text-white/90 hover:border-white/40"
+                    : "bg-transparent text-gray-600 border-gray-300 hover:text-gray-900 hover:border-gray-400"
                 }`}
               >
                 {s.id}

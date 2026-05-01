@@ -1014,7 +1014,7 @@ export default function DriverMonitoring() {
 
   return (
     <div className="min-h-screen" style={{ background: bg }}>
-      <div className="border-b px-6 py-4 flex items-center justify-between"
+      <header className="sticky top-0 z-50 border-b px-6 py-4 flex items-center justify-between"
         style={{ background: card, borderColor: border }}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/use-cases")}
@@ -1033,7 +1033,7 @@ export default function DriverMonitoring() {
           <span className="text-xs" style={{ color: textMuted }}>{dm.pageSubtitle}</span>
           <ThemeToggle />
         </div>
-      </div>
+      </header>
 
       <div className="max-w-6xl mx-auto px-6 py-6">
         <PipelineStepper stage={stage} dark={isDark} steps={PIPELINE_STEPS_T} />
