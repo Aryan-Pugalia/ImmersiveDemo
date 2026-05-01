@@ -57,7 +57,7 @@ interface QAEntry {
 const SESSIONS: ConversationSession[] = [
   {
     id: "voice_session_087", language: "French (FR)", drivingContext: "Moving",
-    sessionType: "Navigation Refinement", audioSrc: "/queues/French/Audio.m4a", recordedAt: "2025-04-11",
+    sessionType: "Navigation Refinement", audioSrc: "/queues/conversations/voice_session_087.m4a", recordedAt: "2025-04-11",
     turns: [
       { id: "t1", turnNumber: 1, utterance: "Emmène-moi à la station de recharge la plus proche.", systemResponse: "Navigation initiated — routing to nearest charging station, 3.2 km away." },
       { id: "t2", turnNumber: 2, utterance: "Assure-toi que c'est une charge rapide.", systemResponse: "Filter applied — re-routing to nearest fast charger, 5.1 km away." },
@@ -67,7 +67,7 @@ const SESSIONS: ConversationSession[] = [
   },
   {
     id: "voice_session_142", language: "Spanish (ES)", drivingContext: "Stationary",
-    sessionType: "Climate & Media Control", audioSrc: "/queues/Spanish/Audio.m4a", recordedAt: "2025-04-14",
+    sessionType: "Climate & Media Control", audioSrc: "/queues/conversations/voice_session_142.m4a", recordedAt: "2025-04-14",
     turns: [
       { id: "t1", turnNumber: 1, utterance: "Pon la música de jazz en la zona trasera.", systemResponse: "Jazz playlist started on rear zone speakers." },
       { id: "t2", turnNumber: 2, utterance: "Baja un poco el volumen.", systemResponse: "Volume reduced on all zones — front and rear." },
@@ -77,7 +77,7 @@ const SESSIONS: ConversationSession[] = [
   },
   {
     id: "voice_session_203", language: "English (US)", drivingContext: "Moving",
-    sessionType: "Communication & Navigation", audioSrc: "/queues/English/Audio.m4a", recordedAt: "2025-04-17",
+    sessionType: "Communication & Navigation", audioSrc: "/queues/conversations/voice_session_203.m4a", recordedAt: "2025-04-17",
     turns: [
       { id: "t1", turnNumber: 1, utterance: "Call the office and let them know I'm running 15 minutes late.", systemResponse: "Calling 'Office'. Message relay not offered — free-text SMS not triggered." },
       { id: "t2", turnNumber: 2, utterance: "Actually, send them a message instead.", systemResponse: "Call cancelled. Message composer opened — awaiting dictation." },
