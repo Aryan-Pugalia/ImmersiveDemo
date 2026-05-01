@@ -9,7 +9,7 @@ type ContextFailureType    = "lost_previous_constraint" | "incorrect_entity_refe
 type TurnContinuity        = "correctly_interpreted" | "ambiguous" | "incorrectly_interpreted";
 type UserFrictionRisk      = "low" | "medium" | "high";
 type ProductionSuitability = "ready" | "needs_retraining" | "unsafe";
-type Stage                 = "ingest" | "annotate" | "ai-verify" | "qa" | "export";
+type Stage                 = "annotate" | "ai-verify" | "qa" | "export";
 type QADecision            = "accept_human" | "accept_ai" | "override";
 
 interface ConversationTurn {
@@ -247,9 +247,8 @@ const SESSION_BARS: Record<string, number[]> = {
 
 // ─── Pipeline stages ──────────────────────────────────────────────────────────
 
-const STAGES: Stage[] = ["ingest", "annotate", "ai-verify", "qa", "export"];
+const STAGES: Stage[] = ["annotate", "ai-verify", "qa", "export"];
 const STAGE_META: Record<Stage, { icon: string; label: string }> = {
-  ingest:      { icon: "forum",      label: "Ingest"    },
   annotate:    { icon: "edit_note",  label: "Annotate"  },
   "ai-verify": { icon: "smart_toy", label: "AI Verify" },
   qa:          { icon: "rule",       label: "QA Review" },
@@ -566,107 +565,54 @@ export default function ConversationalContextQA() {
         <PipelineStepper current={stage} isDark={isDark} />
 
         {/* ══════════════════════════════════════════════════════════════════ */}
-        {/* STAGE 1 — INGEST                                                  */}
-        {/* ══════════════════════════════════════════════════════════════════ */}
-        {stage === "ingest" && (
-          <div className="space-y-6">
-            <div className={cardCls}>
-              {sectionTitle("forum", "Conversation Session Ingestion", "Review the full multi-turn interaction, system responses, and session metadata before annotation.")}
-
-              {/* Session audio player */}
-              <div className="mb-6">
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Session Recording</p>
-                <WaveformPlayer sessionId={session.id} audioSrc={session.audioSrc} isDark={isDark}/>
-              </div>
-
-              {/* Conversation thread */}
-              <div className="mb-6">
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>
-                  Conversation Transcript — {session.turns.length} Turns
-                </p>
-                <div className="space-y-3">
-                  {session.turns.map((turn) => (
-                    <div key={turn.id} className={`rounded-xl border overflow-hidden ${isDark ? "border-white/8" : "border-gray-200"}`}>
-                      {/* User utterance */}
-                      <div className={`flex items-start gap-3 px-4 py-3 ${isDark ? "bg-violet-500/8" : "bg-violet-50"}`}>
-                        <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${isDark ? "bg-violet-500/30 text-violet-300" : "bg-violet-100 text-violet-700"}`}>
-                          {turn.turnNumber}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-violet-400/60" : "text-violet-500"}`}>User</p>
-                          <p className={`text-sm font-medium leading-snug ${isDark ? "text-white/90" : "text-gray-900"}`}>
-                            "{turn.utterance}"
-                          </p>
-                        </div>
-                        <span className="material-symbols-outlined text-violet-400 flex-shrink-0" style={{ fontSize: 15 }}>record_voice_over</span>
-                      </div>
-                      {/* System response */}
-                      <div className={`flex items-start gap-3 px-4 py-3 ${isDark ? "bg-white/2" : "bg-gray-50"}`}>
-                        <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${isDark ? "bg-white/8" : "bg-gray-200"}`}>
-                          <span className="material-symbols-outlined" style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af" }}>smart_toy</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-white/25" : "text-gray-400"}`}>System</p>
-                          <p className={`text-sm leading-snug ${isDark ? "text-white/55" : "text-gray-600"}`}>{turn.systemResponse}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Session metadata */}
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Session Metadata</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {[
-                    { label: "Session ID",       val: session.id,             icon: "tag"            },
-                    { label: "Language",          val: session.language,       icon: "translate"      },
-                    { label: "Driving Context",   val: session.drivingContext, icon: "directions_car" },
-                    { label: "Session Type",      val: session.sessionType,    icon: "forum"          },
-                    { label: "Turn Count",        val: String(session.turns.length), icon: "format_list_numbered" },
-                    { label: "Recorded",          val: session.recordedAt,     icon: "calendar_today" },
-                  ].map(({ label, val, icon }) => (
-                    <div key={label} className={`rounded-lg px-3 py-2.5 border flex items-center gap-2.5 ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                      <span className={`material-symbols-outlined ${isDark ? "text-white/25" : "text-gray-300"}`} style={{ fontSize: 15 }}>{icon}</span>
-                      <div className="min-w-0">
-                        <p className={`text-[9px] font-bold uppercase tracking-wide ${isDark ? "text-white/25" : "text-gray-400"}`}>{label}</p>
-                        <p className={`text-xs font-mono truncate ${isDark ? "text-white/70" : "text-gray-700"}`}>{val}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between">
-              <button onClick={() => navigate("/use-cases")}
-                className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
-              </button>
-              <button onClick={() => setStage("annotate")}
-                className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Begin Annotation
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit_note</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════════════ */}
-        {/* STAGE 2 — ANNOTATE                                                */}
+        {/* STAGE 1 — ANNOTATE (with conversation inline)                     */}
         {/* ══════════════════════════════════════════════════════════════════ */}
         {stage === "annotate" && (
           <div className="space-y-6">
 
-            {/* Session reference strip */}
-            <div className={`rounded-xl border px-4 py-3 flex items-center gap-3 ${isDark ? "bg-violet-500/8 border-violet-500/20" : "bg-violet-50 border-violet-200"}`}>
-              <span className="material-symbols-outlined text-violet-400" style={{ fontSize: 16 }}>forum</span>
-              <p className={`text-sm font-medium ${isDark ? "text-white/80" : "text-gray-800"}`}>{session.sessionType} · {session.turns.length} turns</p>
-              <span className={`ml-auto text-[10px] font-mono ${isDark ? "text-white/25" : "text-gray-400"}`}>{session.id}</span>
-            </div>
+            {/* Conversation + audio side-by-side with annotation */}
+            <div className="grid md:grid-cols-2 gap-6 items-start">
 
-            <div className={cardCls}>
+              {/* LEFT — session view */}
+              <div className="space-y-4">
+                <div className={cardCls}>
+                  {sectionTitle("forum", "Session Recording", `${session.sessionType} · ${session.turns.length} turns · ${session.language}`)}
+                  <WaveformPlayer sessionId={session.id} audioSrc={session.audioSrc} isDark={isDark}/>
+                </div>
+
+                <div className={cardCls}>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>
+                    Conversation Transcript
+                  </p>
+                  <div className="space-y-2">
+                    {session.turns.map((turn) => (
+                      <div key={turn.id} className={`rounded-xl border overflow-hidden ${isDark ? "border-white/8" : "border-gray-200"}`}>
+                        <div className={`flex items-start gap-3 px-3 py-2.5 ${isDark ? "bg-violet-500/8" : "bg-violet-50"}`}>
+                          <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black mt-0.5 ${isDark ? "bg-violet-500/30 text-violet-300" : "bg-violet-100 text-violet-700"}`}>
+                            {turn.turnNumber}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-violet-400/60" : "text-violet-500"}`}>User</p>
+                            <p className={`text-sm font-medium leading-snug ${isDark ? "text-white/90" : "text-gray-900"}`}>"{turn.utterance}"</p>
+                          </div>
+                        </div>
+                        <div className={`flex items-start gap-3 px-3 py-2 ${isDark ? "bg-white/2" : "bg-gray-50"}`}>
+                          <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 ${isDark ? "bg-white/8" : "bg-gray-200"}`}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 11, color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af" }}>smart_toy</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-white/25" : "text-gray-400"}`}>System</p>
+                            <p className={`text-xs leading-snug ${isDark ? "text-white/55" : "text-gray-600"}`}>{turn.systemResponse}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT — annotation form */}
+              <div className={cardCls}>
               {sectionTitle("edit_note", "Human Annotation — Context Retention Labeling")}
 
               {/* 1 - Context Retention Quality */}
@@ -768,10 +714,11 @@ export default function ConversationalContextQA() {
                     isDark ? "bg-white/5 border-white/10 text-white placeholder:text-white/20" : "bg-white border-gray-200 text-gray-800 placeholder:text-gray-300"
                   }`}/>
               </div>
-            </div>
+              </div>{/* end right column */}
+            </div>{/* end grid */}
 
             <div className="flex justify-between">
-              <button onClick={() => setStage("ingest")}
+              <button onClick={() => navigate("/use-cases")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
                 Back
               </button>
