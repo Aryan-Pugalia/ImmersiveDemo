@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/ThemeContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -333,29 +334,6 @@ const CLIPS: Clip[] = [
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const CHEAT_TYPES: { id: CheatType; label: string }[] = [
-  { id: "aim_assist",       label: "Aim assistance anomaly" },
-  { id: "wall_awareness",   label: "Wall awareness anomaly" },
-  { id: "macro_input",      label: "Macro / input automation" },
-  { id: "movement",         label: "Movement anomaly" },
-  { id: "network_artifact", label: "Network / lag artifact" },
-];
-
-const EVIDENCE_FLAGS: { id: EvidenceFlag; label: string }[] = [
-  { id: "aim_snap",          label: "Unnatural aim snap" },
-  { id: "obstacle_tracking", label: "Tracking through obstacles" },
-  { id: "recoil_pattern",    label: "Impossible recoil pattern" },
-  { id: "reaction_outlier",  label: "Reaction time outlier" },
-  { id: "no_evidence",       label: "No evidence / looks normal" },
-];
-
-const STEPS = [
-  { n: 1, label: "Annotate" },
-  { n: 2, label: "AI Review" },
-  { n: 3, label: "Human QA" },
-  { n: 4, label: "Delivered" },
-] as const;
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function riskHue(n: number) {
@@ -396,6 +374,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
   const rafRef      = useRef<number | null>(null);
   const startRef    = useRef<number>(0);
   const pausedRef   = useRef<number>(0);
+  const videoRef    = useRef<HTMLVideoElement>(null);
   const DURATION_MS = clip.duration * 1000;
 
   // reset when clip changes
@@ -404,10 +383,18 @@ function ReplayViewer({ clip }: { clip: Clip }) {
     setProgress(0);
     setPlaying(false);
     pausedRef.current = 0;
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
   }, [clip.id]);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!playing) {
+      videoRef.current?.pause();
+      return;
+    }
+    videoRef.current?.play().catch(() => {});
     startRef.current = performance.now() - pausedRef.current * DURATION_MS;
     const tick = (now: number) => {
       const p = Math.min((now - startRef.current) / DURATION_MS, 1);
@@ -417,6 +404,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
       } else {
         setPlaying(false);
         pausedRef.current = 0;
+        videoRef.current?.pause();
       }
     };
     rafRef.current = requestAnimationFrame(tick);
@@ -429,7 +417,11 @@ function ReplayViewer({ clip }: { clip: Clip }) {
       pausedRef.current = progress;
       setPlaying(false);
     } else {
-      if (progress >= 1) { pausedRef.current = 0; setProgress(0); }
+      if (progress >= 1) {
+        pausedRef.current = 0;
+        setProgress(0);
+        if (videoRef.current) videoRef.current.currentTime = 0;
+      }
       setPlaying(true);
     }
   };
@@ -456,84 +448,78 @@ function ReplayViewer({ clip }: { clip: Clip }) {
         </span>
       </div>
 
-      {/* SVG Map */}
-      <div className="relative">
-        <svg viewBox="0 0 400 300" className="w-full" style={{ background: "#070d16" }}>
-          <defs>
-            <pattern id="cgrid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.035)" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="400" height="300" fill="url(#cgrid)" />
+      {/* Video + Telemetry Overlay */}
+      <div className="relative bg-black" style={{ aspectRatio: "4/3" }}>
+        {/* Actual gameplay footage */}
+        <video
+          ref={videoRef}
+          src="/videos/cs-game-cheating.mp4"
+          className="absolute inset-0 w-full h-full object-cover"
+          muted
+          playsInline
+          preload="auto"
+        />
 
-          {/* Map obstacles */}
-          {[
-            { x:78,  y:38,  w:82, h:122 },
-            { x:238, y:58,  w:124,h:82  },
-            { x:138, y:158, w:124,h:82  },
-            { x:28,  y:218, w:62, h:62  },
-            { x:308, y:198, w:72, h:82  },
-          ].map((r, i) => (
-            <rect key={i} x={r.x} y={r.y} width={r.w} height={r.h} rx="4"
-              fill="rgba(80,110,160,0.10)" stroke="rgba(80,110,160,0.22)" strokeWidth="1"/>
-          ))}
-          <text x="119" y="101" textAnchor="middle" fill="rgba(255,255,255,0.12)" fontSize="7" fontFamily="monospace">COVER A</text>
-          <text x="300" y="101" textAnchor="middle" fill="rgba(255,255,255,0.12)" fontSize="7" fontFamily="monospace">COVER B</text>
-          <text x="200" y="201" textAnchor="middle" fill="rgba(255,255,255,0.12)" fontSize="7" fontFamily="monospace">CENTER</text>
+        {/* Dark scrim so telemetry stays legible over the video */}
+        <div className="absolute inset-0" style={{ background: "rgba(4,8,16,0.40)" }} />
+
+        {/* Telemetry SVG overlay — same coordinate space as clip data */}
+        <svg viewBox="0 0 400 300" className="absolute inset-0 w-full h-full" style={{ background: "transparent" }}>
 
           {/* Suspicious zones */}
           {clip.suspiciousZones.map((z, i) => (
             <g key={i}>
               <rect x={z.x} y={z.y} width={z.w} height={z.h} rx="4"
-                fill="rgba(239,68,68,0.07)" stroke="rgba(239,68,68,0.35)" strokeWidth="1" strokeDasharray="4,3"/>
-              <text x={z.x + z.w / 2} y={z.y + z.h + 10} textAnchor="middle"
-                fill="rgba(239,68,68,0.6)" fontSize="6.5" fontFamily="monospace">{z.label}</text>
+                fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.65)" strokeWidth="1.5" strokeDasharray="5,3"/>
+              <rect x={z.x} y={z.y + z.h + 2} width={z.label.length * 5 + 8} height="12" rx="2" fill="rgba(0,0,0,0.65)"/>
+              <text x={z.x + 4} y={z.y + z.h + 11} fill="rgba(239,68,68,0.9)" fontSize="7" fontFamily="monospace" fontWeight="bold">{z.label}</text>
             </g>
           ))}
 
           {/* Trajectory paths */}
           {clip.trajectoryPaths.map((p, i) => (
-            <path key={i} d={p.d} fill="none" stroke={p.color} strokeWidth="2"
-              opacity="0.55" strokeLinecap="round" strokeLinejoin="round"/>
+            <path key={i} d={p.d} fill="none" stroke={p.color} strokeWidth="2.5"
+              opacity="0.80" strokeLinecap="round" strokeLinejoin="round"/>
           ))}
 
           {/* Kill events — appear as progress passes their t */}
           {visibleKills.map((k, i) => (
             <g key={i}>
-              <circle cx={k.x} cy={k.y} r="12" fill="none" stroke="#ef4444" strokeWidth="1.2" opacity="0.3">
-                <animate attributeName="r" values="12;20;12" dur="2s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+              <circle cx={k.x} cy={k.y} r="14" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.4">
+                <animate attributeName="r" values="14;22;14" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
               </circle>
-              <circle cx={k.x} cy={k.y} r="4" fill="#ef4444"/>
-              <text x={k.x + 8} y={k.y - 6} fill="#f87171" fontSize="7" fontFamily="monospace">{k.label}</text>
+              <circle cx={k.x} cy={k.y} r="5" fill="#ef4444"/>
+              <rect x={k.x + 9} y={k.y - 15} width={k.label.length * 5 + 6} height="12" rx="2" fill="rgba(0,0,0,0.70)" stroke="rgba(239,68,68,0.5)" strokeWidth="1"/>
+              <text x={k.x + 12} y={k.y - 7} fill="#f87171" fontSize="7.5" fontFamily="monospace" fontWeight="bold">{k.label}</text>
             </g>
           ))}
 
           {/* Moving crosshair */}
           {progress > 0 && (
             <g>
-              <line x1={pos.x - 9} y1={pos.y} x2={pos.x + 9} y2={pos.y} stroke="white" strokeWidth="1.5" opacity="0.9"/>
-              <line x1={pos.x} y1={pos.y - 9} x2={pos.x} y2={pos.y + 9} stroke="white" strokeWidth="1.5" opacity="0.9"/>
-              <circle cx={pos.x} cy={pos.y} r="6" fill="none" stroke="white" strokeWidth="1" opacity="0.7"/>
+              <circle cx={pos.x} cy={pos.y} r="18" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
+              <line x1={pos.x - 12} y1={pos.y} x2={pos.x - 5} y2={pos.y} stroke="white" strokeWidth="2" opacity="0.95"/>
+              <line x1={pos.x + 5}  y1={pos.y} x2={pos.x + 12} y2={pos.y} stroke="white" strokeWidth="2" opacity="0.95"/>
+              <line x1={pos.x} y1={pos.y - 12} x2={pos.x} y2={pos.y - 5} stroke="white" strokeWidth="2" opacity="0.95"/>
+              <line x1={pos.x} y1={pos.y + 5}  x2={pos.x} y2={pos.y + 12} stroke="white" strokeWidth="2" opacity="0.95"/>
+              <circle cx={pos.x} cy={pos.y} r="2.5" fill="rgba(255,255,255,0.9)"/>
             </g>
           )}
 
-          {/* Start dot */}
-          <circle cx="195" cy="148" r="6" fill="#8b5cf6" opacity="0.7"/>
-          <circle cx="195" cy="148" r="3" fill="white"/>
-          <text x="204" y="145" fill="rgba(255,255,255,0.45)" fontSize="7" fontFamily="monospace">START</text>
-
-          {/* Corner labels */}
-          <text x="6"   y="11" fill="rgba(255,255,255,0.18)" fontSize="6.5" fontFamily="monospace">MAP: ALPHA</text>
-          <text x="394" y="11" fill="rgba(255,255,255,0.18)" fontSize="6.5" fontFamily="monospace" textAnchor="end">{timeStr}</text>
+          {/* HUD labels */}
+          <rect x="6" y="5" width="80" height="13" rx="2" fill="rgba(0,0,0,0.60)"/>
+          <text x="10" y="14.5" fill="rgba(255,255,255,0.50)" fontSize="7" fontFamily="monospace">TELEMETRY OVERLAY</text>
+          <rect x="308" y="5" width="86" height="13" rx="2" fill="rgba(0,0,0,0.60)"/>
+          <text x="312" y="14.5" fill="rgba(255,255,255,0.50)" fontSize="7" fontFamily="monospace">{timeStr}</text>
         </svg>
 
         {/* Play overlay */}
         {!playing && progress === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer" onClick={toggle}>
-            <div className="w-14 h-14 rounded-full flex items-center justify-center border border-violet-400/30 backdrop-blur-sm"
-              style={{ background: "rgba(109,40,217,0.75)" }}>
-              <Play size={24} className="text-white ml-1" />
+          <div className="absolute inset-0 flex items-center justify-center cursor-pointer" onClick={toggle}>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center border border-violet-400/40 backdrop-blur-sm shadow-lg"
+              style={{ background: "rgba(109,40,217,0.82)" }}>
+              <Play size={28} className="text-white ml-1" />
             </div>
           </div>
         )}
@@ -548,7 +534,7 @@ function ReplayViewer({ clip }: { clip: Clip }) {
               ? <Pause size={13} className="text-foreground/70"/>
               : <Play  size={13} className="text-foreground/70 ml-0.5"/>}
           </button>
-          <div className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer" style={{ background: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)" }}
+          <div className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer" style={{ background: "rgba(255,255,255,0.12)" }}
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const p = (e.clientX - rect.left) / rect.width;
@@ -588,9 +574,16 @@ function ReplayViewer({ clip }: { clip: Clip }) {
 // ─── Progress Stepper ─────────────────────────────────────────────────────────
 
 function ProgressStepper({ stage }: { stage: Stage }) {
+  const { t } = useLanguage();
+  const steps = [
+    { n: 1, label: t.pages.cheatingOrSkill.stageAnnotate },
+    { n: 2, label: t.pages.cheatingOrSkill.stageAiReview },
+    { n: 3, label: t.pages.cheatingOrSkill.stageHumanQa },
+    { n: 4, label: t.pages.cheatingOrSkill.stageDelivered },
+  ] as const;
   return (
     <div className="flex items-center justify-center py-4">
-      {STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const done    = stage > step.n;
         const current = stage === step.n;
         return (
@@ -609,7 +602,7 @@ function ProgressStepper({ stage }: { stage: Stage }) {
                 {step.label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`w-14 h-0.5 mx-1 mb-5 transition-all duration-500 ${
                 stage > step.n ? "bg-violet-600" : "bg-white/10"
               }`} />
@@ -628,11 +621,30 @@ function Stage1({
 }: {
   clip: Clip; clipIdx: number; onSubmit: (a: Annotation) => void;
 }) {
+  const { t } = useLanguage();
   const [label,      setLabel]      = useState<ClassLabel | null>(null);
   const [cheatType,  setCheatType]  = useState<CheatType | null>(null);
   const [evidence,   setEvidence]   = useState<EvidenceFlag[]>([]);
   const [confidence, setConfidence] = useState(50);
   const [note,       setNote]       = useState("");
+
+  const cs = t.pages.cheatingOrSkill;
+
+  const CHEAT_TYPES_T = [
+    { id: "aim_assist"       as CheatType, label: cs.cheatAimAssist },
+    { id: "wall_awareness"   as CheatType, label: cs.cheatWallAwareness },
+    { id: "macro_input"      as CheatType, label: cs.cheatMacroInput },
+    { id: "movement"         as CheatType, label: cs.cheatMovement },
+    { id: "network_artifact" as CheatType, label: cs.cheatNetworkArtifact },
+  ];
+
+  const EVIDENCE_FLAGS_T = [
+    { id: "aim_snap"          as EvidenceFlag, label: cs.evidenceAimSnap },
+    { id: "obstacle_tracking" as EvidenceFlag, label: cs.evidenceObstacleTracking },
+    { id: "recoil_pattern"    as EvidenceFlag, label: cs.evidenceRecoilPattern },
+    { id: "reaction_outlier"  as EvidenceFlag, label: cs.evidenceReactionOutlier },
+    { id: "no_evidence"       as EvidenceFlag, label: cs.evidenceNoEvidence },
+  ];
 
   // Reset when clip changes
   useEffect(() => {
@@ -660,19 +672,19 @@ function Stage1({
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-violet-600/30" style={{ background: "rgba(109,40,217,0.12)" }}>
           <span className="text-xl">🎮</span>
           <div>
-            <div className="text-sm font-bold text-violet-300 font-headline">You are the Human Annotator</div>
-            <div className="text-xs text-violet-400/75 font-body">Review the clip and submit your assessment</div>
+            <div className="text-sm font-bold text-violet-300 font-headline">{cs.youAreAnnotator}</div>
+            <div className="text-xs text-violet-400/75 font-body">{cs.reviewClip}</div>
           </div>
         </div>
 
         {/* Q1 · Classification */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-sm font-semibold text-foreground mb-3 font-headline">1 · Is this skill, cheating, or unsure?</p>
+          <p className="text-sm font-semibold text-foreground mb-3 font-headline">{cs.questionClassification}</p>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { val: "skill"  as ClassLabel, label: "Skill",   active: "bg-emerald-500 border-emerald-500 text-white",     idle: "bg-emerald-950/40 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/50" },
-              { val: "cheat"  as ClassLabel, label: "Cheat",   active: "bg-red-500 border-red-500 text-white",             idle: "bg-red-950/40 border-red-700/50 text-red-400 hover:bg-red-900/50" },
-              { val: "unsure" as ClassLabel, label: "Unsure",  active: "bg-amber-500 border-amber-500 text-white",         idle: "bg-amber-950/40 border-amber-700/50 text-amber-400 hover:bg-amber-900/50" },
+              { val: "skill"  as ClassLabel, label: cs.labelSkill,  active: "bg-emerald-500 border-emerald-500 text-white",     idle: "bg-emerald-950/40 border-emerald-700/50 text-emerald-400 hover:bg-emerald-900/50" },
+              { val: "cheat"  as ClassLabel, label: cs.labelCheat,  active: "bg-red-500 border-red-500 text-white",             idle: "bg-red-950/40 border-red-700/50 text-red-400 hover:bg-red-900/50" },
+              { val: "unsure" as ClassLabel, label: cs.labelUnsure, active: "bg-amber-500 border-amber-500 text-white",         idle: "bg-amber-950/40 border-amber-700/50 text-amber-400 hover:bg-amber-900/50" },
             ].map(opt => (
               <button key={opt.val} onClick={() => setLabel(opt.val)}
                 className={`py-2.5 rounded-xl border-2 text-sm font-bold transition-all ${label === opt.val ? opt.active : opt.idle}`}>
@@ -685,9 +697,9 @@ function Stage1({
         {/* Q2 · Cheat type (conditional) */}
         {(label === "cheat" || label === "unsure") && (
           <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-            <p className="text-sm font-semibold text-foreground mb-3 font-headline">2 · Suspected cheat type</p>
+            <p className="text-sm font-semibold text-foreground mb-3 font-headline">{cs.questionCheatType}</p>
             <div className="space-y-1.5">
-              {CHEAT_TYPES.map(ct => (
+              {CHEAT_TYPES_T.map(ct => (
                 <button key={ct.id} onClick={() => setCheatType(ct.id)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border text-sm text-left transition-all ${
                     cheatType === ct.id
@@ -708,10 +720,10 @@ function Stage1({
         {/* Q3 · Evidence flags */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-3 font-headline">
-            {(label === "cheat" || label === "unsure") ? "3" : "2"} · Evidence flags
+            {(label === "cheat" || label === "unsure") ? "3" : "2"} · {cs.questionEvidence}
           </p>
           <div className="space-y-1.5">
-            {EVIDENCE_FLAGS.map(ef => (
+            {EVIDENCE_FLAGS_T.map(ef => (
               <button key={ef.id} onClick={() => toggleEvidence(ef.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border text-sm text-left transition-all ${
                   evidence.includes(ef.id)
@@ -734,7 +746,7 @@ function Stage1({
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-semibold text-foreground font-headline">
-              {(label === "cheat" || label === "unsure") ? "4" : "3"} · Confidence
+              {(label === "cheat" || label === "unsure") ? "4" : "3"} · {cs.questionConfidence}
             </p>
             <span className="text-sm font-bold tabular-nums" style={{ color: confColor(confidence) }}>
               {confidence}% — {confLabel(confidence)}
@@ -746,21 +758,21 @@ function Stage1({
             style={{ accentColor: confColor(confidence) }}
           />
           <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-foreground/30">Low</span>
-            <span className="text-[10px] text-foreground/30">Medium</span>
-            <span className="text-[10px] text-foreground/30">High</span>
+            <span className="text-[10px] text-foreground/30">{cs.confidenceLow}</span>
+            <span className="text-[10px] text-foreground/30">{cs.confidenceMedium}</span>
+            <span className="text-[10px] text-foreground/30">{cs.confidenceHigh}</span>
           </div>
         </div>
 
         {/* Q5 · Note (optional) */}
         <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
           <p className="text-sm font-semibold text-foreground mb-2 font-headline">
-            {(label === "cheat" || label === "unsure") ? "5" : "4"} · Annotator note <span className="text-foreground/30 font-normal">(optional)</span>
+            {(label === "cheat" || label === "unsure") ? "5" : "4"} · {cs.questionAnnotatorNote} <span className="text-foreground/30 font-normal">(optional)</span>
           </p>
           <textarea
             value={note}
             onChange={e => { if (e.target.value.length <= 140) setNote(e.target.value); }}
-            placeholder="Brief observation…"
+            placeholder={cs.annotatorNotePlaceholder}
             rows={2}
             className="w-full rounded-xl px-3 py-2 text-sm text-foreground/80 placeholder:text-foreground/25 border border-white/10 resize-none focus:outline-none focus:border-violet-500/50 transition-colors font-body"
             style={{ background: "var(--s2)" }}
@@ -770,9 +782,9 @@ function Stage1({
 
         <Button disabled={!canSubmit} onClick={() => canSubmit && onSubmit({ label, cheatType, evidence, confidence, note })}
           className="w-full h-11 text-sm font-semibold bg-violet-600 hover:bg-violet-700">
-          Submit Annotation →
+          {cs.submitAnnotation}
         </Button>
-        {!canSubmit && <p className="text-xs text-foreground/35 text-center font-body">Select classification and at least one evidence flag</p>}
+        {!canSubmit && <p className="text-xs text-foreground/35 text-center font-body">{cs.selectClassificationAndEvidence}</p>}
       </div>
     </div>
   );
@@ -785,6 +797,8 @@ function Stage2({
 }: {
   clip: Clip; annotation: Annotation; onComplete: () => void; onBack: () => void;
 }) {
+  const { t } = useLanguage();
+  const cs = t.pages.cheatingOrSkill;
   const [scores, setScores] = useState({ aim: 0, occlusion: 0, input: 0, network: 0, overall: 0 });
   const [phase,  setPhase]  = useState(0);
 
@@ -804,7 +818,7 @@ function Stage2({
   }, [clip.id]);
 
   const ai = clip.aiResult;
-  const humanLbl   = annotation.label === "skill" ? "✓ Skill" : annotation.label === "cheat" ? "✗ Cheat" : "? Unsure";
+  const humanLbl   = annotation.label === "skill" ? `✓ ${cs.labelSkill}` : annotation.label === "cheat" ? `✗ ${cs.labelCheat}` : `? ${cs.labelUnsure}`;
   const humanColor = annotation.label === "skill" ? "#10b981" : annotation.label === "cheat" ? "#ef4444" : "#f59e0b";
   const ScoreBar = ({ label, score, active, idx }: { label: string; score: number; active: boolean; idx: number }) => (
     <div className="space-y-1">
@@ -831,7 +845,7 @@ function Stage2({
         {/* Human annotation pill */}
         {done && (
           <div className="mt-3 rounded-xl border border-white/10 px-4 py-3 flex items-center gap-3" style={{ background: "var(--s4)" }}>
-            <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">Your annotation:</span>
+            <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">{cs.yourAnnotation}</span>
             <span className="text-sm font-bold" style={{ color: humanColor }}>{humanLbl}</span>
             <span className="text-xs text-foreground/40">·</span>
             <span className="text-xs text-foreground/50">{confLabel(annotation.confidence)} confidence ({annotation.confidence}%)</span>
@@ -844,22 +858,22 @@ function Stage2({
         <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-blue-600/30" style={{ background: "rgba(37,99,235,0.12)" }}>
           <Brain size={20} className="text-blue-400 flex-shrink-0"/>
           <div className="flex-1">
-            <div className="text-sm font-bold text-blue-300 font-headline">AI Detection Model</div>
-            <div className="text-xs text-blue-400/75 font-body">AI-assisted · not a final decision</div>
+            <div className="text-sm font-bold text-blue-300 font-headline">{cs.aiDetectionModel}</div>
+            <div className="text-xs text-blue-400/75 font-body">{cs.aiAssistedNotFinal}</div>
           </div>
           {done && <span className="text-xs px-2 py-0.5 rounded-full font-semibold border border-blue-600/40 text-blue-300" style={{ background: "rgba(37,99,235,0.25)" }}>Complete</span>}
         </div>
 
         {/* Score bars */}
         <div className="rounded-2xl border border-white/10 p-4 space-y-3.5" style={{ background: "var(--s4)" }}>
-          <ScoreBar label="Aim Anomaly Score"        score={scores.aim}       active={phase >= 2} idx={0}/>
-          <ScoreBar label="Occlusion Awareness Score" score={scores.occlusion} active={phase >= 3} idx={1}/>
-          <ScoreBar label="Input Pattern Score"      score={scores.input}     active={phase >= 4} idx={2}/>
-          <ScoreBar label="Network Artifact Likelihood" score={scores.network} active={phase >= 5} idx={3}/>
+          <ScoreBar label={cs.aimAnomalyScore}            score={scores.aim}       active={phase >= 2} idx={0}/>
+          <ScoreBar label={cs.occlusionAwarenessScore}    score={scores.occlusion} active={phase >= 3} idx={1}/>
+          <ScoreBar label={cs.inputPatternScore}          score={scores.input}     active={phase >= 4} idx={2}/>
+          <ScoreBar label={cs.networkArtifactLikelihood}  score={scores.network}   active={phase >= 5} idx={3}/>
 
           {done && (
             <div className="border-t border-white/8 pt-3.5">
-              <p className="text-xs font-bold uppercase tracking-wider text-foreground/30 mb-2.5">Overall AI Risk Score</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-foreground/30 mb-2.5">{cs.overallAiRiskScore}</p>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
                   style={{ background: riskBg(scores.overall) }}>
@@ -877,7 +891,7 @@ function Stage2({
         {/* Explanation */}
         {done && (
           <div className="rounded-2xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
-            <p className="text-sm font-semibold text-foreground mb-2.5 font-headline">Signals detected:</p>
+            <p className="text-sm font-semibold text-foreground mb-2.5 font-headline">{cs.signalsDetected}</p>
             <div className="space-y-2">
               {ai.explanationBullets.map((b, i) => (
                 <div key={i} className="flex items-start gap-2">
@@ -896,7 +910,7 @@ function Stage2({
               ← Back
             </Button>
             <Button onClick={onComplete} className="flex-[2] h-10 text-sm font-semibold bg-violet-600 hover:bg-violet-700">
-              Send to Human QA →
+              {cs.sendToHumanQa}
             </Button>
           </div>
         )}
@@ -912,12 +926,24 @@ function Stage3({
 }: {
   clip: Clip; annotation: Annotation; onSubmit: (a: QAAction) => void;
 }) {
+  const { t } = useLanguage();
+  const cs = t.pages.cheatingOrSkill;
   const [selected,        setSelected]        = useState<QAAction | null>(null);
   const [overrideReason,  setOverrideReason]  = useState<string | null>(null);
   const ai = clip.aiResult;
 
   const humanColor = annotation.label === "skill" ? "#10b981" : annotation.label === "cheat" ? "#ef4444" : "#f59e0b";
-  const humanLbl   = annotation.label === "skill" ? "✓ Skill" : annotation.label === "cheat" ? "✗ Cheat" : "? Unsure";
+  const humanLbl   = annotation.label === "skill" ? `✓ ${cs.labelSkill}` : annotation.label === "cheat" ? `✗ ${cs.labelCheat}` : `? ${cs.labelUnsure}`;
+
+  const CHEAT_TYPE_LABEL_MAP: Record<string, string> = {
+    aim_assist: cs.cheatAimAssist, wall_awareness: cs.cheatWallAwareness,
+    macro_input: cs.cheatMacroInput, movement: cs.cheatMovement, network_artifact: cs.cheatNetworkArtifact,
+  };
+  const EVIDENCE_LABEL_MAP: Record<string, string> = {
+    aim_snap: cs.evidenceAimSnap, obstacle_tracking: cs.evidenceObstacleTracking,
+    recoil_pattern: cs.evidenceRecoilPattern, reaction_outlier: cs.evidenceReactionOutlier,
+    no_evidence: cs.evidenceNoEvidence,
+  };
 
   const conflict =
     (annotation.label === "skill"  && ai.riskScore >= 60) ||
@@ -941,8 +967,8 @@ function Stage3({
       <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-indigo-600/30" style={{ background: "rgba(79,70,229,0.12)" }}>
         <Shield size={20} className="text-indigo-400 flex-shrink-0"/>
         <div>
-          <div className="text-sm font-bold text-indigo-300 font-headline">Human QA Review — TP</div>
-          <div className="text-xs text-indigo-400/75 font-body">You are a senior QA reviewer. Review both assessments and make the final call.</div>
+          <div className="text-sm font-bold text-indigo-300 font-headline">{cs.humanQaReview}</div>
+          <div className="text-xs text-indigo-400/75 font-body">{cs.youAreQaReviewer}</div>
         </div>
       </div>
 
@@ -961,17 +987,17 @@ function Stage3({
       <div className="grid grid-cols-3 gap-4">
         {/* Human annotation */}
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3">👤 Human Annotation</p>
+          <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3">{cs.humanAnnotation}</p>
           <div className="text-xl font-black mb-2" style={{ color: humanColor }}>{humanLbl}</div>
           <div className="text-xs text-foreground/50 space-y-1.5 font-body">
             <div><span className="font-semibold text-foreground/60">Confidence:</span> {annotation.confidence}% ({confLabel(annotation.confidence)})</div>
             {annotation.cheatType && (
-              <div><span className="font-semibold text-foreground/60">Type:</span> {CHEAT_TYPES.find(c => c.id === annotation.cheatType)?.label}</div>
+              <div><span className="font-semibold text-foreground/60">Type:</span> {annotation.cheatType ? CHEAT_TYPE_LABEL_MAP[annotation.cheatType] : ""}</div>
             )}
             <div className="font-semibold text-foreground/60 mt-2">Evidence flags:</div>
             {annotation.evidence.map(e => {
-              const ef = EVIDENCE_FLAGS.find(f => f.id === e);
-              return ef ? <div key={e}>· {ef.label}</div> : null;
+              const label = EVIDENCE_LABEL_MAP[e];
+              return label ? <div key={e}>· {label}</div> : null;
             })}
             {annotation.note && <div className="mt-1.5 italic opacity-60">"{annotation.note}"</div>}
           </div>
@@ -980,7 +1006,7 @@ function Stage3({
         {/* Centre — clip stats + TP Insight */}
         <div className="space-y-3">
           <div className="rounded-2xl border border-white/10 p-3" style={{ background: "var(--s4)" }}>
-            <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-2">📊 Clip Stats</p>
+            <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-2">{cs.clipStats}</p>
             {[
               { label: "React time",  value: `${clip.stats.avgReactionMs}ms` },
               { label: "Aim smooth",  value: `${clip.stats.aimSmoothness}%` },
@@ -995,7 +1021,7 @@ function Stage3({
           </div>
           {/* Quality metrics */}
           <div className="rounded-xl p-3 border border-white/8" style={{ background: "var(--s3)" }}>
-            <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-2">📋 Quality Indicators</p>
+            <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-2">{cs.qualityIndicators}</p>
             {[
               { label: "False positive risk", value: ai.riskScore < 50 ? "Low" : ai.riskScore < 75 ? "Medium" : "High", color: ai.riskScore < 50 ? "#10b981" : ai.riskScore < 75 ? "#f59e0b" : "#ef4444" },
               { label: "False negative risk", value: ai.riskScore > 50 ? "Low" : ai.riskScore > 25 ? "Medium" : "High", color: ai.riskScore > 50 ? "#10b981" : ai.riskScore > 25 ? "#f59e0b" : "#ef4444" },
@@ -1011,7 +1037,7 @@ function Stage3({
 
         {/* AI result */}
         <div className="rounded-2xl border-2 border-white/10 p-4" style={{ background: "var(--s4)" }}>
-          <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3">🤖 AI Model Decision</p>
+          <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3">{cs.aiModelDecision}</p>
           <div className="text-xl font-black mb-1" style={{ color: riskHue(ai.riskScore) }}>{ai.riskScore}/100</div>
           <div className="text-xs font-bold mb-3 font-headline" style={{ color: riskHue(ai.riskScore) }}>{ai.recommendation}</div>
           <div className="text-xs text-foreground/45 space-y-1 font-body">
@@ -1022,12 +1048,12 @@ function Stage3({
 
       {/* QA action card */}
       <div className="rounded-2xl border border-white/10 p-5" style={{ background: "var(--s4)" }}>
-        <p className="text-sm font-bold text-foreground mb-4 font-headline">QA Decision — Select your action:</p>
+        <p className="text-sm font-bold text-foreground mb-4 font-headline">{cs.qaDecisionPrompt}</p>
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { action: "approve_skill"  as QAAction, icon: "✓", label: "Approve as Skill",        sub: "No enforcement",        idleBg: "rgba(5,150,105,0.12)",    border: "border-emerald-700/50 text-emerald-400", active: "border-emerald-500 bg-emerald-500 text-white" },
-            { action: "confirm_cheat"  as QAAction, icon: "✗", label: "Confirm Cheating",         sub: "Queue enforcement",     idleBg: "rgba(220,38,38,0.12)",    border: "border-red-700/50 text-red-400",          active: "border-red-500 bg-red-500 text-white" },
-            { action: "needs_followup" as QAAction, icon: "🔍",label: "Needs Follow-up",          sub: "Escalate for review",   idleBg: "rgba(217,119,6,0.12)",    border: "border-amber-700/50 text-amber-400",      active: "border-amber-500 bg-amber-500 text-white" },
+            { action: "approve_skill"  as QAAction, icon: "✓", label: cs.approveAsSkill,   sub: cs.approveAsSkillSub,   idleBg: "rgba(5,150,105,0.12)",    border: "border-emerald-700/50 text-emerald-400", active: "border-emerald-500 bg-emerald-500 text-white" },
+            { action: "confirm_cheat"  as QAAction, icon: "✗", label: cs.confirmCheating,  sub: cs.confirmCheatingSub,  idleBg: "rgba(220,38,38,0.12)",    border: "border-red-700/50 text-red-400",          active: "border-red-500 bg-red-500 text-white" },
+            { action: "needs_followup" as QAAction, icon: "🔍",label: cs.needsFollowUp,    sub: cs.needsFollowUpSub,    idleBg: "rgba(217,119,6,0.12)",    border: "border-amber-700/50 text-amber-400",      active: "border-amber-500 bg-amber-500 text-white" },
           ].map(opt => (
             <button key={opt.action}
               onClick={() => setSelected(opt.action)}
@@ -1043,7 +1069,7 @@ function Stage3({
         {/* Override rationale */}
         {isOverride && selected && (
           <div className="rounded-xl p-4 mb-4 border border-violet-600/25" style={{ background: "rgba(109,40,217,0.12)" }}>
-            <p className="text-sm font-bold text-violet-200 mb-3 font-headline">⚠️ You are overriding — select a rationale:</p>
+            <p className="text-sm font-bold text-violet-200 mb-3 font-headline">{cs.overridingRationale}</p>
             <div className="grid grid-cols-2 gap-2">
               {OVERRIDE_REASONS.map(r => (
                 <button key={r} onClick={() => setOverrideReason(r)}
@@ -1064,7 +1090,7 @@ function Stage3({
           disabled={!selected || (isOverride && !overrideReason)}
           onClick={() => selected && onSubmit(selected)}
           className="w-full h-11 text-sm font-semibold bg-violet-600 hover:bg-violet-700">
-          Finalize QA Decision →
+          {cs.finalizeQaDecision}
         </Button>
       </div>
     </div>
@@ -1079,6 +1105,8 @@ function Stage4({
   clip: Clip; annotation: Annotation; qaAction: QAAction; clipIdx: number; onNext: () => void;
 }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const cs = t.pages.cheatingOrSkill;
   const decision = clip.finalDecision[qaAction];
 
   const statusCfg = {
@@ -1107,10 +1135,10 @@ function Stage4({
 }`;
 
   const metrics = [
-    { Icon: Shield,     label: "False Positives Avoided", value: decision.status !== "cheat" ? "0" : "N/A",       sub: "per 1,000 similar clips",                    color: "text-violet-400", iconBg: "rgba(109,40,217,0.20)" },
-    { Icon: TrendingUp, label: "Review Time",             value: "<3 min",                                         sub: "annotation → AI → QA → delivery",            color: "text-emerald-400", iconBg: "rgba(5,150,105,0.20)" },
-    { Icon: Zap,        label: "AI Assist Rate",          value: "73%",                                            sub: "of clips closed without QA override",         color: "text-blue-400",    iconBg: "rgba(37,99,235,0.20)" },
-    { Icon: Users,      label: "TP Specialists",          value: "2",                                              sub: "annotator + QA reviewer in loop",             color: "text-indigo-400",  iconBg: "rgba(79,70,229,0.20)" },
+    { Icon: Shield,     label: cs.falsePositivesAvoided, value: decision.status !== "cheat" ? "0" : "N/A", sub: cs.falsePositivesAvoidedSub, color: "text-violet-400",  iconBg: "rgba(109,40,217,0.20)" },
+    { Icon: TrendingUp, label: cs.reviewTime,            value: "<3 min",                                   sub: cs.reviewTimeSub,            color: "text-emerald-400", iconBg: "rgba(5,150,105,0.20)" },
+    { Icon: Zap,        label: cs.aiAssistRate,          value: "73%",                                      sub: cs.aiAssistRateSub,          color: "text-blue-400",    iconBg: "rgba(37,99,235,0.20)" },
+    { Icon: Users,      label: "TP Specialists",         value: "2",                                        sub: "annotator + QA reviewer in loop", color: "text-indigo-400", iconBg: "rgba(79,70,229,0.20)" },
   ];
 
   const hasMore = clipIdx < CLIPS.length - 1;
@@ -1119,7 +1147,7 @@ function Stage4({
     <div className="flex flex-col gap-5 items-center max-w-2xl mx-auto w-full">
       {/* Delivery badge */}
       <div className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-1.5 rounded-full" style={{ background: "var(--s7)" }}>
-        <span>📦</span> Step 4: Decision Packet Delivered to Client Platform
+        <span>📦</span> {cs.decisionPacket}
       </div>
 
       {/* Status card */}
@@ -1138,7 +1166,7 @@ function Stage4({
       {/* Decision Packet */}
       <div className="w-full rounded-2xl border border-white/10 overflow-hidden" style={{ background: "var(--s3)" }}>
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/8" style={{ background: "var(--s5)" }}>
-          <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">📄 Decision Packet</span>
+          <span className="text-xs font-bold text-foreground/40 uppercase tracking-wider">{cs.decisionPacket}</span>
           <span className="text-xs bg-emerald-900/40 text-emerald-400 border border-emerald-700/30 px-2 py-0.5 rounded font-mono ml-auto">JSON</span>
         </div>
         <pre className="px-4 py-3 text-xs text-emerald-300/80 font-mono leading-relaxed overflow-x-auto whitespace-pre">{jsonPacket}</pre>
@@ -1146,7 +1174,7 @@ function Stage4({
 
       {/* Impact metrics */}
       <div className="w-full">
-        <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3 text-center">Simulated Impact Metrics</p>
+        <p className="text-xs font-bold text-foreground/30 uppercase tracking-wider mb-3 text-center">{cs.simulatedImpact}</p>
         <div className="grid grid-cols-2 gap-3">
           {metrics.map((m, i) => (
             <div key={i} className="rounded-xl border border-white/10 p-4" style={{ background: "var(--s4)" }}>
@@ -1186,11 +1214,11 @@ function Stage4({
         </Button>
         {hasMore ? (
           <Button onClick={onNext} className="flex-[2] bg-violet-600 hover:bg-violet-700 gap-2 h-11">
-            <RotateCcw size={13}/> Next: {CLIPS[clipIdx + 1].title.split("—")[0].trim()} →
+            <RotateCcw size={13}/> {cs.nextClip}{CLIPS[clipIdx + 1].title.split("—")[0].trim()} →
           </Button>
         ) : (
           <Button onClick={onNext} className="flex-[2] bg-violet-600 hover:bg-violet-700 gap-2 h-11">
-            <RotateCcw size={13}/> Restart from Clip A
+            <RotateCcw size={13}/> {cs.restartFromClipA}
           </Button>
         )}
       </div>
@@ -1203,7 +1231,9 @@ function Stage4({
 export default function CheatingOrSkill() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const isLight = theme === 'light';
+  const cs = t.pages.cheatingOrSkill;
 
   const [clipIdx,     setClipIdx]     = useState(0);
   const [stage,       setStage]       = useState<Stage>(1);
@@ -1246,7 +1276,7 @@ export default function CheatingOrSkill() {
             <ThemeToggle />
             <Gamepad2 size={14} className="text-violet-400"/>
             <span className="text-xs bg-violet-600/20 text-violet-300 border border-violet-600/30 px-3 py-1 rounded-full font-semibold">
-              Anti‑Cheat · Live Demo
+              {cs.badgeAntiCheat} · Live Demo
             </span>
           </div>
         </div>
@@ -1258,10 +1288,10 @@ export default function CheatingOrSkill() {
         {/* Hero */}
         <div className="text-center mb-3">
           <h1 className="text-2xl font-black text-white font-headline">
-            Is This Cheating or Skill? <span className="text-violet-400">Anti‑Cheat Review</span>
+            {cs.pageTitle} <span className="text-violet-400">{cs.badgeAntiCheat}</span>
           </h1>
           <p className="text-sm text-foreground/45 mt-1 max-w-xl mx-auto font-body">
-            Review gameplay clips, label anomalies, watch AI flag detection signals, then QA-override and deliver the final enforcement decision.
+            {cs.pageHint}
           </p>
         </div>
 
