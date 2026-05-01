@@ -531,15 +531,15 @@ export default function AudioQualityQA() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/use-cases")}
-              className="flex items-center justify-center p-2 hover:bg-muted rounded-full transition-colors"
+              className="flex items-center justify-center p-2 hover:bg-white/10 rounded-full transition-colors"
             >
-              <span className="material-symbols-outlined text-foreground">arrow_back</span>
+              <span className="material-symbols-outlined text-white">arrow_back</span>
             </button>
             <div>
               <span className="text-sm font-bold text-white font-headline">
                 TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
               </span>
-              <span className={`ml-3 text-xs font-mono px-2 py-0.5 rounded-full border ${isDark ? "border-violet-500/30 text-violet-400 bg-violet-500/10" : "border-violet-300 text-violet-600 bg-violet-50"}`}>
+              <span className="ml-3 text-xs font-mono px-2 py-0.5 rounded-full border border-violet-500/30 text-violet-400 bg-violet-500/10">
                 AUD-402
               </span>
             </div>
@@ -552,9 +552,7 @@ export default function AudioQualityQA() {
                 className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${
                   sampleIdx === i
                     ? "bg-violet-600 text-white border-violet-500"
-                    : isDark
-                      ? "bg-transparent text-white/50 border-white/15 hover:border-white/30"
-                      : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
+                    : "bg-transparent text-white/50 border-white/15 hover:text-white/90 hover:border-white/30"
                 }`}
               >
                 {s.id}
