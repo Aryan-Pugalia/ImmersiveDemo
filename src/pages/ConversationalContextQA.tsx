@@ -532,7 +532,7 @@ export default function ConversationalContextQA() {
             <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1 hidden sm:block">Switch Session:</span>
             {SESSIONS.map((s, i) => (
               <button key={s.id}
-                onClick={() => { setSessionIdx(i); setStage("ingest"); }}
+                onClick={() => { setSessionIdx(i); setStage("annotate"); }}
                 title={`${s.id} · ${s.language}`}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
                   sessionIdx === i
