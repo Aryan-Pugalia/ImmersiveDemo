@@ -170,7 +170,7 @@ export const useCases: UseCase[] = [
   {
     id: "19",
     slug: "speech-emotion-qa",
-    title: "Speech Emotion & Tone Reasoning QA",
+    title: "Speech Emotion & Tone Reasoning",
     description: "4-stage emotion annotation pipeline — classify primary emotion, tone attributes, intensity, and escalation risk. AI verification with per-dimension confidence scores, human QA adjudication, and structured JSON export for CX intelligence and safety models.",
     icon: "psychology",
     idTag: "AUD-403",
@@ -181,7 +181,7 @@ export const useCases: UseCase[] = [
   {
     id: "21",
     slug: "conversational-context-qa",
-    title: "Conversational Context Retention QA",
+    title: "Conversational Context Retention",
     description: "Human reviewers assess whether in-vehicle voice assistants preserve conversational context across multiple turns. AI assists verification, while human QA ensures reliable, safe dialogue behavior for infotainment and navigation systems.",
     icon: "forum",
     idTag: "AUD-405",

@@ -552,7 +552,7 @@ export default function ConversationalContextQA() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-6">
           <h1 className={`text-2xl font-bold font-headline tracking-tight mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-            Conversational Context Retention QA
+            Conversational Context Retention
           </h1>
           <p className={`text-sm ${isDark ? "text-white/50" : "text-gray-500"}`}>
             Human-in-the-loop validation of multi-turn voice interactions in vehicles

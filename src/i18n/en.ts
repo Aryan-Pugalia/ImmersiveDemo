@@ -839,7 +839,7 @@ export const en = {
       deliverRedacted: "Deliver Redacted Document →",
     },
     speechEmotionQa: {
-      pageTitle: "Speech Emotion & Tone Reasoning QA",
+      pageTitle: "Speech Emotion & Tone Reasoning",
       pageSubtitle: "4-stage annotation pipeline — emotion, tone, intensity, and escalation risk — with AI verification and human QA adjudication.",
       domainBadge: "Audio / CX Intelligence",
       stageAnnotate: "Annotate",
