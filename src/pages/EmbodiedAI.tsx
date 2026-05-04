@@ -366,13 +366,13 @@ function SelectField({
         onChange={(e) => onChange(e.target.value)}
         className={`text-sm rounded-md px-2 py-1.5 border outline-none ${
           isDark
-            ? "bg-white/10 border-white/20 text-white"
+            ? "bg-[hsl(0,0%,12%)] border-white/20 text-white"
             : "bg-white border-gray-300 text-gray-900"
         }`}
       >
-        <option value="">-- Select --</option>
+        <option value="" style={{ background: isDark ? "#1f1f1f" : "#ffffff", color: isDark ? "#ffffff" : "#111111" }}>-- Select --</option>
         {options.map((o) => (
-          <option key={o.value} value={o.value}>
+          <option key={o.value} value={o.value} style={{ background: isDark ? "#1f1f1f" : "#ffffff", color: isDark ? "#ffffff" : "#111111" }}>
             {o.label}
           </option>
         ))}
@@ -1530,7 +1530,7 @@ const EmbodiedAI: React.FC = () => {
     },
     selfie: {
       icon: "face",
-      title: "Human Presence: Selfie QA",
+      title: "Human Presence: Selfie",
       desc: "Assess selfie video for lighting, framing, steadiness, and face visibility for training suitability.",
       tag: "Presence QA · Video",
     },
@@ -1679,7 +1679,7 @@ const EmbodiedAI: React.FC = () => {
               ref={videoRef}
               key={activeTask}
               controls
-              className="w-full rounded-lg"
+              className={`rounded-lg ${activeTask === "selfie" ? "max-h-[300px] mx-auto" : "w-full"}`}
               src={TASK_VIDEO[activeTask]}
               onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime ?? 0)}
             >
@@ -1695,21 +1695,19 @@ const EmbodiedAI: React.FC = () => {
               >
                 {fmtTime(currentTime)}
               </span>
-              <button
-                className={`${btnGhost} text-xs`}
-                onClick={handleMarkStart}
-              >
-                Mark Start ({fmtTime(markedStart)})
-              </button>
-              <button
-                className={`${btnGhost} text-xs`}
-                onClick={handleMarkEnd}
-              >
-                Mark End ({fmtTime(markedEnd)})
-              </button>
-              {activeTask === "selfie" && videoRef.current?.duration && (
+              {activeTask !== "selfie" && (
+                <>
+                  <button className={`${btnGhost} text-xs`} onClick={handleMarkStart}>
+                    Mark Start ({fmtTime(markedStart)})
+                  </button>
+                  <button className={`${btnGhost} text-xs`} onClick={handleMarkEnd}>
+                    Mark End ({fmtTime(markedEnd)})
+                  </button>
+                </>
+              )}
+              {activeTask === "selfie" && (
                 <span className={`text-xs ${textSecondary}`}>
-                  Duration: {fmtTime(videoRef.current.duration)}
+                  Scrub through the clip to review quality before scoring below
                 </span>
               )}
             </div>
