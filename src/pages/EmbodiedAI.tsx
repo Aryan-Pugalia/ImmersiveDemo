@@ -1010,7 +1010,7 @@ const EmbodiedAI: React.FC = () => {
                 className={`text-xs px-2 py-1 rounded border ${isDark ? "border-white/20 text-white/60 hover:bg-white/10" : "border-gray-200 text-gray-500 hover:bg-gray-100"}`}
                 onClick={() => captureMWNodeTimestamp(node.id)}
               >
-                Capture t
+                Capture timestamp
               </button>
             </div>
           ))}
