@@ -54,7 +54,7 @@ const UseCaseSelection = () => {
             <ThemeToggle />
             <LanguagePicker />
             <button
-              onClick={() => window.open("https://remix-ontology-studio-750134068448.asia-southeast1.run.app/", "_blank")}
+              onClick={() => navigate("/dashboard")}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 hover:border-primary/70 hover:bg-primary/10 transition-colors text-xs font-bold text-primary font-body uppercase tracking-wider"
             >
               <span className="material-symbols-outlined" style={{ fontSize:"14px" }}>monitoring</span>
