@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -402,6 +403,8 @@ const EmbodiedAI: React.FC = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { t } = useLanguage();
+  const ea = t.pages.embodiedAi;
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -501,10 +504,10 @@ const EmbodiedAI: React.FC = () => {
 
   // ── Stage indicator ────────────────────────────────────────────────────────
   const stages: { id: Stage; label: string }[] = [
-    { id: "annotate", label: "① Annotate" },
-    { id: "ai-verify", label: "② AI Verify" },
-    { id: "qa", label: "③ QA Review" },
-    { id: "export", label: "④ Export" },
+    { id: "annotate", label: ea.stageAnnotate },
+    { id: "ai-verify", label: ea.stageAiVerify },
+    { id: "qa", label: ea.stageQaReview },
+    { id: "export", label: ea.stageExport },
   ];
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -772,7 +775,7 @@ const EmbodiedAI: React.FC = () => {
       return (
         <div className="flex items-center gap-2 text-green-400 text-sm">
           <span className="material-symbols-outlined text-base">check_circle</span>
-          No issues found
+          {ea.noIssues}
         </div>
       );
     }
@@ -803,9 +806,9 @@ const EmbodiedAI: React.FC = () => {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <span className={`text-sm font-semibold ${textPrimary}`}>Event Segments</span>
+          <span className={`text-sm font-semibold ${textPrimary}`}>{ea.eventSegments}</span>
           <button className={btnViolet} onClick={() => setPpAddingSegment((v) => !v)}>
-            {ppAddingSegment ? "Cancel" : "+ Add Event Segment"}
+            {ppAddingSegment ? ea.cancel : ea.addEventSegment}
           </button>
         </div>
 
@@ -813,7 +816,7 @@ const EmbodiedAI: React.FC = () => {
           <div className={`${panelClass} flex flex-col gap-3`}>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>Start Time (s)</label>
+                <label className={labelClass}>{ea.startTimeSec}</label>
                 <input
                   type="number"
                   min={0}
@@ -824,7 +827,7 @@ const EmbodiedAI: React.FC = () => {
                 />
               </div>
               <div>
-                <label className={labelClass}>End Time (s)</label>
+                <label className={labelClass}>{ea.endTimeSec}</label>
                 <input
                   type="number"
                   min={0}
@@ -837,54 +840,54 @@ const EmbodiedAI: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <SelectField
-                label="Event Type"
+                label={ea.eventType}
                 value={ppSegForm.event_type}
                 onChange={(v) => setPpSegForm((f) => ({ ...f, event_type: v }))}
                 isDark={isDark}
                 options={[
-                  { value: "grasp", label: "Grasp" },
-                  { value: "lift", label: "Lift" },
-                  { value: "transport", label: "Transport" },
-                  { value: "placement", label: "Placement" },
-                  { value: "release", label: "Release" },
-                  { value: "drop", label: "Drop" },
-                  { value: "regrasp", label: "Regrasp" },
-                  { value: "idle", label: "Idle" },
+                  { value: "grasp", label: ea.optGrasp },
+                  { value: "lift", label: ea.optLift },
+                  { value: "transport", label: ea.optTransport },
+                  { value: "placement", label: ea.optPlacement },
+                  { value: "release", label: ea.optRelease },
+                  { value: "drop", label: ea.optDrop },
+                  { value: "regrasp", label: ea.optRegrasp },
+                  { value: "idle", label: ea.optIdle },
                 ]}
               />
               <SelectField
-                label="Contact Quality"
+                label={ea.contactQuality}
                 value={ppSegForm.contact_quality}
                 onChange={(v) => setPpSegForm((f) => ({ ...f, contact_quality: v }))}
                 isDark={isDark}
                 options={[
-                  { value: "clean", label: "Clean" },
-                  { value: "partial", label: "Partial" },
-                  { value: "failed", label: "Failed" },
+                  { value: "clean", label: ea.optClean },
+                  { value: "partial", label: ea.optPartial },
+                  { value: "failed", label: ea.optFailed },
                 ]}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <SelectField
-                label="Stability"
+                label={ea.stabilityLabel}
                 value={ppSegForm.stability}
                 onChange={(v) => setPpSegForm((f) => ({ ...f, stability: v }))}
                 isDark={isDark}
                 options={[
-                  { value: "stable", label: "Stable" },
-                  { value: "wobble", label: "Wobble" },
-                  { value: "drop", label: "Drop" },
+                  { value: "stable", label: ea.optStable },
+                  { value: "wobble", label: ea.optWobble },
+                  { value: "drop", label: ea.optDrop },
                 ]}
               />
               <SelectField
-                label="Confidence"
+                label={ea.confidenceLabel}
                 value={ppSegForm.confidence}
                 onChange={(v) => setPpSegForm((f) => ({ ...f, confidence: v }))}
                 isDark={isDark}
                 options={[
-                  { value: "high", label: "High" },
-                  { value: "medium", label: "Medium" },
-                  { value: "low", label: "Low" },
+                  { value: "high", label: ea.optHigh },
+                  { value: "medium", label: ea.optMedium },
+                  { value: "low", label: ea.optLow },
                 ]}
               />
             </div>
@@ -893,13 +896,13 @@ const EmbodiedAI: React.FC = () => {
               onClick={addPPSegment}
               disabled={!ppSegForm.event_type || !ppSegForm.contact_quality || !ppSegForm.stability || !ppSegForm.confidence}
             >
-              Add Segment
+              {ea.addSegment}
             </button>
           </div>
         )}
 
         {pp.segments.length === 0 ? (
-          <p className={`text-sm ${textSecondary}`}>No segments added yet.</p>
+          <p className={`text-sm ${textSecondary}`}>{ea.noSegments}</p>
         ) : (
           <div className="flex flex-col gap-2">
             {pp.segments.map((s) => (
@@ -930,38 +933,38 @@ const EmbodiedAI: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-3 mt-2">
           <SelectField
-            label="Training Suitability"
+            label={ea.trainingSuitability}
             value={pp.training_suitability}
             onChange={(v) => updatePP((p) => ({ ...p, training_suitability: v }))}
             isDark={isDark}
             options={[
-              { value: "approved", label: "Approved" },
-              { value: "needs-review", label: "Needs Review" },
-              { value: "rejected", label: "Rejected" },
+              { value: "approved", label: ea.optApproved },
+              { value: "needs-review", label: ea.optNeedsReview },
+              { value: "rejected", label: ea.optRejected },
             ]}
           />
           <SelectField
-            label="Primary Risk"
+            label={ea.primaryRisk}
             value={pp.primary_risk}
             onChange={(v) => updatePP((p) => ({ ...p, primary_risk: v }))}
             isDark={isDark}
             options={[
-              { value: "none", label: "None" },
-              { value: "drop", label: "Drop" },
-              { value: "slip", label: "Slip" },
-              { value: "collision", label: "Collision" },
+              { value: "none", label: ea.optNone },
+              { value: "drop", label: ea.optDrop },
+              { value: "slip", label: ea.optSlip },
+              { value: "collision", label: ea.optCollision },
             ]}
           />
         </div>
 
         <div>
-          <label className={labelClass}>Notes (optional)</label>
+          <label className={labelClass}>{ea.notesOptional}</label>
           <textarea
             value={pp.notes}
             onChange={(e) => updatePP((p) => ({ ...p, notes: e.target.value }))}
             rows={2}
             className={`${inputClass} resize-none mt-1`}
-            placeholder="Additional notes..."
+            placeholder={ea.notesPlaceholder}
           />
         </div>
 
@@ -970,7 +973,7 @@ const EmbodiedAI: React.FC = () => {
           disabled={!canSubmit}
           onClick={handleSubmitAnnotationFresh}
         >
-          Submit Annotation →
+          {ea.submitAnnotation}
         </button>
       </div>
     );
@@ -983,7 +986,7 @@ const EmbodiedAI: React.FC = () => {
 
     return (
       <div className="flex flex-col gap-4">
-        <span className={`text-sm font-semibold ${textPrimary}`}>Skill Graph Nodes</span>
+        <span className={`text-sm font-semibold ${textPrimary}`}>{ea.skillGraphNodes}</span>
         <div className="flex flex-col gap-2">
           {mw.nodes.map((node) => (
             <div
@@ -1010,13 +1013,13 @@ const EmbodiedAI: React.FC = () => {
                 className={`text-xs px-2 py-1 rounded border ${isDark ? "border-white/20 text-white/60 hover:bg-white/10" : "border-gray-200 text-gray-500 hover:bg-gray-100"}`}
                 onClick={() => captureMWNodeTimestamp(node.id)}
               >
-                Capture timestamp
+                {ea.captureTimestamp}
               </button>
             </div>
           ))}
         </div>
 
-        <span className={`text-sm font-semibold ${textPrimary}`}>Prerequisite Edges Satisfied</span>
+        <span className={`text-sm font-semibold ${textPrimary}`}>{ea.prerequisiteEdges}</span>
         <div className="flex flex-col gap-2">
           {MICROWAVE_EDGES.map((edge) => (
             <label key={`${edge.from}-${edge.to}`} className="flex items-center gap-2 cursor-pointer">
@@ -1034,39 +1037,39 @@ const EmbodiedAI: React.FC = () => {
           ))}
         </div>
 
-        <span className={`text-sm font-semibold ${textPrimary}`}>Constraint Checks</span>
+        <span className={`text-sm font-semibold ${textPrimary}`}>{ea.constraintChecks}</span>
         <div className="grid grid-cols-1 gap-3">
           <SelectField
-            label="Door closed before timer"
+            label={ea.doorClosedBeforeTimer}
             value={mw.door_closed_before_timer}
             onChange={(v) => updateMW((m) => ({ ...m, door_closed_before_timer: v }))}
             isDark={isDark}
             options={[
-              { value: "pass", label: "Pass" },
-              { value: "fail", label: "Fail" },
-              { value: "unknown", label: "Unknown" },
+              { value: "pass", label: ea.optPass },
+              { value: "fail", label: ea.optFail },
+              { value: "unknown", label: ea.optUnknown },
             ]}
           />
           <SelectField
-            label="Timer set to 30s"
+            label={ea.timerSetTo30s}
             value={mw.timer_set_to_30s}
             onChange={(v) => updateMW((m) => ({ ...m, timer_set_to_30s: v }))}
             isDark={isDark}
             options={[
-              { value: "pass", label: "Pass" },
-              { value: "fail", label: "Fail" },
-              { value: "unknown", label: "Unknown" },
+              { value: "pass", label: ea.optPass },
+              { value: "fail", label: ea.optFail },
+              { value: "unknown", label: ea.optUnknown },
             ]}
           />
           <SelectField
-            label="Safe handling"
+            label={ea.safeHandling}
             value={mw.safe_handling}
             onChange={(v) => updateMW((m) => ({ ...m, safe_handling: v }))}
             isDark={isDark}
             options={[
-              { value: "pass", label: "Pass" },
-              { value: "fail", label: "Fail" },
-              { value: "unknown", label: "Unknown" },
+              { value: "pass", label: ea.optPass },
+              { value: "fail", label: ea.optFail },
+              { value: "unknown", label: ea.optUnknown },
             ]}
           />
         </div>
@@ -1078,7 +1081,7 @@ const EmbodiedAI: React.FC = () => {
             onChange={() => updateMW((m) => ({ ...m, clarification_needed: !m.clarification_needed }))}
             className="accent-violet-500 w-4 h-4"
           />
-          <span className={`text-sm ${textSecondary}`}>Clarification needed from task owner</span>
+          <span className={`text-sm ${textSecondary}`}>{ea.clarificationNeeded}</span>
         </label>
 
         <button
@@ -1086,7 +1089,7 @@ const EmbodiedAI: React.FC = () => {
           disabled={!canSubmit}
           onClick={handleSubmitAnnotationFresh}
         >
-          Submit Annotation →
+          {ea.submitAnnotation}
         </button>
       </div>
     );
@@ -1094,19 +1097,19 @@ const EmbodiedAI: React.FC = () => {
 
   // ── Selfie annotation panel ────────────────────────────────────────────────
   const SELFIE_CHECKS: { key: keyof SelfieAnnotation; label: string }[] = [
-    { key: "lighting_quality", label: "Lighting Quality" },
-    { key: "framing_quality", label: "Framing Quality" },
-    { key: "steadiness", label: "Steadiness" },
-    { key: "eye_contact_consistency", label: "Eye Contact Consistency" },
-    { key: "face_visibility", label: "Face Visibility" },
-    { key: "motion_pattern", label: "Motion Pattern" },
+    { key: "lighting_quality", label: ea.lightingQuality },
+    { key: "framing_quality", label: ea.framingQuality },
+    { key: "steadiness", label: ea.steadiness },
+    { key: "eye_contact_consistency", label: ea.eyeContactConsistency },
+    { key: "face_visibility", label: ea.faceVisibility },
+    { key: "motion_pattern", label: ea.motionPattern },
   ];
 
   function renderSelfieAnnotation() {
     const sf = selfieAnn;
     return (
       <div className="flex flex-col gap-4">
-        <span className={`text-sm font-semibold ${textPrimary}`}>Quality Checklist</span>
+        <span className={`text-sm font-semibold ${textPrimary}`}>{ea.qualityChecklist}</span>
         <div className="flex flex-col gap-3">
           {SELFIE_CHECKS.map((check) => {
             const val = sf[check.key] as string;
@@ -1137,50 +1140,50 @@ const EmbodiedAI: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-3 mt-2">
           <SelectField
-            label="Resolution Estimate"
+            label={ea.resolutionEstimate}
             value={sf.resolution_estimate}
             onChange={(v) => updateSelfie((s) => ({ ...s, resolution_estimate: v }))}
             isDark={isDark}
             options={[
-              { value: "720p", label: "720p" },
-              { value: "1080p", label: "1080p" },
-              { value: "4k", label: "4K" },
-              { value: "sub-720p", label: "Sub-720p" },
+              { value: "720p", label: ea.opt720p },
+              { value: "1080p", label: ea.opt1080p },
+              { value: "4k", label: ea.opt4K },
+              { value: "sub-720p", label: ea.optSub720p },
             ]}
           />
           <SelectField
-            label="Overall Capture Quality"
+            label={ea.overallCaptureQuality}
             value={sf.overall_capture_quality}
             onChange={(v) => updateSelfie((s) => ({ ...s, overall_capture_quality: v }))}
             isDark={isDark}
             options={[
-              { value: "excellent", label: "Excellent" },
-              { value: "good", label: "Good" },
-              { value: "acceptable", label: "Acceptable" },
-              { value: "poor", label: "Poor" },
+              { value: "excellent", label: ea.optExcellent },
+              { value: "good", label: ea.optGood },
+              { value: "acceptable", label: ea.optAcceptable },
+              { value: "poor", label: ea.optPoor },
             ]}
           />
           <SelectField
-            label="Usable for Training?"
+            label={ea.usableForTraining}
             value={sf.usable_for_training}
             onChange={(v) => updateSelfie((s) => ({ ...s, usable_for_training: v }))}
             isDark={isDark}
             options={[
-              { value: "yes", label: "Yes" },
-              { value: "no", label: "No" },
-              { value: "conditional", label: "Conditional" },
+              { value: "yes", label: ea.optYes },
+              { value: "no", label: ea.optNo },
+              { value: "conditional", label: ea.optConditional },
             ]}
           />
         </div>
 
         <div>
-          <label className={labelClass}>Notes (optional)</label>
+          <label className={labelClass}>{ea.notesOptional}</label>
           <textarea
             value={sf.notes}
             onChange={(e) => updateSelfie((s) => ({ ...s, notes: e.target.value }))}
             rows={2}
             className={`${inputClass} resize-none mt-1`}
-            placeholder="Additional notes..."
+            placeholder={ea.notesPlaceholder}
           />
         </div>
 
@@ -1189,7 +1192,7 @@ const EmbodiedAI: React.FC = () => {
           disabled={!canSubmit}
           onClick={handleSubmitAnnotationFresh}
         >
-          Submit Annotation →
+          {ea.submitAnnotation}
         </button>
       </div>
     );
@@ -1201,12 +1204,12 @@ const EmbodiedAI: React.FC = () => {
       return (
         <div className="flex flex-col items-center justify-center gap-3 py-10">
           <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-          <span className={`text-sm ${textSecondary}`}>AI verifying annotation…</span>
+          <span className={`text-sm ${textSecondary}`}>{ea.aiVerifying}</span>
         </div>
       );
     }
     if (!aiResult) {
-      return <p className={`text-sm ${textSecondary}`}>Submit annotation to trigger AI verification.</p>;
+      return <p className={`text-sm ${textSecondary}`}>{ea.submitToTrigger}</p>;
     }
 
     let confidenceScore = 0;
@@ -1230,16 +1233,16 @@ const EmbodiedAI: React.FC = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <span className={`material-symbols-outlined text-violet-400`}>psychology</span>
-          <span className={`font-semibold text-sm ${textPrimary}`}>AI Verification Result</span>
+          <span className={`font-semibold text-sm ${textPrimary}`}>{ea.aiVerificationResult}</span>
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className={labelClass}>Confidence Score</span>
+          <span className={labelClass}>{ea.confidenceScore}</span>
           <ConfidenceBar score={confidenceScore} isDark={isDark} />
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className={labelClass}>Flags</span>
+          <span className={labelClass}>{ea.flagsLabel}</span>
           {renderAIFlags(flags)}
         </div>
 
@@ -1252,12 +1255,12 @@ const EmbodiedAI: React.FC = () => {
               : "bg-yellow-500/10 text-yellow-400"
           }`}>
             <span className="material-symbols-outlined text-base">lightbulb</span>
-            AI Recommendation: <span className="font-bold ml-1 capitalize">{(aiResult as SelfieAIResult).ai_recommendation}</span>
+            {ea.aiRecommendation} <span className="font-bold ml-1 capitalize">{(aiResult as SelfieAIResult).ai_recommendation}</span>
           </div>
         )}
 
         <button className={btnViolet} onClick={handleProceedToQA}>
-          Proceed to QA →
+          {ea.proceedToQA}
         </button>
       </div>
     );
@@ -1266,7 +1269,7 @@ const EmbodiedAI: React.FC = () => {
   // ── QA Review right panel ─────────────────────────────────────────────────
   function renderQAPanel() {
     if (!aiResult) {
-      return <p className={`text-sm ${textSecondary}`}>AI verification results not available.</p>;
+      return <p className={`text-sm ${textSecondary}`}>{ea.aiResultsNotAvailable}</p>;
     }
 
     let flags: AIFlag[] = [];
@@ -1278,44 +1281,44 @@ const EmbodiedAI: React.FC = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-yellow-400">rate_review</span>
-          <span className={`font-semibold text-sm ${textPrimary}`}>QA Review</span>
+          <span className={`font-semibold text-sm ${textPrimary}`}>{ea.qaReviewTitle}</span>
         </div>
 
         <div className={`${panelClass} flex flex-col gap-2`}>
-          <span className={`text-xs font-semibold ${textSecondary}`}>AI Findings</span>
+          <span className={`text-xs font-semibold ${textSecondary}`}>{ea.aiFindingsLabel}</span>
           {renderAIFlags(flags)}
         </div>
 
         {!qaState.accepted_ai ? (
           <div className="flex flex-col gap-3">
             <button className={btnViolet} onClick={handleAcceptAI}>
-              Accept AI Findings
+              {ea.acceptAIFindings}
             </button>
-            <span className={`text-xs ${textSecondary}`}>— or override below —</span>
+            <span className={`text-xs ${textSecondary}`}>{ea.orOverride}</span>
 
             {activeTask === "pick-place" && (
               <>
                 <SelectField
-                  label="Override Training Suitability"
+                  label={ea.overrideSuitability}
                   value={qaState.override_suitability}
                   onChange={(v) => updateQA((q) => ({ ...q, override_suitability: v }))}
                   isDark={isDark}
                   options={[
-                    { value: "approved", label: "Approved" },
-                    { value: "needs-review", label: "Needs Review" },
-                    { value: "rejected", label: "Rejected" },
+                    { value: "approved", label: ea.optApproved },
+                    { value: "needs-review", label: ea.optNeedsReview },
+                    { value: "rejected", label: ea.optRejected },
                   ]}
                 />
                 <SelectField
-                  label="Override Primary Risk"
+                  label={ea.overrideRisk}
                   value={qaState.override_risk}
                   onChange={(v) => updateQA((q) => ({ ...q, override_risk: v }))}
                   isDark={isDark}
                   options={[
-                    { value: "none", label: "None" },
-                    { value: "drop", label: "Drop" },
-                    { value: "slip", label: "Slip" },
-                    { value: "collision", label: "Collision" },
+                    { value: "none", label: ea.optNone },
+                    { value: "drop", label: ea.optDrop },
+                    { value: "slip", label: ea.optSlip },
+                    { value: "collision", label: ea.optCollision },
                   ]}
                 />
               </>
@@ -1324,7 +1327,7 @@ const EmbodiedAI: React.FC = () => {
             {activeTask === "microwave" && (
               <>
                 <div>
-                  <label className={labelClass}>Override Procedure Score (0–100)</label>
+                  <label className={labelClass}>{ea.overrideProcedureScore}</label>
                   <input
                     type="number"
                     min={0}
@@ -1337,14 +1340,14 @@ const EmbodiedAI: React.FC = () => {
                   />
                 </div>
                 <SelectField
-                  label="Final Constraint Status"
+                  label={ea.finalConstraintStatus}
                   value={qaState.override_constraint_status}
                   onChange={(v) => updateQA((q) => ({ ...q, override_constraint_status: v }))}
                   isDark={isDark}
                   options={[
-                    { value: "all-pass", label: "All Pass" },
-                    { value: "partial", label: "Partial" },
-                    { value: "fail", label: "Fail" },
+                    { value: "all-pass", label: ea.optAllPass },
+                    { value: "partial", label: ea.optPartial },
+                    { value: "fail", label: ea.optFail },
                   ]}
                 />
               </>
@@ -1352,14 +1355,14 @@ const EmbodiedAI: React.FC = () => {
 
             {activeTask === "selfie" && (
               <SelectField
-                label="Final Status Override"
+                label={ea.finalStatusOverride}
                 value={qaState.override_final_status}
                 onChange={(v) => updateQA((q) => ({ ...q, override_final_status: v }))}
                 isDark={isDark}
                 options={[
-                  { value: "usable", label: "Usable" },
-                  { value: "reshoot", label: "Reshoot" },
-                  { value: "conditional", label: "Conditional" },
+                  { value: "usable", label: ea.optUsable },
+                  { value: "reshoot", label: ea.optReshoot },
+                  { value: "conditional", label: ea.optConditional },
                 ]}
               />
             )}
@@ -1367,7 +1370,7 @@ const EmbodiedAI: React.FC = () => {
         ) : (
           <div className="flex items-center gap-2 text-green-400 text-sm">
             <span className="material-symbols-outlined text-base">check_circle</span>
-            AI findings accepted
+            {ea.aiFindingsAccepted}
           </div>
         )}
 
@@ -1382,7 +1385,7 @@ const EmbodiedAI: React.FC = () => {
               : !qaState.override_final_status
           )}
         >
-          Lock QA Decision →
+          {ea.lockQADecision}
         </button>
       </div>
     );
@@ -1403,7 +1406,7 @@ const EmbodiedAI: React.FC = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-green-400">download</span>
-          <span className={`font-semibold text-sm ${textPrimary}`}>Export</span>
+          <span className={`font-semibold text-sm ${textPrimary}`}>{ea.exportTitle}</span>
         </div>
 
         <div className="flex gap-2">
@@ -1411,18 +1414,18 @@ const EmbodiedAI: React.FC = () => {
             className={btnViolet}
             onClick={() => downloadBlob(jsonStr, `${activeTask}-annotation.json`, "application/json")}
           >
-            Download JSON
+            {ea.downloadJSON}
           </button>
           <button
             className={btnGhost}
             onClick={() => downloadBlob(csvStr, `${activeTask}-annotation.csv`, "text/csv")}
           >
-            Download CSV
+            {ea.downloadCSV}
           </button>
         </div>
 
         <div>
-          <span className={`text-xs font-semibold ${textSecondary}`}>JSON Preview</span>
+          <span className={`text-xs font-semibold ${textSecondary}`}>{ea.jsonPreview}</span>
           <pre
             className={`mt-1 text-xs rounded-lg p-3 overflow-auto max-h-64 font-mono border ${
               isDark ? "bg-black/40 border-white/10 text-green-300" : "bg-gray-900 border-gray-700 text-green-300"
@@ -1434,7 +1437,7 @@ const EmbodiedAI: React.FC = () => {
 
         {csvLines.length > 1 && (
           <div>
-            <span className={`text-xs font-semibold ${textSecondary}`}>CSV Preview</span>
+            <span className={`text-xs font-semibold ${textSecondary}`}>{ea.csvPreview}</span>
             <div className={`mt-1 overflow-auto max-h-40 rounded-lg border ${isDark ? "border-white/10" : "border-gray-200"}`}>
               <table className="w-full text-xs">
                 <thead>
@@ -1463,7 +1466,7 @@ const EmbodiedAI: React.FC = () => {
         )}
 
         <button className={btnGhost} onClick={handleStartNewTask}>
-          Start New Task →
+          {ea.startNewTask}
         </button>
       </div>
     );
@@ -1477,23 +1480,23 @@ const EmbodiedAI: React.FC = () => {
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-violet-400">info</span>
-              <span className={`font-semibold text-sm ${textPrimary}`}>Workflow</span>
+              <span className={`font-semibold text-sm ${textPrimary}`}>{ea.workflowTitle}</span>
             </div>
             <p className={`text-sm ${textSecondary}`}>
-              Complete the annotation panel, then click "Submit Annotation" to trigger AI verification.
+              {ea.workflowDesc}
             </p>
             <div className={`${panelClass} flex flex-col gap-2 text-sm`}>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-violet-400 text-base">videocam</span>
-                <span className={textSecondary}>Use video controls to scrub through footage</span>
+                <span className={textSecondary}>{ea.workflowHintScrub}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-violet-400 text-base">timer</span>
-                <span className={textSecondary}>Mark Start / Mark End captures current playback time</span>
+                <span className={textSecondary}>{ea.workflowHintMark}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-violet-400 text-base">check_circle</span>
-                <span className={textSecondary}>Fill all required fields to enable Submit</span>
+                <span className={textSecondary}>{ea.workflowHintFill}</span>
               </div>
             </div>
           </div>
@@ -1516,24 +1519,9 @@ const EmbodiedAI: React.FC = () => {
 
   // ── Task metadata ─────────────────────────────────────────────────────────
   const TASK_META: Record<TaskId, { icon: string; title: string; desc: string; tag: string }> = {
-    "pick-place": {
-      icon: "smart_toy",
-      title: "Manipulation: Pick & Place",
-      desc: "Label robotic grasp, transport, and placement events with contact quality and stability scores.",
-      tag: "Robotics · Manipulation",
-    },
-    microwave: {
-      icon: "microwave",
-      title: "Multi-step: Microwave",
-      desc: "Construct a skill graph for the microwave task sequence and verify prerequisite constraints.",
-      tag: "Household AI · Task Graph",
-    },
-    selfie: {
-      icon: "face",
-      title: "Human Presence: Selfie",
-      desc: "Assess selfie video for lighting, framing, steadiness, and face visibility for training suitability.",
-      tag: "Presence QA · Video",
-    },
+    "pick-place": { icon: "smart_toy", title: ea.taskPickPlaceTitle, desc: ea.taskPickPlaceDesc, tag: ea.taskPickPlaceTag },
+    microwave: { icon: "microwave", title: ea.taskMicrowaveTitle, desc: ea.taskMicrowaveDesc, tag: ea.taskMicrowaveTag },
+    selfie: { icon: "face", title: ea.taskSelfieTitle, desc: ea.taskSelfieDesc, tag: ea.taskSelfieTag },
   };
   const meta = TASK_META[activeTask];
 
@@ -1562,7 +1550,7 @@ const EmbodiedAI: React.FC = () => {
               smart_toy
             </span>
             <span className={`font-bold text-sm ${isDark ? "text-white" : "text-gray-900"}`}>
-              Embodied AI Data Labeling
+              {ea.pageTitle}
             </span>
           </div>
         </div>
@@ -1605,7 +1593,7 @@ const EmbodiedAI: React.FC = () => {
           }`}
         >
           <div className="flex flex-col gap-2">
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textSecondary}`}>Tasks</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider ${textSecondary}`}>{ea.tasksLabel}</span>
             {(["pick-place", "microwave", "selfie"] as TaskId[]).map((taskId) => {
               const m = TASK_META[taskId];
               const isActive = activeTask === taskId;
@@ -1649,7 +1637,7 @@ const EmbodiedAI: React.FC = () => {
 
           {/* Annotation progress indicator */}
           <div className={panelClass}>
-            <span className={`text-xs font-semibold ${textSecondary}`}>Progress</span>
+            <span className={`text-xs font-semibold ${textSecondary}`}>{ea.progressLabel}</span>
             {(["pick-place", "microwave", "selfie"] as TaskId[]).map((taskId) => {
               const ann = annotations[taskId];
               const done = ann?.complete;
@@ -1698,16 +1686,16 @@ const EmbodiedAI: React.FC = () => {
               {activeTask !== "selfie" && (
                 <>
                   <button className={`${btnGhost} text-xs`} onClick={handleMarkStart}>
-                    Mark Start ({fmtTime(markedStart)})
+                    {`${ea.markStart} (${fmtTime(markedStart)})`}
                   </button>
                   <button className={`${btnGhost} text-xs`} onClick={handleMarkEnd}>
-                    Mark End ({fmtTime(markedEnd)})
+                    {`${ea.markEnd} (${fmtTime(markedEnd)})`}
                   </button>
                 </>
               )}
               {activeTask === "selfie" && (
                 <span className={`text-xs ${textSecondary}`}>
-                  Scrub through the clip to review quality before scoring below
+                  {ea.selfieHint}
                 </span>
               )}
             </div>
@@ -1717,7 +1705,7 @@ const EmbodiedAI: React.FC = () => {
           <div className={panelClass}>
             <div className="flex items-center gap-2 mb-3">
               <span className="material-symbols-outlined text-violet-400 text-base">edit_note</span>
-              <span className={`font-semibold text-sm ${textPrimary}`}>Annotation Controls</span>
+              <span className={`font-semibold text-sm ${textPrimary}`}>{ea.annotationControls}</span>
             </div>
             {stage === "annotate" ? (
               renderAnnotationPanel()
@@ -1728,16 +1716,16 @@ const EmbodiedAI: React.FC = () => {
                 </span>
                 <span className="text-sm">
                   {stage === "ai-verify"
-                    ? "AI verification in progress…"
+                    ? ea.aiVerifyInProgress
                     : stage === "qa"
-                    ? "QA review in progress"
-                    : "Annotation complete — export ready"}
+                    ? ea.qaInProgress
+                    : ea.annotationComplete}
                 </span>
                 <button
                   className={btnGhost}
                   onClick={() => setStage("annotate")}
                 >
-                  ← Back to Annotate
+                  {ea.backToAnnotate}
                 </button>
               </div>
             )}
