@@ -200,6 +200,17 @@ export const useCases: UseCase[] = [
     secondaryTag: "Intent · Infotainment",
     filters: ["Audio"],
   },
+  {
+    id: "22",
+    slug: "embodied-ai",
+    title: "Embodied AI Data Labeling",
+    description: "Unified 3-task annotation pipeline for embodied AI: manipulation pick & place, multi-step household tasks, and human presence QA — with AI verification, human adjudication, and structured export.",
+    icon: "smart_toy",
+    idTag: "EAI-001",
+    categoryTag: "Video / Robotics",
+    secondaryTag: "Embodied AI · 3 Tasks",
+    filters: ["Video"],
+  },
 ];
 
 export function getUseCaseBySlug(slug: string): UseCase | undefined {
