@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -257,7 +258,7 @@ const STAGE_META: Record<Stage, { icon: string; label: string }> = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean }) {
+function PipelineStepper({ current, isDark, stageMeta }: { current: Stage; isDark: boolean; stageMeta: Record<Stage, { icon: string; label: string }> }) {
   const currentIdx = STAGES.indexOf(current);
   return (
     <div className="flex items-center gap-0 mb-10 overflow-x-auto pb-1">
@@ -275,11 +276,11 @@ function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean 
               }`}>
                 {done
                   ? <span className="material-symbols-outlined text-white" style={{ fontSize: 16 }}>check</span>
-                  : <span className={`material-symbols-outlined ${active ? "text-violet-400" : isDark ? "text-white/30" : "text-gray-400"}`} style={{ fontSize: 16 }}>{STAGE_META[s].icon}</span>
+                  : <span className={`material-symbols-outlined ${active ? "text-violet-400" : isDark ? "text-white/30" : "text-gray-400"}`} style={{ fontSize: 16 }}>{stageMeta[s].icon}</span>
                 }
               </div>
               <span className={`text-[10px] mt-1 font-bold uppercase tracking-wide whitespace-nowrap ${active ? "text-violet-400" : isDark ? "text-white/40" : "text-gray-400"}`}>
-                {STAGE_META[s].label}
+                {stageMeta[s].label}
               </span>
             </div>
             {i < STAGES.length - 1 && (
@@ -292,7 +293,7 @@ function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean 
   );
 }
 
-function WaveformPlayer({ sessionId, audioSrc, isDark }: { sessionId: string; audioSrc: string; isDark: boolean }) {
+function WaveformPlayer({ sessionId, audioSrc, isDark, playingLabel, idleLabel }: { sessionId: string; audioSrc: string; isDark: boolean; playingLabel: string; idleLabel: string }) {
   const [playing,  setPlaying]  = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -355,7 +356,7 @@ function WaveformPlayer({ sessionId, audioSrc, isDark }: { sessionId: string; au
         </div>
       </div>
       <div className="flex justify-between text-xs font-mono">
-        <span className={isDark ? "text-white/40" : "text-gray-400"}>{playing ? "▶ Playing…" : "● Session Recording"}</span>
+        <span className={isDark ? "text-white/40" : "text-gray-400"}>{playing ? playingLabel : idleLabel}</span>
         <span className={isDark ? "text-white/40" : "text-gray-400"}>{Math.round(progress * 100)}%</span>
       </div>
     </div>
@@ -375,26 +376,26 @@ function ConfidenceBar({ value, isDark }: { value: number; isDark: boolean }) {
   );
 }
 
-function RetentionBadge({ v, isDark }: { v: ContextRetention; isDark: boolean }) {
+function RetentionBadge({ v, isDark, label }: { v: ContextRetention; isDark: boolean; label: string }) {
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isDark ? RETENTION_BADGE_DARK[v] : RETENTION_BADGE_LIGHT[v]}`}>
-      {RETENTION_LABELS[v]}
+      {label}
     </span>
   );
 }
 
-function ContinuityBadge({ v, isDark }: { v: TurnContinuity; isDark: boolean }) {
+function ContinuityBadge({ v, isDark, label }: { v: TurnContinuity; isDark: boolean; label: string }) {
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isDark ? CONTINUITY_BADGE_DARK[v] : CONTINUITY_BADGE_LIGHT[v]}`}>
-      {CONTINUITY_LABELS[v]}
+      {label}
     </span>
   );
 }
 
-function SuitabilityBadge({ v, isDark }: { v: ProductionSuitability; isDark: boolean }) {
+function SuitabilityBadge({ v, isDark, label }: { v: ProductionSuitability; isDark: boolean; label: string }) {
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isDark ? SUITABILITY_BADGE_DARK[v] : SUITABILITY_BADGE_LIGHT[v]}`}>
-      {SUITABILITY_LABELS[v]}
+      {label}
     </span>
   );
 }
@@ -404,7 +405,38 @@ function SuitabilityBadge({ v, isDark }: { v: ProductionSuitability; isDark: boo
 export default function ConversationalContextQA() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { t } = useLanguage();
+  const cq = t.pages.conversationalContextQa;
   const isDark = theme === "dark";
+
+  // ─── Localised label maps (depend on cq) ────────────────────────────────
+  const retentionLabels: Record<ContextRetention, string> = {
+    fully_retained:    cq.retentionFullyRetained,
+    partially_retained:cq.retentionPartiallyRetained,
+    context_lost:      cq.retentionContextLost,
+  };
+  const failureLabels: Record<ContextFailureType, string> = {
+    lost_previous_constraint:  cq.failureLostPreviousConstraint,
+    incorrect_entity_reference:cq.failureIncorrectEntityReference,
+    reset_conversation_state:  cq.failureResetConversationState,
+    misapplied_followup:       cq.failureMisappliedFollowup,
+  };
+  const continuityLabels: Record<TurnContinuity, string> = {
+    correctly_interpreted:   cq.continuityCorrect,
+    ambiguous:               cq.continuityAmbiguous,
+    incorrectly_interpreted: cq.continuityIncorrect,
+  };
+  const suitabilityLabels: Record<ProductionSuitability, string> = {
+    ready:            cq.suitabilityReady,
+    needs_retraining: cq.suitabilityNeedsRetraining,
+    unsafe:           cq.suitabilityUnsafe,
+  };
+  const stageMeta: Record<Stage, { icon: string; label: string }> = {
+    annotate:    { icon: "edit_note",  label: cq.stageAnnotate  },
+    "ai-verify": { icon: "smart_toy", label: cq.stageAiVerify },
+    qa:          { icon: "rule",       label: cq.stageQa },
+    export:      { icon: "download",   label: cq.stageExport },
+  };
 
   const [stage,       setStage]       = useState<Stage>("annotate");
   const [sessionIdx,  setSessionIdx]  = useState(0);
@@ -529,7 +561,7 @@ export default function ConversationalContextQA() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1 hidden sm:block">Switch Session:</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1 hidden sm:block">{cq.switchSession}</span>
             {SESSIONS.map((s, i) => (
               <button key={s.id}
                 onClick={() => { setSessionIdx(i); setStage("annotate"); }}
@@ -552,14 +584,14 @@ export default function ConversationalContextQA() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-6">
           <h1 className={`text-2xl font-bold font-headline tracking-tight mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-            Conversational Context Retention
+            {cq.pageTitle}
           </h1>
           <p className={`text-sm ${isDark ? "text-white/50" : "text-gray-500"}`}>
-            Human-in-the-loop validation of multi-turn voice interactions in vehicles
+            {cq.pageSubtitle}
           </p>
         </div>
 
-        <PipelineStepper current={stage} isDark={isDark} />
+        <PipelineStepper current={stage} isDark={isDark} stageMeta={stageMeta} />
 
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/* STAGE 1 — ANNOTATE (with conversation inline)                     */}
@@ -573,13 +605,13 @@ export default function ConversationalContextQA() {
               {/* LEFT — session view */}
               <div className="space-y-4">
                 <div className={cardCls}>
-                  {sectionTitle("forum", "Session Recording", `${session.sessionType} · ${session.turns.length} turns · ${session.language}`)}
-                  <WaveformPlayer sessionId={session.id} audioSrc={session.audioSrc} isDark={isDark}/>
+                  {sectionTitle("forum", cq.sectionSessionRecording, `${session.sessionType} · ${session.turns.length} turns · ${session.language}`)}
+                  <WaveformPlayer sessionId={session.id} audioSrc={session.audioSrc} isDark={isDark} playingLabel={cq.waveformPlaying} idleLabel={cq.waveformIdle}/>
                 </div>
 
                 <div className={cardCls}>
                   <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>
-                    Conversation Transcript
+                    {cq.sectionConversationTranscript}
                   </p>
                   <div className="space-y-2">
                     {session.turns.map((turn) => (
@@ -589,7 +621,7 @@ export default function ConversationalContextQA() {
                             {turn.turnNumber}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-violet-400/60" : "text-violet-500"}`}>User</p>
+                            <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-violet-400/60" : "text-violet-500"}`}>{cq.labelUser}</p>
                             <p className={`text-sm font-medium leading-snug ${isDark ? "text-white/90" : "text-gray-900"}`}>"{turn.utterance}"</p>
                           </div>
                         </div>
@@ -598,7 +630,7 @@ export default function ConversationalContextQA() {
                             <span className="material-symbols-outlined" style={{ fontSize: 11, color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af" }}>smart_toy</span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-white/25" : "text-gray-400"}`}>System</p>
+                            <p className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${isDark ? "text-white/25" : "text-gray-400"}`}>{cq.labelSystem}</p>
                             <p className={`text-xs leading-snug ${isDark ? "text-white/55" : "text-gray-600"}`}>{turn.systemResponse}</p>
                           </div>
                         </div>
@@ -610,16 +642,16 @@ export default function ConversationalContextQA() {
 
               {/* RIGHT — annotation form */}
               <div className={cardCls}>
-              {sectionTitle("edit_note", "Human Annotation — Context Retention Labeling")}
+              {sectionTitle("edit_note", cq.sectionHumanAnnotation)}
 
               {/* 1 - Context Retention Quality */}
               <div className="mb-6">
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>1 · Context Retention Quality</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>How well did the system preserve conversational context across all turns?</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{cq.labelContextRetentionQuality}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{cq.labelContextRetentionQualityHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {(["fully_retained", "partially_retained", "context_lost"] as ContextRetention[]).map(v => (
                     <ChoiceBtn key={v} value={v} current={annotation.contextRetention}
-                      label={RETENTION_LABELS[v]}
+                      label={retentionLabels[v]}
                       colorActive={isDark ? RETENTION_COLORS_DARK[v] : RETENTION_COLORS_LIGHT[v]}
                       onClick={() => patchAnnotation({ contextRetention: v, failureType: v === "fully_retained" ? null : annotation.failureType })}/>
                   ))}
@@ -629,12 +661,12 @@ export default function ConversationalContextQA() {
               {/* 2 - Context Failure Type (conditional) */}
               {annotation.contextRetention && annotation.contextRetention !== "fully_retained" && (
                 <div className="mb-6">
-                  <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>2 · Context Failure Type</p>
-                  <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>Select the primary type of context failure observed.</p>
+                  <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{cq.labelContextFailureType}</p>
+                  <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{cq.labelContextFailureTypeHint}</p>
                   <div className="flex flex-wrap gap-2">
                     {(["lost_previous_constraint", "incorrect_entity_reference", "reset_conversation_state", "misapplied_followup"] as ContextFailureType[]).map(v => (
                       <ChoiceBtn key={v} value={v} current={annotation.failureType}
-                        label={FAILURE_LABELS[v]}
+                        label={failureLabels[v]}
                         colorActive="bg-rose-600 text-white border-rose-500"
                         onClick={() => patchAnnotation({ failureType: v })}/>
                     ))}
@@ -645,9 +677,9 @@ export default function ConversationalContextQA() {
               {/* 3 - Turn-level continuity */}
               <div className="mb-6">
                 <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>
-                  {annotation.contextRetention && annotation.contextRetention !== "fully_retained" ? "3" : "2"} · Turn-Level Continuity
+                  {annotation.contextRetention && annotation.contextRetention !== "fully_retained" ? "3" : "2"} · {cq.labelTurnLevelContinuity}
                 </p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>Label how each turn was handled by the system.</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{cq.labelTurnLevelContinuityHint}</p>
                 <div className="space-y-2">
                   {session.turns.map((turn) => {
                     const tc = annotation.turnContinuity[turn.id] ?? null;
@@ -667,7 +699,7 @@ export default function ConversationalContextQA() {
                                   ? isDark ? CONTINUITY_COLORS_DARK[v] : CONTINUITY_COLORS_LIGHT[v]
                                   : isDark ? "bg-transparent text-white/40 border-white/12 hover:border-white/25" : "bg-transparent text-gray-400 border-gray-200 hover:border-gray-300"
                               }`}>
-                              {CONTINUITY_LABELS[v]}
+                              {continuityLabels[v]}
                             </button>
                           ))}
                         </div>
@@ -680,14 +712,14 @@ export default function ConversationalContextQA() {
               {/* 4 - User Friction Risk */}
               <div className="mb-6">
                 <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>
-                  {annotation.contextRetention && annotation.contextRetention !== "fully_retained" ? "4" : "3"} · User Friction Risk
+                  {annotation.contextRetention && annotation.contextRetention !== "fully_retained" ? "4" : "3"} · {cq.labelUserFrictionRisk}
                 </p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>How much extra effort did context failures impose on the user?</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{cq.labelUserFrictionRiskHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {([
-                    { val: "low"    as UserFrictionRisk, label: "Low — Minor inconvenience"     },
-                    { val: "medium" as UserFrictionRisk, label: "Medium — Requires re-prompting" },
-                    { val: "high"   as UserFrictionRisk, label: "High — Task abandoned or unsafe"},
+                    { val: "low"    as UserFrictionRisk, label: cq.frictionLow    },
+                    { val: "medium" as UserFrictionRisk, label: cq.frictionMedium },
+                    { val: "high"   as UserFrictionRisk, label: cq.frictionHigh   },
                   ]).map(({ val, label }) => (
                     <ChoiceBtn key={val} value={val} current={annotation.userFrictionRisk}
                       label={label}
@@ -700,11 +732,11 @@ export default function ConversationalContextQA() {
               {/* 5 - Notes */}
               <div>
                 <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/40" : "text-gray-500"}`}>
-                  {annotation.contextRetention && annotation.contextRetention !== "fully_retained" ? "5" : "4"} · Annotator Note{" "}
-                  <span className={`font-normal ${isDark ? "text-white/20" : "text-gray-300"}`}>(optional)</span>
+                  {annotation.contextRetention && annotation.contextRetention !== "fully_retained" ? "5" : "4"} · {cq.labelAnnotatorNote}{" "}
+                  <span className={`font-normal ${isDark ? "text-white/20" : "text-gray-300"}`}>{cq.labelAnnotatorNoteOptional}</span>
                 </p>
                 <textarea rows={3}
-                  placeholder="Describe where context was lost, what should have been preserved, or any ambiguity in the interaction…"
+                  placeholder={cq.annotatorNotePlaceholder}
                   value={annotation.notes}
                   onChange={e => patchAnnotation({ notes: e.target.value })}
                   className={`w-full text-sm rounded-lg border px-3 py-2 outline-none focus:ring-1 focus:ring-violet-500 resize-none transition-colors ${
@@ -717,11 +749,11 @@ export default function ConversationalContextQA() {
             <div className="flex justify-between">
               <button onClick={() => navigate("/use-cases")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {cq.btnBack}
               </button>
               <button disabled={!canSubmitAnnotation} onClick={() => setStage("ai-verify")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Submit to AI Verification
+                {cq.btnSubmitToAiVerify}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>smart_toy</span>
               </button>
             </div>
@@ -734,14 +766,14 @@ export default function ConversationalContextQA() {
         {stage === "ai-verify" && (
           <div className="space-y-6">
             <div className={cardCls}>
-              {sectionTitle("smart_toy", "AI Verification Pass", "A context-verification agent re-analyses the full session and checks whether the system preserved conversational state.")}
+              {sectionTitle("smart_toy", cq.sectionAiVerification, cq.sectionAiVerificationHint)}
 
               {/* 3-col summary */}
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {[
-                  { label: "Context Agreement", val: aiResult.contextAgreement ? "Agree" : "Disagree", color: aiResult.contextAgreement ? "text-emerald-400" : "text-amber-400" },
-                  { label: "Flagged Turns",      val: String(aiResult.flaggedTurns.length),             color: aiResult.flaggedTurns.length > 0 ? "text-rose-400" : "text-emerald-400" },
-                  { label: "AI Confidence",      val: `${Math.round(aiResult.confidence * 100)}%`,      color: "text-violet-400" },
+                  { label: cq.aiContextAgreement, val: aiResult.contextAgreement ? "Agree" : "Disagree", color: aiResult.contextAgreement ? "text-emerald-400" : "text-amber-400" },
+                  { label: cq.aiFlaggedTurns,     val: String(aiResult.flaggedTurns.length),             color: aiResult.flaggedTurns.length > 0 ? "text-rose-400" : "text-emerald-400" },
+                  { label: cq.aiConfidence,        val: `${Math.round(aiResult.confidence * 100)}%`,      color: "text-violet-400" },
                 ].map(({ label, val, color }) => (
                   <div key={label} className={`rounded-xl p-3 text-center border ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-gray-50"}`}>
                     <p className={`text-xl font-bold font-mono ${color}`}>{val}</p>
@@ -752,7 +784,7 @@ export default function ConversationalContextQA() {
 
               {/* Confidence bar */}
               <div className={`rounded-xl p-4 border mb-4 ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Model Confidence Score</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.labelModelConfidenceScore}</p>
                 <ConfidenceBar value={aiResult.confidence} isDark={isDark}/>
               </div>
 
@@ -765,20 +797,20 @@ export default function ConversationalContextQA() {
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
                     <span className={`material-symbols-outlined ${isDark ? "text-white/40" : "text-gray-400"}`} style={{ fontSize: 16 }}>psychology</span>
-                    <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>Context Retention</span>
+                    <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>{cq.labelContextRetention}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
                       aiResult.contextAgreement
                         ? isDark ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
                         : isDark ? "bg-amber-500/20 text-amber-400"     : "bg-amber-100 text-amber-700"
                     }`}>
-                      {aiResult.contextAgreement ? "AI Agrees" : "AI Disagrees"}
+                      {aiResult.contextAgreement ? cq.aiAgrees : cq.aiDisagrees}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
-                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>Human:</span>
-                    {annotation.contextRetention && <RetentionBadge v={annotation.contextRetention} isDark={isDark}/>}
-                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>AI:</span>
-                    <RetentionBadge v={aiResult.suggestedRetention} isDark={isDark}/>
+                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>{cq.labelHuman}</span>
+                    {annotation.contextRetention && <RetentionBadge v={annotation.contextRetention} isDark={isDark} label={retentionLabels[annotation.contextRetention]}/>}
+                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>{cq.labelAi}</span>
+                    <RetentionBadge v={aiResult.suggestedRetention} isDark={isDark} label={retentionLabels[aiResult.suggestedRetention]}/>
                   </div>
                 </div>
               </div>
@@ -786,7 +818,7 @@ export default function ConversationalContextQA() {
               {/* Flagged turns */}
               {aiResult.flaggedTurns.length > 0 && (
                 <div className={`rounded-xl border p-4 mb-4 ${isDark ? "border-rose-500/20 bg-rose-500/5" : "border-rose-200 bg-rose-50"}`}>
-                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Turns Flagged by AI</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.labelTurnsFlaggedByAi}</p>
                   <div className="space-y-2">
                     {session.turns
                       .filter(t => aiResult.flaggedTurns.includes(t.id))
@@ -804,7 +836,7 @@ export default function ConversationalContextQA() {
 
               {/* AI justification */}
               <div className={`rounded-xl p-4 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>AI Justification</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.labelAiJustification}</p>
                 <p className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-gray-600"}`}>{aiResult.justification}</p>
               </div>
             </div>
@@ -812,11 +844,11 @@ export default function ConversationalContextQA() {
             <div className="flex justify-between">
               <button onClick={() => setStage("annotate")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {cq.btnBack}
               </button>
               <button onClick={() => setStage("qa")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Proceed to QA Review
+                {cq.btnProceedToQa}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>rule</span>
               </button>
             </div>
@@ -838,15 +870,15 @@ export default function ConversationalContextQA() {
             {/* 3-col context */}
             <div className="grid grid-cols-3 gap-4">
               <div className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Human Annotation</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.humanAnnotationCard}</p>
                 <div className="space-y-2">
-                  {annotation.contextRetention && <RetentionBadge v={annotation.contextRetention} isDark={isDark}/>}
+                  {annotation.contextRetention && <RetentionBadge v={annotation.contextRetention} isDark={isDark} label={retentionLabels[annotation.contextRetention]}/>}
                   {annotation.failureType && (
-                    <p className={`text-xs ${isDark ? "text-white/50" : "text-gray-500"}`}>{FAILURE_LABELS[annotation.failureType]}</p>
+                    <p className={`text-xs ${isDark ? "text-white/50" : "text-gray-500"}`}>{failureLabels[annotation.failureType]}</p>
                   )}
                   {annotation.userFrictionRisk && (
                     <p className={`text-xs ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      Friction: <span className="font-semibold capitalize">{annotation.userFrictionRisk}</span>
+                      {cq.exportFriction} <span className="font-semibold capitalize">{annotation.userFrictionRisk}</span>
                     </p>
                   )}
                   {annotation.notes && (
@@ -855,45 +887,45 @@ export default function ConversationalContextQA() {
                 </div>
               </div>
               <div className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>AI Verification</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.aiVerificationCard}</p>
                 <div className="space-y-2">
-                  <RetentionBadge v={aiResult.suggestedRetention} isDark={isDark}/>
+                  <RetentionBadge v={aiResult.suggestedRetention} isDark={isDark} label={retentionLabels[aiResult.suggestedRetention]}/>
                   <ConfidenceBar value={aiResult.confidence} isDark={isDark}/>
                   <p className={`text-xs ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                    {aiResult.flaggedTurns.length} turn{aiResult.flaggedTurns.length !== 1 ? "s" : ""} flagged
+                    {aiResult.flaggedTurns.length} {aiResult.flaggedTurns.length !== 1 ? cq.exportTurnsFlaggedByAiPlural : cq.exportTurnsFlaggedByAi}
                   </p>
                 </div>
               </div>
               <div className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Discrepancies</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.discrepanciesLabel}</p>
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5">
                     <span className={`material-symbols-outlined ${aiResult.contextAgreement ? "text-emerald-400" : "text-amber-400"}`} style={{ fontSize: 14 }}>
                       {aiResult.contextAgreement ? "check_circle" : "warning"}
                     </span>
-                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>Context retention</span>
+                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>{cq.discrepanciesContextRetention}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={`material-symbols-outlined ${aiResult.flaggedTurns.length === 0 ? "text-emerald-400" : "text-rose-400"}`} style={{ fontSize: 14 }}>
                       {aiResult.flaggedTurns.length === 0 ? "check_circle" : "error"}
                     </span>
-                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>Turn continuity</span>
+                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>{cq.discrepanciesTurnContinuity}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className={cardCls}>
-              {sectionTitle("rule", "QA Adjudication", "Accept human judgment, apply the AI correction, or override both with a definitive ruling.")}
+              {sectionTitle("rule", cq.sectionQaAdjudication, cq.sectionQaAdjudicationHint)}
 
               {/* Context retention decision */}
               <div className={`rounded-xl border p-4 mb-4 ${isDark ? "border-white/10 bg-white/2" : "border-gray-200 bg-white"}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-500"}`}>Context Retention — Final Call</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-500"}`}>{cq.qaContextRetentionFinalCall}</p>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {([
-                    { val: "accept_human" as QADecision, label: "Accept Human" },
-                    { val: "accept_ai"    as QADecision, label: "Accept AI"    },
-                    { val: "override"     as QADecision, label: "Override Both" },
+                    { val: "accept_human" as QADecision, label: cq.qaAcceptHuman  },
+                    { val: "accept_ai"    as QADecision, label: cq.qaAcceptAi     },
+                    { val: "override"     as QADecision, label: cq.qaOverrideBoth },
                   ]).map(({ val, label }) => (
                     <button key={val} onClick={() => patchQA({ retentionDecision: val, retentionOverride: null })}
                       className={`px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all ${
@@ -914,23 +946,23 @@ export default function ConversationalContextQA() {
                             ? isDark ? RETENTION_COLORS_DARK[v] : RETENTION_COLORS_LIGHT[v]
                             : isDark ? "bg-transparent text-white/50 border-white/15 hover:border-white/30" : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
                         }`}>
-                        {RETENTION_LABELS[v]}
+                        {retentionLabels[v]}
                       </button>
                     ))}
                   </div>
                 )}
                 {qa.retentionDecision && (qa.retentionDecision !== "override" || qa.retentionOverride) && (
                   <div className="mt-2 flex items-center gap-1.5">
-                    <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>Final:</span>
-                    <RetentionBadge v={resolvedRetention()} isDark={isDark}/>
+                    <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>{cq.qaFinal}</span>
+                    <RetentionBadge v={resolvedRetention()} isDark={isDark} label={retentionLabels[resolvedRetention()]}/>
                   </div>
                 )}
               </div>
 
               {/* Reliability score */}
               <div className={`rounded-xl border p-4 mb-4 ${isDark ? "border-white/10 bg-white/2" : "border-gray-200 bg-white"}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>Conversational Reliability Score</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Rate the overall reliability of this session's dialogue behavior (1 = unreliable, 5 = fully reliable).</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{cq.qaConversationalReliabilityScore}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.qaConversationalReliabilityHint}</p>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map(score => (
                     <button key={score} onClick={() => patchQA({ reliabilityScore: score })}
@@ -946,7 +978,7 @@ export default function ConversationalContextQA() {
                   ))}
                   {qa.reliabilityScore && (
                     <span className={`ml-2 self-center text-xs ${isDark ? "text-white/40" : "text-gray-400"}`}>
-                      {qa.reliabilityScore <= 2 ? "Unreliable" : qa.reliabilityScore === 3 ? "Moderate" : qa.reliabilityScore === 4 ? "Reliable" : "Fully Reliable"}
+                      {qa.reliabilityScore <= 2 ? cq.qaReliabilityUnreliable : qa.reliabilityScore === 3 ? cq.qaReliabilityModerate : qa.reliabilityScore === 4 ? cq.qaReliabilityReliable : cq.qaReliabilityFullyReliable}
                     </span>
                   )}
                 </div>
@@ -954,8 +986,8 @@ export default function ConversationalContextQA() {
 
               {/* Production suitability */}
               <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/2" : "border-gray-200 bg-white"}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>Production Suitability</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>What is this session's disposition for downstream training or deployment use?</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{cq.qaProductionSuitability}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.qaProductionSuitabilityHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {(["ready", "needs_retraining", "unsafe"] as ProductionSuitability[]).map(v => (
                     <button key={v} onClick={() => patchQA({ productionSuitability: v })}
@@ -964,7 +996,7 @@ export default function ConversationalContextQA() {
                           ? isDark ? SUITABILITY_COLORS_DARK[v] : SUITABILITY_COLORS_LIGHT[v]
                           : isDark ? "bg-transparent text-white/50 border-white/15 hover:border-white/30" : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
                       }`}>
-                      {SUITABILITY_LABELS[v]}
+                      {suitabilityLabels[v]}
                     </button>
                   ))}
                 </div>
@@ -974,11 +1006,11 @@ export default function ConversationalContextQA() {
             <div className="flex justify-between">
               <button onClick={() => setStage("ai-verify")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {cq.btnBack}
               </button>
               <button disabled={!canSubmitQA} onClick={() => setStage("export")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Finalize &amp; Export
+                {cq.btnFinalizeExport}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
               </button>
             </div>
@@ -995,9 +1027,9 @@ export default function ConversationalContextQA() {
           const disagreements = !aiResult.contextAgreement ? 1 : 0;
 
           const statusLabel =
-            suitability === "ready"           ? "Approved for Production"
-            : suitability === "needs_retraining" ? "Needs Retraining"
-            : "Unsafe for Deployment";
+            suitability === "ready"           ? cq.exportApprovedForProduction
+            : suitability === "needs_retraining" ? cq.exportNeedsRetraining
+            : cq.exportUnsafeForDeployment;
           const statusColor =
             suitability === "ready"           ? "text-emerald-400"
             : suitability === "needs_retraining" ? "text-amber-400"
@@ -1014,10 +1046,10 @@ export default function ConversationalContextQA() {
               {/* KPI row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: "Production Status",       val: statusLabel,                                   color: statusColor },
-                  { label: "Context Retention",        val: RETENTION_LABELS[retention],                  color: isDark ? "text-white" : "text-gray-900" },
-                  { label: "Human–AI Disagreements",   val: String(disagreements),                        color: disagreements > 0 ? "text-amber-400" : "text-emerald-400" },
-                  { label: "Reliability Score",        val: qa.reliabilityScore ? `${qa.reliabilityScore} / 5` : "—", color: (qa.reliabilityScore ?? 0) >= 4 ? "text-emerald-400" : (qa.reliabilityScore ?? 0) >= 3 ? "text-amber-400" : "text-rose-400" },
+                  { label: cq.exportProductionStatus,       val: statusLabel,                                   color: statusColor },
+                  { label: cq.exportContextRetention,        val: retentionLabels[retention],                   color: isDark ? "text-white" : "text-gray-900" },
+                  { label: cq.exportHumanAiDisagreements,   val: String(disagreements),                        color: disagreements > 0 ? "text-amber-400" : "text-emerald-400" },
+                  { label: cq.exportReliabilityScore,        val: qa.reliabilityScore ? `${qa.reliabilityScore} / 5` : "—", color: (qa.reliabilityScore ?? 0) >= 4 ? "text-emerald-400" : (qa.reliabilityScore ?? 0) >= 3 ? "text-amber-400" : "text-rose-400" },
                 ].map(({ label, val, color }) => (
                   <div key={label} className={`rounded-xl border p-4 text-center ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
                     <p className={`text-sm font-bold font-mono uppercase leading-tight ${color}`}>{val}</p>
@@ -1028,24 +1060,24 @@ export default function ConversationalContextQA() {
 
               {/* Final summary */}
               <div className={cardCls}>
-                {sectionTitle("verified", "Final QA Summary")}
+                {sectionTitle("verified", cq.sectionFinalQaSummary)}
                 <div className="grid md:grid-cols-3 gap-4 mb-5">
                   <div className={`rounded-xl p-3 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Context Retention</p>
-                    <RetentionBadge v={retention} isDark={isDark}/>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.exportContextRetentionCard}</p>
+                    <RetentionBadge v={retention} isDark={isDark} label={retentionLabels[retention]}/>
                     {annotation.failureType && (
-                      <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>{FAILURE_LABELS[annotation.failureType]}</p>
+                      <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>{failureLabels[annotation.failureType]}</p>
                     )}
                   </div>
                   <div className={`rounded-xl p-3 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Production Suitability</p>
-                    <SuitabilityBadge v={suitability} isDark={isDark}/>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.exportProductionSuitabilityCard}</p>
+                    <SuitabilityBadge v={suitability} isDark={isDark} label={suitabilityLabels[suitability]}/>
                     <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      Reliability: {qa.reliabilityScore}/5
+                      {cq.exportReliabilityLabel} {qa.reliabilityScore}/5
                     </p>
                   </div>
                   <div className={`rounded-xl p-3 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Turn Continuity</p>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.exportTurnContinuityCard}</p>
                     <div className="flex flex-wrap gap-1">
                       {session.turns.map(t => {
                         const tc = annotation.turnContinuity[t.id];
@@ -1057,14 +1089,14 @@ export default function ConversationalContextQA() {
                       })}
                     </div>
                     <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      {aiResult.flaggedTurns.length} turn{aiResult.flaggedTurns.length !== 1 ? "s" : ""} flagged by AI
+                      {aiResult.flaggedTurns.length} {aiResult.flaggedTurns.length !== 1 ? cq.exportTurnsFlaggedByAiPlural : cq.exportTurnsFlaggedByAi}
                     </p>
                   </div>
                 </div>
 
                 {/* Downstream impact */}
                 <div>
-                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Downstream Impact Classification</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{cq.exportDownstreamImpact}</p>
                   <div className="grid grid-cols-3 gap-3">
                     {downstreamImpacts.map(({ label, risk }) => (
                       <div key={label} className={`rounded-lg px-3 py-2.5 border flex items-center gap-2 ${
@@ -1084,7 +1116,7 @@ export default function ConversationalContextQA() {
 
               {/* JSON export */}
               <div className={cardCls}>
-                {sectionTitle("code", "Decision Packet — JSON Export")}
+                {sectionTitle("code", cq.sectionDecisionPacket)}
                 <pre className={`text-xs rounded-xl p-4 overflow-auto leading-relaxed border ${isDark ? "bg-black/40 border-white/10 text-emerald-300" : "bg-gray-50 border-gray-200 text-emerald-700"}`}>
                   {JSON.stringify(packet, null, 2)}
                 </pre>
@@ -1101,7 +1133,7 @@ export default function ConversationalContextQA() {
                     }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors">
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
-                    Download JSON
+                    {cq.btnDownloadJson}
                   </button>
                   <button
                     onClick={() => {
@@ -1117,25 +1149,25 @@ export default function ConversationalContextQA() {
                     }}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>table_chart</span>
-                    Export CSV
+                    {cq.btnExportCsv}
                   </button>
                   <button
                     onClick={() => { setSessionIdx(i => (i + 1) % SESSIONS.length); setStage("ingest"); }}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ml-auto ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>skip_next</span>
-                    Next Session
+                    {cq.btnNextSession}
                   </button>
                 </div>
               </div>
 
               {/* Scale callout */}
               <div className={`rounded-2xl p-5 ${isDark ? "bg-white/3 border border-white/8" : "bg-gray-50 border border-gray-200"}`}>
-                <p className={`text-sm font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>How TP Operationalises This at Scale</p>
+                <p className={`text-sm font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>{cq.scaleTitle}</p>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   {[
-                    { val: "2M+",   sub: "Multi-turn sessions annotated annually" },
-                    { val: "94.8%", sub: "Cross-turn context consistency rate"    },
-                    { val: "18+",   sub: "IVI and navigation programme clients"   },
+                    { val: cq.scaleKpi1Val, sub: cq.scaleKpi1Sub },
+                    { val: cq.scaleKpi2Val, sub: cq.scaleKpi2Sub },
+                    { val: cq.scaleKpi3Val, sub: cq.scaleKpi3Sub },
                   ].map(kpi => (
                     <div key={kpi.val}>
                       <p className="text-2xl font-black text-violet-400">{kpi.val}</p>

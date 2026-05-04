@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -255,7 +256,7 @@ const CATEGORY_LABELS: Record<IntentCategory, string> = {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean }) {
+function PipelineStepper({ current, isDark, stageLabels }: { current: Stage; isDark: boolean; stageLabels: Record<Stage, string> }) {
   const currentIdx = STAGES.indexOf(current);
   return (
     <div className="flex items-center gap-0 mb-10 overflow-x-auto pb-1">
@@ -277,7 +278,7 @@ function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean 
                 }
               </div>
               <span className={`text-[10px] mt-1 font-bold uppercase tracking-wide whitespace-nowrap ${active ? "text-violet-400" : isDark ? "text-white/40" : "text-gray-400"}`}>
-                {STAGE_META[s].label}
+                {stageLabels[s]}
               </span>
             </div>
             {i < STAGES.length - 1 && (
@@ -290,7 +291,7 @@ function PipelineStepper({ current, isDark }: { current: Stage; isDark: boolean 
   );
 }
 
-function WaveformPlayer({ sampleId, audioSrc, isDark }: { sampleId: string; audioSrc: string; isDark: boolean }) {
+function WaveformPlayer({ sampleId, audioSrc, isDark, playingLabel, stoppedLabel }: { sampleId: string; audioSrc: string; isDark: boolean; playingLabel: string; stoppedLabel: string }) {
   const [playing,  setPlaying]  = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -353,7 +354,7 @@ function WaveformPlayer({ sampleId, audioSrc, isDark }: { sampleId: string; audi
         </div>
       </div>
       <div className="flex justify-between text-xs font-mono">
-        <span className={isDark ? "text-white/40" : "text-gray-400"}>{playing ? "▶ Playing…" : "● Stopped"}</span>
+        <span className={isDark ? "text-white/40" : "text-gray-400"}>{playing ? playingLabel : stoppedLabel}</span>
         <span className={isDark ? "text-white/40" : "text-gray-400"}>{Math.round(progress * 100)}%</span>
       </div>
     </div>
@@ -373,26 +374,26 @@ function ConfidenceBar({ value, isDark }: { value: number; isDark: boolean }) {
   );
 }
 
-function IntentBadge({ v, isDark }: { v: IntentUnderstanding; isDark: boolean }) {
+function IntentBadge({ v, isDark, label }: { v: IntentUnderstanding; isDark: boolean; label?: string }) {
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isDark ? INTENT_BADGE_DARK[v] : INTENT_BADGE_LIGHT[v]}`}>
-      {INTENT_LABELS[v]}
+      {label ?? INTENT_LABELS[v]}
     </span>
   );
 }
 
-function FulfillBadge({ v, isDark }: { v: FulfillmentAccuracy; isDark: boolean }) {
+function FulfillBadge({ v, isDark, label }: { v: FulfillmentAccuracy; isDark: boolean; label?: string }) {
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isDark ? FULFILLMENT_BADGE_DARK[v] : FULFILLMENT_BADGE_LIGHT[v]}`}>
-      {FULFILLMENT_LABELS[v]}
+      {label ?? FULFILLMENT_LABELS[v]}
     </span>
   );
 }
 
-function RiskBadge({ v, isDark }: { v: RiskLevel; isDark: boolean }) {
+function RiskBadge({ v, isDark, label }: { v: RiskLevel; isDark: boolean; label?: string }) {
   return (
     <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isDark ? RISK_BADGE_DARK[v] : RISK_BADGE_LIGHT[v]}`}>
-      {RISK_LABELS[v]}
+      {label ?? RISK_LABELS[v]}
     </span>
   );
 }
@@ -402,7 +403,33 @@ function RiskBadge({ v, isDark }: { v: RiskLevel; isDark: boolean }) {
 export default function VoiceCommandIntentQA() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { t } = useLanguage();
+  const vc = t.pages.voiceCommandIntentQa;
   const isDark = theme === "dark";
+
+  // Translated display maps for badge sub-components
+  const tIntentLabels: Record<IntentUnderstanding, string> = {
+    correctly_understood: vc.correctlyUnderstood,
+    partially_understood: vc.partiallyUnderstood,
+    misunderstood:        vc.misunderstood,
+  };
+  const tFulfillmentLabels: Record<FulfillmentAccuracy, string> = {
+    fully_fulfilled:     vc.fullyFulfilled,
+    partially_fulfilled: vc.partiallyFulfilled,
+    not_fulfilled:       vc.notFulfilled,
+  };
+  const tRiskLabels: Record<RiskLevel, string> = {
+    safe:      vc.riskSafe,
+    ambiguous: vc.riskAmbiguous,
+    unsafe:    vc.riskUnsafe,
+  };
+  const tCategoryLabels: Record<IntentCategory, string> = {
+    navigation:      vc.categoryNavigation,
+    vehicle_control: vc.categoryVehicleControl,
+    media:           vc.categoryMedia,
+    communication:   vc.categoryCommunication,
+    system_settings: vc.categorySystemSettings,
+  };
 
   const [stage,      setStage]      = useState<Stage>("ingest");
   const [sampleIdx,  setSampleIdx]  = useState(0);
@@ -525,12 +552,12 @@ export default function VoiceCommandIntentQA() {
                 TP.ai <span style={{ color: "#9071f0" }}>Data</span>Studio
               </span>
               <span className="ml-3 text-xs font-mono px-2 py-0.5 rounded-full border border-violet-500/30 text-violet-400 bg-violet-500/10">
-                AUD-404
+                {vc.domainBadge}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1 hidden sm:block">Switch Sample:</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1 hidden sm:block">{vc.switchSample}</span>
             {SAMPLES.map((s, i) => (
               <button key={s.id}
                 onClick={() => { setSampleIdx(i); setStage("ingest"); }}
@@ -554,14 +581,20 @@ export default function VoiceCommandIntentQA() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <div className="mb-6">
           <h1 className={`text-2xl font-bold font-headline tracking-tight mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>
-            Voice Command Intent Understanding
+            {vc.pageTitle}
           </h1>
           <p className={`text-sm ${isDark ? "text-white/50" : "text-gray-500"}`}>
-            Human-in-the-loop validation of spoken intent and system fulfillment in vehicles
+            {vc.pageSubtitle}
           </p>
         </div>
 
-        <PipelineStepper current={stage} isDark={isDark} />
+        <PipelineStepper current={stage} isDark={isDark} stageLabels={{
+          ingest: vc.stageIngest,
+          annotate: vc.stageAnnotate,
+          "ai-verify": vc.stageAiVerify,
+          qa: vc.stageQaReview,
+          export: vc.stageExport,
+        }} />
 
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/* STAGE 1 — INGEST                                                  */}
@@ -569,12 +602,12 @@ export default function VoiceCommandIntentQA() {
         {stage === "ingest" && (
           <div className="space-y-6">
             <div className={cardCls}>
-              {sectionTitle("mic", "Voice Command Ingestion", "Review the spoken command, system interpretation, and vehicle context before annotation.")}
+              {sectionTitle("mic", vc.ingestSectionTitle, vc.ingestSectionSub)}
 
               {/* Audio player */}
               <div className="mb-6">
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Command Recording</p>
-                <WaveformPlayer sampleId={sample.id} audioSrc={sample.audioSrc} isDark={isDark}/>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.commandRecording}</p>
+                <WaveformPlayer sampleId={sample.id} audioSrc={sample.audioSrc} isDark={isDark} playingLabel={vc.waveformPlaying} stoppedLabel={vc.waveformStopped}/>
               </div>
 
               {/* Spoken command callout */}
@@ -582,7 +615,7 @@ export default function VoiceCommandIntentQA() {
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-violet-400 mt-0.5" style={{ fontSize: 18 }}>record_voice_over</span>
                   <div>
-                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isDark ? "text-violet-400/70" : "text-violet-500"}`}>Spoken Command</p>
+                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isDark ? "text-violet-400/70" : "text-violet-500"}`}>{vc.spokenCommand}</p>
                     <p className={`text-base font-semibold leading-snug ${isDark ? "text-white" : "text-gray-900"}`}>
                       "{sample.spokenCommand}"
                     </p>
@@ -593,26 +626,26 @@ export default function VoiceCommandIntentQA() {
               {/* Two-column: system interpretation + action */}
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div className={`rounded-xl p-4 border ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
-                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>System Interpreted Intent</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.systemInterpretedIntent}</p>
                   <p className={`text-sm font-medium ${isDark ? "text-white/80" : "text-gray-700"}`}>{sample.systemInterpretedIntent}</p>
                 </div>
                 <div className={`rounded-xl p-4 border ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
-                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Resulting System Action</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.resultingSystemAction}</p>
                   <p className={`text-sm font-medium ${isDark ? "text-white/80" : "text-gray-700"}`}>{sample.systemAction}</p>
                 </div>
               </div>
 
               {/* Metadata grid */}
               <div>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Recording Metadata</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.recordingMetadata}</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {[
-                    { label: "Utterance ID",    val: sample.id,             icon: "tag"             },
-                    { label: "Language",        val: sample.language,       icon: "translate"       },
-                    { label: "Vehicle Context", val: sample.vehicleContext, icon: "directions_car"  },
-                    { label: "System Invoked",  val: sample.systemInvoked,  icon: "settings_voice"  },
-                    { label: "Duration",        val: sample.duration,       icon: "timer"           },
-                    { label: "Recorded",        val: sample.recordedAt,     icon: "calendar_today"  },
+                    { label: vc.metaUtteranceId,    val: sample.id,             icon: "tag"             },
+                    { label: vc.metaLanguage,        val: sample.language,       icon: "translate"       },
+                    { label: vc.metaVehicleContext,  val: sample.vehicleContext, icon: "directions_car"  },
+                    { label: vc.metaSystemInvoked,   val: sample.systemInvoked,  icon: "settings_voice"  },
+                    { label: vc.metaDuration,        val: sample.duration,       icon: "timer"           },
+                    { label: vc.metaRecorded,        val: sample.recordedAt,     icon: "calendar_today"  },
                   ].map(({ label, val, icon }) => (
                     <div key={label} className={`rounded-lg px-3 py-2.5 border flex items-center gap-2.5 ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
                       <span className={`material-symbols-outlined ${isDark ? "text-white/25" : "text-gray-300"}`} style={{ fontSize: 15 }}>{icon}</span>
@@ -629,11 +662,11 @@ export default function VoiceCommandIntentQA() {
             <div className="flex justify-between">
               <button onClick={() => navigate("/use-cases")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {vc.back}
               </button>
               <button onClick={() => setStage("annotate")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Begin Annotation
+                {vc.beginAnnotation}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit_note</span>
               </button>
             </div>
@@ -654,16 +687,16 @@ export default function VoiceCommandIntentQA() {
             </div>
 
             <div className={cardCls}>
-              {sectionTitle("edit_note", "Human Annotation — Intent & Fulfillment Labeling")}
+              {sectionTitle("edit_note", vc.annotateSectionTitle)}
 
               {/* Intent Understanding */}
               <div className="mb-6">
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>1 · Intent Understanding</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>Was the spoken command correctly interpreted by the system?</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.intentUnderstandingLabel}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{vc.intentUnderstandingHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {(["correctly_understood", "partially_understood", "misunderstood"] as IntentUnderstanding[]).map(v => (
                     <ChoiceButton key={v} value={v} current={annotation.intentUnderstanding}
-                      label={INTENT_LABELS[v]}
+                      label={tIntentLabels[v]}
                       colorActive={isDark ? INTENT_COLORS_DARK[v] : INTENT_COLORS_LIGHT[v]}
                       onClick={() => patchAnnotation({ intentUnderstanding: v })}/>
                   ))}
@@ -672,12 +705,12 @@ export default function VoiceCommandIntentQA() {
 
               {/* Intent Category */}
               <div className="mb-6">
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>2 · Intent Category</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>Select the primary domain this command belongs to.</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.intentCategoryLabel}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{vc.intentCategoryHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {(["navigation", "vehicle_control", "media", "communication", "system_settings"] as IntentCategory[]).map(v => (
                     <ChoiceButton key={v} value={v} current={annotation.intentCategory}
-                      label={CATEGORY_LABELS[v]}
+                      label={tCategoryLabels[v]}
                       colorActive="bg-violet-600 text-white border-violet-500"
                       onClick={() => patchAnnotation({ intentCategory: v })}/>
                   ))}
@@ -686,12 +719,12 @@ export default function VoiceCommandIntentQA() {
 
               {/* Fulfillment Accuracy */}
               <div className="mb-6">
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>3 · Fulfillment Accuracy</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>Did the system action match what the user requested?</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.fulfillmentAccuracyLabel}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{vc.fulfillmentAccuracyHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {(["fully_fulfilled", "partially_fulfilled", "not_fulfilled"] as FulfillmentAccuracy[]).map(v => (
                     <ChoiceButton key={v} value={v} current={annotation.fulfillmentAccuracy}
-                      label={FULFILLMENT_LABELS[v]}
+                      label={tFulfillmentLabels[v]}
                       colorActive={
                         v === "fully_fulfilled"  ? (isDark ? "bg-emerald-600 text-white border-emerald-500" : "bg-emerald-500 text-white border-emerald-500")
                         : v === "partially_fulfilled" ? "bg-amber-500 text-white border-amber-400"
@@ -704,12 +737,12 @@ export default function VoiceCommandIntentQA() {
 
               {/* Clarification Needed */}
               <div className="mb-6">
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>4 · Clarification Required</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>Should the system have asked a follow-up question before acting?</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.clarificationRequiredLabel}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/35" : "text-gray-400"}`}>{vc.clarificationRequiredHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {([
-                    { val: "no"  as ClarificationNeeded, label: "No — Action was appropriate"    },
-                    { val: "yes" as ClarificationNeeded, label: "Yes — Follow-up was warranted"  },
+                    { val: "no"  as ClarificationNeeded, label: vc.clarificationNo  },
+                    { val: "yes" as ClarificationNeeded, label: vc.clarificationYes },
                   ]).map(({ val, label }) => (
                     <ChoiceButton key={val} value={val} current={annotation.clarificationNeeded}
                       label={label}
@@ -721,9 +754,9 @@ export default function VoiceCommandIntentQA() {
 
               {/* Notes */}
               <div>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/40" : "text-gray-500"}`}>5 · Annotator Note <span className={`font-normal ${isDark ? "text-white/20" : "text-gray-300"}`}>(optional)</span></p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.annotatorNoteLabel} <span className={`font-normal ${isDark ? "text-white/20" : "text-gray-300"}`}>{vc.annotatorNoteOptional}</span></p>
                 <textarea rows={3}
-                  placeholder="Describe what was misunderstood, what action should have been taken, or any context relevant to the judgment…"
+                  placeholder={vc.annotatorNotePlaceholder}
                   value={annotation.notes}
                   onChange={e => patchAnnotation({ notes: e.target.value })}
                   className={`w-full text-sm rounded-lg border px-3 py-2 outline-none focus:ring-1 focus:ring-violet-500 resize-none transition-colors ${
@@ -735,11 +768,11 @@ export default function VoiceCommandIntentQA() {
             <div className="flex justify-between">
               <button onClick={() => setStage("ingest")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {vc.back}
               </button>
               <button disabled={!canSubmitAnnotation} onClick={() => setStage("ai-verify")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Submit to AI Verification
+                {vc.submitToAiVerification}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>smart_toy</span>
               </button>
             </div>
@@ -752,14 +785,14 @@ export default function VoiceCommandIntentQA() {
         {stage === "ai-verify" && (
           <div className="space-y-6">
             <div className={cardCls}>
-              {sectionTitle("smart_toy", "AI Verification Pass", "An intent-verification agent re-analyses the command and compares expected vs. actual system behaviour.")}
+              {sectionTitle("smart_toy", vc.aiVerifySectionTitle, vc.aiVerifySectionSub)}
 
               {/* Agreement summary */}
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {[
-                  { label: "Intent Agreement",      val: aiResult.intentAgreement      ? "Agree" : "Disagree", color: aiResult.intentAgreement      ? "text-emerald-400" : "text-amber-400" },
-                  { label: "Fulfillment Agreement", val: aiResult.fulfillmentAgreement ? "Agree" : "Disagree", color: aiResult.fulfillmentAgreement ? "text-emerald-400" : "text-amber-400" },
-                  { label: "AI Confidence",         val: `${Math.round(aiResult.confidence * 100)}%`,          color: "text-violet-400" },
+                  { label: vc.intentAgreement,      val: aiResult.intentAgreement      ? vc.agreeLabel : vc.disagreeLabel, color: aiResult.intentAgreement      ? "text-emerald-400" : "text-amber-400" },
+                  { label: vc.fulfillmentAgreement, val: aiResult.fulfillmentAgreement ? vc.agreeLabel : vc.disagreeLabel, color: aiResult.fulfillmentAgreement ? "text-emerald-400" : "text-amber-400" },
+                  { label: vc.aiConfidence,         val: `${Math.round(aiResult.confidence * 100)}%`,                     color: "text-violet-400" },
                 ].map(({ label, val, color }) => (
                   <div key={label} className={`rounded-xl p-3 text-center border ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-gray-50"}`}>
                     <p className={`text-xl font-bold font-mono ${color}`}>{val}</p>
@@ -770,7 +803,7 @@ export default function VoiceCommandIntentQA() {
 
               {/* Confidence bar */}
               <div className={`rounded-xl p-4 border mb-4 ${isDark ? "bg-white/3 border-white/10" : "bg-gray-50 border-gray-200"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Model Confidence Score</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.modelConfidenceScore}</p>
                 <ConfidenceBar value={aiResult.confidence} isDark={isDark}/>
               </div>
 
@@ -783,20 +816,20 @@ export default function VoiceCommandIntentQA() {
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
                     <span className={`material-symbols-outlined ${isDark ? "text-white/40" : "text-gray-400"}`} style={{ fontSize: 16 }}>psychology</span>
-                    <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>Intent Understanding</span>
+                    <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>{vc.intentUnderstandingComparison}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
                       aiResult.intentAgreement
                         ? isDark ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
                         : isDark ? "bg-amber-500/20 text-amber-400"     : "bg-amber-100 text-amber-700"
                     }`}>
-                      {aiResult.intentAgreement ? "AI Agrees" : "AI Disagrees"}
+                      {aiResult.intentAgreement ? vc.aiAgrees : vc.aiDisagrees}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>Human:</span>
-                    {annotation.intentUnderstanding && <IntentBadge v={annotation.intentUnderstanding} isDark={isDark}/>}
-                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>AI:</span>
-                    <IntentBadge v={aiResult.suggestedIntent} isDark={isDark}/>
+                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>{vc.humanLabel}</span>
+                    {annotation.intentUnderstanding && <IntentBadge v={annotation.intentUnderstanding} isDark={isDark} label={tIntentLabels[annotation.intentUnderstanding]}/>}
+                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>{vc.aiLabel}</span>
+                    <IntentBadge v={aiResult.suggestedIntent} isDark={isDark} label={tIntentLabels[aiResult.suggestedIntent]}/>
                   </div>
                 </div>
               </div>
@@ -810,27 +843,27 @@ export default function VoiceCommandIntentQA() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className={`material-symbols-outlined ${isDark ? "text-white/40" : "text-gray-400"}`} style={{ fontSize: 16 }}>task_alt</span>
-                    <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>Fulfillment Accuracy</span>
+                    <span className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>{vc.fulfillmentAccuracyComparison}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
                       aiResult.fulfillmentAgreement
                         ? isDark ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
                         : isDark ? "bg-amber-500/20 text-amber-400"     : "bg-amber-100 text-amber-700"
                     }`}>
-                      {aiResult.fulfillmentAgreement ? "AI Agrees" : "AI Disagrees"}
+                      {aiResult.fulfillmentAgreement ? vc.aiAgrees : vc.aiDisagrees}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>Human:</span>
-                    {annotation.fulfillmentAccuracy && <FulfillBadge v={annotation.fulfillmentAccuracy} isDark={isDark}/>}
-                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>AI:</span>
-                    <FulfillBadge v={aiResult.suggestedFulfillment} isDark={isDark}/>
+                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>{vc.humanLabel}</span>
+                    {annotation.fulfillmentAccuracy && <FulfillBadge v={annotation.fulfillmentAccuracy} isDark={isDark} label={tFulfillmentLabels[annotation.fulfillmentAccuracy]}/>}
+                    <span className={`text-[10px] ${isDark ? "text-white/40" : "text-gray-400"}`}>{vc.aiLabel}</span>
+                    <FulfillBadge v={aiResult.suggestedFulfillment} isDark={isDark} label={tFulfillmentLabels[aiResult.suggestedFulfillment]}/>
                   </div>
                 </div>
               </div>
 
               {/* AI justification */}
               <div className={`rounded-xl p-4 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>AI Justification</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.aiJustification}</p>
                 <p className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-gray-600"}`}>{aiResult.justification}</p>
               </div>
             </div>
@@ -838,11 +871,11 @@ export default function VoiceCommandIntentQA() {
             <div className="flex justify-between">
               <button onClick={() => setStage("annotate")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {vc.back}
               </button>
               <button onClick={() => setStage("qa")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Proceed to QA Review
+                {vc.proceedToQaReview}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>rule</span>
               </button>
             </div>
@@ -864,18 +897,18 @@ export default function VoiceCommandIntentQA() {
             {/* Three-column context */}
             <div className="grid grid-cols-3 gap-4">
               <div className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Human Annotation</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.humanAnnotationPanel}</p>
                 <div className="space-y-2">
-                  {annotation.intentUnderstanding && <IntentBadge v={annotation.intentUnderstanding} isDark={isDark}/>}
-                  {annotation.fulfillmentAccuracy  && <FulfillBadge v={annotation.fulfillmentAccuracy} isDark={isDark}/>}
+                  {annotation.intentUnderstanding && <IntentBadge v={annotation.intentUnderstanding} isDark={isDark} label={tIntentLabels[annotation.intentUnderstanding]}/>}
+                  {annotation.fulfillmentAccuracy  && <FulfillBadge v={annotation.fulfillmentAccuracy} isDark={isDark} label={tFulfillmentLabels[annotation.fulfillmentAccuracy]}/>}
                   {annotation.intentCategory && (
                     <p className={`text-xs ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      Category: {CATEGORY_LABELS[annotation.intentCategory]}
+                      {vc.categoryLabel} {tCategoryLabels[annotation.intentCategory]}
                     </p>
                   )}
                   {annotation.clarificationNeeded && (
                     <p className={`text-xs ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      Clarification: {annotation.clarificationNeeded === "yes" ? "Needed" : "Not needed"}
+                      {vc.clarificationLabel} {annotation.clarificationNeeded === "yes" ? vc.clarificationNeeded : vc.clarificationNotNeeded}
                     </p>
                   )}
                   {annotation.notes && (
@@ -884,43 +917,43 @@ export default function VoiceCommandIntentQA() {
                 </div>
               </div>
               <div className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>AI Verification</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.aiVerificationPanel}</p>
                 <div className="space-y-2">
-                  <IntentBadge v={aiResult.suggestedIntent} isDark={isDark}/>
-                  <FulfillBadge v={aiResult.suggestedFulfillment} isDark={isDark}/>
+                  <IntentBadge v={aiResult.suggestedIntent} isDark={isDark} label={tIntentLabels[aiResult.suggestedIntent]}/>
+                  <FulfillBadge v={aiResult.suggestedFulfillment} isDark={isDark} label={tFulfillmentLabels[aiResult.suggestedFulfillment]}/>
                   <ConfidenceBar value={aiResult.confidence} isDark={isDark}/>
                 </div>
               </div>
               <div className={`rounded-2xl border p-4 ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>Discrepancies</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.discrepanciesPanel}</p>
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5">
                     <span className={`material-symbols-outlined text-sm ${aiResult.intentAgreement ? "text-emerald-400" : "text-amber-400"}`} style={{ fontSize: 14 }}>
                       {aiResult.intentAgreement ? "check_circle" : "warning"}
                     </span>
-                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>Intent</span>
+                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>{vc.intentUnderstandingComparison}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={`material-symbols-outlined ${aiResult.fulfillmentAgreement ? "text-emerald-400" : "text-amber-400"}`} style={{ fontSize: 14 }}>
                       {aiResult.fulfillmentAgreement ? "check_circle" : "warning"}
                     </span>
-                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>Fulfillment</span>
+                    <span className={`text-xs ${isDark ? "text-white/60" : "text-gray-600"}`}>{vc.fulfillmentAccuracyComparison}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className={cardCls}>
-              {sectionTitle("rule", "QA Adjudication", "Accept the human judgment, apply the AI correction, or override both with a definitive ruling.")}
+              {sectionTitle("rule", vc.qaSectionTitle, vc.qaSectionSub)}
 
               {/* Intent decision */}
               <div className={`rounded-xl border p-4 mb-4 ${isDark ? "border-white/10 bg-white/2" : "border-gray-200 bg-white"}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-500"}`}>Intent Understanding — Final Call</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.intentFinalCall}</p>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {([
-                    { val: "accept_human" as QADecision, label: "Accept Human" },
-                    { val: "accept_ai"    as QADecision, label: "Accept AI"    },
-                    { val: "override"     as QADecision, label: "Override Both" },
+                    { val: "accept_human" as QADecision, label: vc.acceptHuman    },
+                    { val: "accept_ai"    as QADecision, label: vc.acceptAi       },
+                    { val: "override"     as QADecision, label: vc.overrideBoth   },
                   ]).map(({ val, label }) => (
                     <button key={val} onClick={() => patchQA({ intentDecision: val, intentOverride: null })}
                       className={`px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all ${
@@ -941,27 +974,27 @@ export default function VoiceCommandIntentQA() {
                             ? isDark ? INTENT_COLORS_DARK[v] : INTENT_COLORS_LIGHT[v]
                             : isDark ? "bg-transparent text-white/50 border-white/15 hover:border-white/30" : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
                         }`}>
-                        {INTENT_LABELS[v]}
+                        {tIntentLabels[v]}
                       </button>
                     ))}
                   </div>
                 )}
                 {qa.intentDecision && (qa.intentDecision !== "override" || qa.intentOverride) && (
                   <div className="mt-2 flex items-center gap-1.5">
-                    <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>Final:</span>
-                    <IntentBadge v={resolvedIntent()} isDark={isDark}/>
+                    <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>{vc.finalLabel}</span>
+                    <IntentBadge v={resolvedIntent()} isDark={isDark} label={tIntentLabels[resolvedIntent()]}/>
                   </div>
                 )}
               </div>
 
               {/* Fulfillment decision */}
               <div className={`rounded-xl border p-4 mb-4 ${isDark ? "border-white/10 bg-white/2" : "border-gray-200 bg-white"}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-500"}`}>Fulfillment Accuracy — Final Call</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.fulfillmentFinalCall}</p>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {([
-                    { val: "accept_human" as QADecision, label: "Accept Human" },
-                    { val: "accept_ai"    as QADecision, label: "Accept AI"    },
-                    { val: "override"     as QADecision, label: "Override Both" },
+                    { val: "accept_human" as QADecision, label: vc.acceptHuman  },
+                    { val: "accept_ai"    as QADecision, label: vc.acceptAi     },
+                    { val: "override"     as QADecision, label: vc.overrideBoth },
                   ]).map(({ val, label }) => (
                     <button key={val} onClick={() => patchQA({ fulfillmentDecision: val, fulfillmentOverride: null })}
                       className={`px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider transition-all ${
@@ -982,23 +1015,23 @@ export default function VoiceCommandIntentQA() {
                             ? v === "fully_fulfilled" ? (isDark ? "bg-emerald-600 text-white border-emerald-500" : "bg-emerald-500 text-white border-emerald-500") : v === "partially_fulfilled" ? "bg-amber-500 text-white border-amber-400" : (isDark ? "bg-rose-600 text-white border-rose-500" : "bg-rose-500 text-white border-rose-400")
                             : isDark ? "bg-transparent text-white/50 border-white/15 hover:border-white/30" : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
                         }`}>
-                        {FULFILLMENT_LABELS[v]}
+                        {tFulfillmentLabels[v]}
                       </button>
                     ))}
                   </div>
                 )}
                 {qa.fulfillmentDecision && (qa.fulfillmentDecision !== "override" || qa.fulfillmentOverride) && (
                   <div className="mt-2 flex items-center gap-1.5">
-                    <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>Final:</span>
-                    <FulfillBadge v={resolvedFulfillment()} isDark={isDark}/>
+                    <span className={`text-[10px] ${isDark ? "text-white/30" : "text-gray-300"}`}>{vc.finalLabel}</span>
+                    <FulfillBadge v={resolvedFulfillment()} isDark={isDark} label={tFulfillmentLabels[resolvedFulfillment()]}/>
                   </div>
                 )}
               </div>
 
               {/* Risk level */}
               <div className={`rounded-xl border p-4 ${isDark ? "border-white/10 bg-white/2" : "border-gray-200 bg-white"}`}>
-                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>Final Risk Assessment</p>
-                <p className={`text-xs mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>What is the safety implication of this intent handling failure, if any?</p>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-white/40" : "text-gray-500"}`}>{vc.finalRiskAssessment}</p>
+                <p className={`text-xs mb-3 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.riskAssessmentHint}</p>
                 <div className="flex flex-wrap gap-2">
                   {(["safe", "ambiguous", "unsafe"] as RiskLevel[]).map(v => (
                     <button key={v} onClick={() => patchQA({ riskLevel: v })}
@@ -1007,7 +1040,7 @@ export default function VoiceCommandIntentQA() {
                           ? isDark ? RISK_COLORS_DARK[v] : RISK_COLORS_LIGHT[v]
                           : isDark ? "bg-transparent text-white/50 border-white/15 hover:border-white/30" : "bg-transparent text-gray-500 border-gray-300 hover:border-gray-400"
                       }`}>
-                      {RISK_LABELS[v]}
+                      {tRiskLabels[v]}
                     </button>
                   ))}
                 </div>
@@ -1017,11 +1050,11 @@ export default function VoiceCommandIntentQA() {
             <div className="flex justify-between">
               <button onClick={() => setStage("ai-verify")}
                 className={`px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
-                Back
+                {vc.back}
               </button>
               <button disabled={!canSubmitQA} onClick={() => setStage("export")}
                 className="px-6 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
-                Finalize &amp; Export
+                {vc.finalizeAndExport}
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
               </button>
             </div>
@@ -1039,9 +1072,9 @@ export default function VoiceCommandIntentQA() {
           const disagreements = [!aiResult.intentAgreement, !aiResult.fulfillmentAgreement].filter(Boolean).length;
 
           const statusLabel =
-            packet.qa_final_verdict === "approved_for_production"   ? "Approved for Production"
-            : packet.qa_final_verdict === "approved_with_constraints" ? "Approved with Constraints"
-            : "Requires Retraining";
+            packet.qa_final_verdict === "approved_for_production"   ? vc.verdictApprovedProduction
+            : packet.qa_final_verdict === "approved_with_constraints" ? vc.verdictApprovedConstraints
+            : vc.verdictRequiresRetraining;
           const statusColor =
             packet.qa_final_verdict === "approved_for_production"   ? "text-emerald-400"
             : packet.qa_final_verdict === "approved_with_constraints" ? "text-amber-400"
@@ -1052,10 +1085,10 @@ export default function VoiceCommandIntentQA() {
               {/* KPI row */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: "Downstream Status",    val: statusLabel,                          color: statusColor         },
-                  { label: "Final Intent Verdict",  val: INTENT_LABELS[intent],               color: isDark ? "text-white" : "text-gray-900" },
-                  { label: "Human–AI Disagreements",val: String(disagreements),               color: disagreements > 0 ? "text-amber-400" : "text-emerald-400" },
-                  { label: "Risk Level",            val: RISK_LABELS[risk],                   color: risk === "safe" ? "text-emerald-400" : risk === "ambiguous" ? "text-amber-400" : "text-rose-400" },
+                  { label: vc.kpiDownstreamStatus,    val: statusLabel,           color: statusColor         },
+                  { label: vc.kpiFinalIntentVerdict,  val: tIntentLabels[intent],  color: isDark ? "text-white" : "text-gray-900" },
+                  { label: vc.kpiDisagreements,       val: String(disagreements),  color: disagreements > 0 ? "text-amber-400" : "text-emerald-400" },
+                  { label: vc.kpiRiskLevel,           val: tRiskLabels[risk],      color: risk === "safe" ? "text-emerald-400" : risk === "ambiguous" ? "text-amber-400" : "text-rose-400" },
                 ].map(({ label, val, color }) => (
                   <div key={label} className={`rounded-xl border p-4 text-center ${isDark ? "border-white/10 bg-white/3" : "border-gray-200 bg-white shadow-sm"}`}>
                     <p className={`text-sm font-bold font-mono uppercase leading-tight ${color}`}>{val}</p>
@@ -1066,27 +1099,27 @@ export default function VoiceCommandIntentQA() {
 
               {/* Final verdict summary */}
               <div className={cardCls}>
-                {sectionTitle("verified", "Final QA Summary")}
+                {sectionTitle("verified", vc.exportSectionTitle)}
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className={`rounded-xl p-3 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Intent Classification</p>
-                    <IntentBadge v={intent} isDark={isDark}/>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.intentClassification}</p>
+                    <IntentBadge v={intent} isDark={isDark} label={tIntentLabels[intent]}/>
                     {annotation.intentCategory && (
-                      <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>{CATEGORY_LABELS[annotation.intentCategory]}</p>
+                      <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>{tCategoryLabels[annotation.intentCategory]}</p>
                     )}
                   </div>
                   <div className={`rounded-xl p-3 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Fulfillment Verdict</p>
-                    <FulfillBadge v={fulfil} isDark={isDark}/>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.fulfillmentVerdict}</p>
+                    <FulfillBadge v={fulfil} isDark={isDark} label={tFulfillmentLabels[fulfil]}/>
                     <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      Clarification: {annotation.clarificationNeeded === "yes" ? "Required" : "Not required"}
+                      {vc.clarificationLabel} {annotation.clarificationNeeded === "yes" ? vc.clarificationRequiredVal : vc.clarificationNotRequiredVal}
                     </p>
                   </div>
                   <div className={`rounded-xl p-3 border ${isDark ? "border-white/8 bg-white/2" : "border-gray-100 bg-gray-50"}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>Risk Level</p>
-                    <RiskBadge v={risk} isDark={isDark}/>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${isDark ? "text-white/30" : "text-gray-400"}`}>{vc.riskLevelLabel}</p>
+                    <RiskBadge v={risk} isDark={isDark} label={tRiskLabels[risk]}/>
                     <p className={`text-xs mt-2 ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                      AI confidence: {Math.round(aiResult.confidence * 100)}%
+                      {vc.aiConfidenceLabel} {Math.round(aiResult.confidence * 100)}%
                     </p>
                   </div>
                 </div>
@@ -1094,7 +1127,7 @@ export default function VoiceCommandIntentQA() {
 
               {/* JSON export */}
               <div className={cardCls}>
-                {sectionTitle("code", "Decision Packet — JSON Export")}
+                {sectionTitle("code", vc.exportJsonSectionTitle)}
                 <pre className={`text-xs rounded-xl p-4 overflow-auto leading-relaxed border ${isDark ? "bg-black/40 border-white/10 text-emerald-300" : "bg-gray-50 border-gray-200 text-emerald-700"}`}>
                   {JSON.stringify(packet, null, 2)}
                 </pre>
@@ -1111,7 +1144,7 @@ export default function VoiceCommandIntentQA() {
                     }}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold uppercase tracking-wider transition-colors">
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
-                    Download JSON
+                    {vc.downloadJson}
                   </button>
                   <button
                     onClick={() => {
@@ -1127,25 +1160,25 @@ export default function VoiceCommandIntentQA() {
                     }}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>table_chart</span>
-                    Export CSV
+                    {vc.exportCsv}
                   </button>
                   <button
                     onClick={() => { setSampleIdx(i => (i + 1) % SAMPLES.length); setStage("ingest"); }}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold uppercase tracking-wider transition-colors ml-auto ${isDark ? "border-white/20 text-white/60 hover:border-white/40" : "border-gray-300 text-gray-500 hover:border-gray-400"}`}>
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>skip_next</span>
-                    Next Command
+                    {vc.nextCommand}
                   </button>
                 </div>
               </div>
 
               {/* Scale callout */}
               <div className={`rounded-2xl p-5 ${isDark ? "bg-white/3 border border-white/8" : "bg-gray-50 border border-gray-200"}`}>
-                <p className={`text-sm font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>How TP Operationalises This at Scale</p>
+                <p className={`text-sm font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>{vc.scaleHeading}</p>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   {[
-                    { val: "500K+", sub: "Voice commands reviewed monthly" },
-                    { val: "97.2%", sub: "Intent classification consistency" },
-                    { val: "12+",   sub: "OEM and Tier-1 programmes active" },
+                    { val: vc.scaleKpi1Val, sub: vc.scaleKpi1Sub },
+                    { val: vc.scaleKpi2Val, sub: vc.scaleKpi2Sub },
+                    { val: vc.scaleKpi3Val, sub: vc.scaleKpi3Sub },
                   ].map(kpi => (
                     <div key={kpi.val}>
                       <p className="text-2xl font-black text-violet-400">{kpi.val}</p>
