@@ -1,7 +1,7 @@
 export const en = {
   // ── Nav / common ──────────────────────────────────────────────────────────
   nav: {
-    dashboard: "Dashboard",
+    dashboard: "Analytics",
     back: "Back",
     newImage: "New Image",
     qaReport: "QA Report",
