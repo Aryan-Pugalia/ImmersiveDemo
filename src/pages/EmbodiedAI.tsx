@@ -1435,7 +1435,7 @@ const EmbodiedAI: React.FC = () => {
         {csvLines.length > 1 && (
           <div>
             <span className={`text-xs font-semibold ${textSecondary}`}>CSV Preview</span>
-            <div className="mt-1 overflow-auto max-h-40 rounded-lg border border-white/10">
+            <div className={`mt-1 overflow-auto max-h-40 rounded-lg border ${isDark ? "border-white/10" : "border-gray-200"}`}>
               <table className="w-full text-xs">
                 <thead>
                   <tr className={isDark ? "bg-white/10" : "bg-gray-200"}>

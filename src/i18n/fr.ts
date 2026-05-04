@@ -76,8 +76,20 @@ export const fr: Translations = {
       description: "Annotation qualité audio en 7 dimensions — bruit de fond, clarté du signal, écrêtage, écho, coupures. Vérification IA, adjudication QA et export JSON pour les pipelines de pré-entraînement.",
     },
     "speech-emotion-qa": {
-      title: "QA raisonnement émotionnel vocal & tonalité",
+      title: "Raisonnement émotionnel vocal & tonalité",
       description: "Pipeline d'annotation d'émotion en 4 étapes — émotion principale, attributs tonaux, intensité et risque d'escalade. Vérification IA par dimension, adjudication QA humaine et export JSON structuré pour l'intelligence CX et les modèles de sécurité.",
+    },
+    "conversational-context-qa": {
+      title: "Rétention du contexte conversationnel",
+      description: "Les réviseurs humains évaluent si les assistants vocaux embarqués préservent le contexte sur plusieurs tours. L'IA aide à la vérification, tandis que le QA humain garantit un comportement de dialogue fiable pour l'infodivertissement et la navigation.",
+    },
+    "voice-command-intent-qa": {
+      title: "Compréhension de l'intention vocale",
+      description: "Les réviseurs humains évaluent si les commandes vocales embarquées sont correctement interprétées et exécutées. L'IA aide à la vérification, tandis que le QA humain assure une compréhension précise et sûre pour les systèmes d'infodivertissement.",
+    },
+    "embodied-ai": {
+      title: "Étiquetage de données IA incarnée",
+      description: "Pipeline d'annotation unifié sur 3 tâches pour l'IA incarnée : manipulation pick & place, tâches domestiques multi-étapes et QA de présence humaine — avec vérification IA, adjudication humaine et export structuré.",
     },
   },
   capabilities: {

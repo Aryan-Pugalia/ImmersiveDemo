@@ -76,8 +76,20 @@ export const ko: Translations = {
       description: "7개 차원의 오디오 품질 어노테이션 — 배경 소음, 신호 명확도, 클리핑, 에코, 드롭아웃. AI 검증, QA 조정, 사전 학습 파이프라인용 JSON 내보내기.",
     },
     "speech-emotion-qa": {
-      title: "음성 감정 및 톤 추론 QA",
+      title: "음성 감정 및 톤 추론",
       description: "4단계 감정 주석 파이프라인 — 주요 감정, 톤 속성, 강도, 에스컬레이션 위험. 차원별 AI 검증, 인간 QA 판정, CX 인텔리전스 및 안전 모델을 위한 구조화된 JSON 내보내기.",
+    },
+    "conversational-context-qa": {
+      title: "대화 맥락 유지",
+      description: "인간 검토자가 차량 내 음성 도우미가 여러 대화 턴에 걸쳐 문맥을 유지하는지 평가합니다. AI가 검증을 보조하고, 인간 QA가 인포테인먼트 및 내비게이션 시스템의 안전한 대화 동작을 보장합니다.",
+    },
+    "voice-command-intent-qa": {
+      title: "음성 명령 의도 이해",
+      description: "인간 검토자가 차량 음성 명령이 올바르게 해석·실행되는지 평가합니다. AI가 검증을 보조하고, 인간 QA가 인포테인먼트 및 내비게이션 시스템의 정확하고 안전한 의도 이해를 보장합니다.",
+    },
+    "embodied-ai": {
+      title: "Embodied AI 데이터 레이블링",
+      description: "Embodied AI를 위한 3가지 작업 통합 주석 파이프라인: 물체 집기·놓기, 다단계 가정 작업, 인간 존재 QA — AI 검증, 인간 판정, 구조화된 내보내기 포함.",
     },
   },
   capabilities: {

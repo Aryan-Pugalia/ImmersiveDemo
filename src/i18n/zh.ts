@@ -76,8 +76,20 @@ export const zh: Translations = {
       description: "7维音频质量标注——背景噪声、信号清晰度、削波、回声、丢帧等。AI验证、质检裁定和JSON导出，用于预训练数据管道。",
     },
     "speech-emotion-qa": {
-      title: "语音情感与语调推理质检",
+      title: "语音情感与语调推理",
       description: "四阶段情感标注流水线——主要情感、语调属性、强度和升级风险。逐维度AI验证、人工QA裁决，以及用于CX智能和安全模型的结构化JSON导出。",
+    },
+    "conversational-context-qa": {
+      title: "对话上下文保留",
+      description: "人工审核员评估车载语音助手是否在多轮对话中保留上下文。AI辅助验证，人工QA确保车载娱乐和导航系统可靠、安全的对话行为。",
+    },
+    "voice-command-intent-qa": {
+      title: "语音命令意图理解",
+      description: "人工审核员评估车载语音命令是否被正确解读和执行。AI辅助验证，人工QA确保车载娱乐和导航系统准确、安全的意图理解。",
+    },
+    "embodied-ai": {
+      title: "具身AI数据标注",
+      description: "面向具身AI的三任务统一标注流水线：物体抓取与放置、多步骤家务任务和人体存在质检——包含AI验证、人工裁决和结构化导出。",
     },
   },
   capabilities: {

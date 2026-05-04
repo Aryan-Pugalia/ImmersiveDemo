@@ -82,6 +82,22 @@ export const en = {
       title: "Audio Quality & Signal Integrity QA",
       description: "7-dimension audio quality annotation — background noise, signal clarity, clipping, echo, dropouts and more. AI verification, QA adjudication, and structured JSON export for pre-training data pipelines.",
     },
+    "speech-emotion-qa": {
+      title: "Speech Emotion & Tone Reasoning",
+      description: "4-stage emotion annotation pipeline — classify primary emotion, tone attributes, intensity, and escalation risk. AI verification with per-dimension confidence scores, human QA adjudication, and structured JSON export for CX intelligence and safety models.",
+    },
+    "conversational-context-qa": {
+      title: "Conversational Context Retention",
+      description: "Human reviewers assess whether in-vehicle voice assistants preserve conversational context across multiple turns. AI assists verification, while human QA ensures reliable, safe dialogue behavior for infotainment and navigation systems.",
+    },
+    "voice-command-intent-qa": {
+      title: "Voice Command Intent Understanding",
+      description: "Human reviewers evaluate whether in-vehicle voice commands are correctly interpreted and fulfilled. AI assists verification, while human QA ensures safe, accurate intent understanding for infotainment and navigation systems.",
+    },
+    "embodied-ai": {
+      title: "Embodied AI Data Labeling",
+      description: "Unified 3-task annotation pipeline for embodied AI: manipulation pick & place, multi-step household tasks, and human presence QA — with AI verification, human adjudication, and structured export.",
+    },
   } as Record<string, { title: string; description: string }>,
 
   // ── Capabilities marquee ──────────────────────────────────────────────────
