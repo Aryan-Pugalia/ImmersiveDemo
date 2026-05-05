@@ -360,10 +360,11 @@ html.light .circular-img {
 
 /* ── Page wrapper ── */
 .page {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--s0);
 }
 
