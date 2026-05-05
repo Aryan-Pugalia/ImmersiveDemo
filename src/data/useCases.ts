@@ -8,6 +8,8 @@ export interface UseCase {
   categoryTag: string;
   secondaryTag: string;
   filters: string[];
+  /** Set to true to hide from the card grid without deleting the entry */
+  hidden?: boolean;
 }
 
 export const FILTERS = [
@@ -80,6 +82,7 @@ export const useCases: UseCase[] = [
   {
     id: "11",
     slug: "dating-trust-safety",
+    hidden: true, // re-enable: remove or set to false
     title: "Digital Identity Protection & Policy Enforcement",
     description: "Profile labeling, content monitoring, and redaction of sensitive info + policy violations. Annotate, watch AI review, QA-override, and deliver a clean decision packet.",
     icon: "policy",

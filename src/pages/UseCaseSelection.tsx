@@ -114,9 +114,10 @@ const UseCaseSelection = () => {
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {FILTERS.map((filter) => {
             const isActive = activeFilter === filter;
+            const visibleCases = useCases.filter(uc => !uc.hidden);
             const count = filter === "All"
-              ? useCases.length
-              : useCases.filter(uc => uc.filters.includes(filter)).length;
+              ? visibleCases.length
+              : visibleCases.filter(uc => uc.filters.includes(filter)).length;
             return (
               <button
                 key={filter}
@@ -158,6 +159,7 @@ const UseCaseSelection = () => {
         {/* Use Case Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {useCases
+            .filter(uc => !uc.hidden)
             .filter(uc => activeFilter === "All" || uc.filters.includes(activeFilter))
             .map((useCase) => (
             <Link
@@ -189,7 +191,7 @@ const UseCaseSelection = () => {
         </div>
 
         {/* Empty state */}
-        {useCases.filter(uc => activeFilter === "All" || uc.filters.includes(activeFilter)).length === 0 && (
+        {useCases.filter(uc => !uc.hidden).filter(uc => activeFilter === "All" || uc.filters.includes(activeFilter)).length === 0 && (
           <div className="text-center py-20 text-foreground/30 text-lg font-body">
             No use cases found for <span className="text-primary font-bold">{activeFilter}</span>
           </div>
